@@ -5,7 +5,6 @@ FROM alpine:edge
 # We have to uncomment Community repo for some packages
 #
 RUN sed -e 's;^#http\(.*\)/edge/community;http\1/edge/community;g' -i /etc/apk/repositories
-RUN echo 'http://dl-cdn.alpinelinux.org/alpine/edge/testing' >> /etc/apk/repositories
 
 #
 # Installing Packages
@@ -16,12 +15,10 @@ RUN apk add --no-cache=true --update \
     build-base \
     bzip2-dev \
     curl \
-    figlet \
     gcc \
     g++ \
     git \
     sudo \
-    aria2 \
     util-linux \
     libevent \
     jpeg-dev \
@@ -33,31 +30,17 @@ RUN apk add --no-cache=true --update \
     libxslt-dev \
     linux-headers \
     musl \
-    neofetch \
     openssl-dev \
-    postgresql \
-    postgresql-client \
-    postgresql-dev \
     openssl \
-    pv \
-    jq \
     wget \
     python \
     python-dev \
     python3 \
     python3-dev \
     readline-dev \
-    sqlite \
-    ffmpeg \
-    sqlite-dev \
-    sudo \
-    chromium \
-    chromium-chromedriver \
     zlib-dev \
     jpeg \
     zip \
-    megatools \
-    nodejs \
     freetype-dev
 
 RUN python3 -m ensurepip \
@@ -71,12 +54,10 @@ RUN pip3 install heroku3 telethon && rm -r /root/.cache
 #
 # Clone repo and prepare working directory
 #
-RUN git clone -b master https://github.com/adekmaulana/ProjectBish /home/projectbish/
-RUN mkdir /home/projectbish/bin/
+RUN git clone -b master-fallback https://github.com/adekmaulana/ProjectBish /home/projectbish/
 WORKDIR /home/projectbish/
 
 #
 # Install requirements
 #
-RUN pip3 install -r requirements.txt
 CMD ["python3","-m","userbot"]
