@@ -9,7 +9,7 @@ import asyncio
 import requests
 import math
 
-from userbot import CMD_HELP, HEROKU_APP_NAME, HEROKU_API_KEY
+from userbot import HEROKU_APP_NAME, HEROKU_API_KEY
 from userbot.events import register
 
 Heroku = heroku3.from_key(HEROKU_API_KEY)
@@ -20,21 +20,20 @@ useragent = ('Mozilla/5.0 (Linux; Android 10; SM-G975F) '
              )
 
 
-@register(outgoing=True, pattern="^.dyno (restart|shutdown|usage)(?: |$)")
+@register(outgoing=True, pattern="^.dyno (restart|shutdown|usage|help)(?: |$)")
 async def dyno_manage(dyno):
     """ - Restart/Kill dyno - """
     await dyno.edit("`Sending information...`")
     app = Heroku.app(HEROKU_APP_NAME)
-    try:
-        """ - Catch error if dyno not on - """
-        Dyno = app.dynos()[0]
-    except IndexError:
-        app.scale_formation_process("worker", 1)
-        return await dyno.edit(
-            f"`Starting` ⬢**{HEROKU_APP_NAME}**`...`")
-    dyno_name = Dyno.name
     exe = dyno.pattern_match.group(1)
     if exe == "restart":
+        try:
+            """ - Catch error if dyno not on - """
+            Dyno = app.dynos()[0]
+        except IndexError:
+            app.scale_formation_process("worker", 1)
+            return await dyno.edit(
+                f"`Starting` ⬢**{HEROKU_APP_NAME}**`...`")
         wait = 0.03
         dot = "."
         i = 0
@@ -75,18 +74,6 @@ async def dyno_manage(dyno):
         return await dyno.edit(
             f"`Restarting` ⬢**{HEROKU_APP_NAME}**`... done`")
     elif exe == "shutdown":
-        headers = {
-            'User-Agent': useragent,
-            'Authorization': f'Bearer {HEROKU_API_KEY}',
-            'Content-Type': 'application/json',
-            'Accept': 'application/vnd.heroku+json; version=3',
-        }
-        path = ("/apps/" + HEROKU_APP_NAME + "/dynos/" +
-                dyno_name + "/actions/stop")
-        r = requests.post(heroku_api + path, headers=headers)
-        if r.status_code != 202:
-            return await dyno.edit("`Error: something bad happened`\n\n"
-                                   f">.`{r.reason}`\n")
         """ - Complete shutdown - """
         app.scale_formation_process("worker", 0)
         await dyno.edit(f"`Shutdown` ⬢**{HEROKU_APP_NAME}**`... done`")
@@ -116,50 +103,40 @@ async def dyno_manage(dyno):
         hours = math.floor(minutes_remaining / 60)
         minutes = math.floor(minutes_remaining % 60)
 
-        """ - Current - """
-        App = result['apps']
-        try:
-            App[0]['quota_used']
-            App[1]['quota_used']
-        except IndexError:
-            App0QuotaUsed = 0
-            App0Percentage = 0
-            App1QuotaUsed = 0
-            App1Percentage = 0
-        else:
-            App0QuotaUsed = App[0]['quota_used'] / 60
-            App0Percentage = math.floor(App[0]['quota_used'] * 100 / quota)
-            App1QuotaUsed = App[1]['quota_used'] / 60
-            App1Percentage = math.floor(App[1]['quota_used'] * 100 / quota)
-        App0Hours = math.floor(App0QuotaUsed / 60)
-        App0Minutes = math.floor(App0QuotaUsed % 60)
-        App1Hours = math.floor(App1QuotaUsed / 60)
-        App1Minutes = math.floor(App1QuotaUsed % 60)
-
-        await asyncio.sleep(1.5)
-
+        """ - Used per/App Usage - """
+        Apps = result['apps']
+        msg = None
+        for App in Apps:
+            try:
+                AppQuota = App['quota_used']
+                AppQuotaUsed = AppQuota / 60
+                AppPercentage = math.floor(AppQuota * 100 / quota)
+            except IndexError:
+                AppQuotaUsed = 0
+                AppPercentage = 0
+            finally:
+                AppHours = math.floor(AppQuotaUsed / 60)
+                AppMinutes = math.floor(AppQuotaUsed % 60)
+                msg += ("**Dyno Usage**:\n\n"
+                        f" -> `Dyno usage for`  **{App.name}**:\n"
+                        f"     •  `{AppHours}`**h**  `{AppMinutes}`**m**  "
+                        f"**|**  [`{AppPercentage}`**%**]\n")
+        if msg is None:
+            msg = (" -> `No quota used for any of your Apps`:\n")
+            for App in Heroku.apps():
+                msg += f"     •  **⬢{App.name}**.\n"
         return await dyno.edit(
-            "**Dyno Usage**:\n\n"
-            f" -> `Dyno usage for`  **{Apps[0].name}**:\n"
-            f"     •  `{App0Hours}`**h**  `{App0Minutes}`**m**  "
-            f"**|**  [`{App0Percentage}`**%**]"
-            "\n"
-            f" -> `Dyno usage for`  **{Apps[1].name}**:\n"
-            f"     •  `{App1Hours}`**h**  `{App1Minutes}`**m**  "
-            f"**|**  [`{App1Percentage}`**%**]"
-            "\n\n"
+            f"{msg}\n"
             " -> `Dyno hours quota remaining this month`:\n"
             f"     •  `{hours}`**h**  `{minutes}`**m**  "
             f"**|**  [`{percentage}`**%**]"
         )
-
-
-CMD_HELP.update({
-    "dyno":
-    ">.`dyno usage`"
-    "\nUsage: Check your heroku dyno quota remainings and used quota app"
-    "\n\n>.`dyno restart`"
-    "\nUsage: Restart your dyno application, turned on it if not on"
-    "\n\n>.`dyno shutdown`"
-    "\nUsage: Shutdown completly"
-})
+    elif exe == "help":
+        return await dyno.edit(
+            ">.`dyno usage`"
+            "\nUsage: Check your heroku App usage dyno quota"
+            "\n\n>.`dyno restart`"
+            "\nUsage: Restart your dyno application, turn it on if off"
+            "\n\n>.`dyno shutdown`"
+            "\nUsage: Shutdown dyno completly"
+        )

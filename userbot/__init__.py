@@ -93,6 +93,3 @@ with bot:
             "BOTLOG_CHATID environment variable isn't a "
             "valid entity. Check your environment variables/config.env file.")
         quit(1)
-
-# Global Variables
-CMD_HELP = {}
