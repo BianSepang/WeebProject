@@ -60,4 +60,5 @@ WORKDIR /home/projectbish/
 #
 # Install requirements
 #
+RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 CMD ["python3","-m","userbot"]
