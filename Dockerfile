@@ -9,39 +9,21 @@ RUN sed -e 's;^#http\(.*\)/edge/community;http\1/edge/community;g' -i /etc/apk/r
 #
 # Installing Packages
 #
+RUN apk update && apk upgrade
 RUN apk add --no-cache=true --update \
     coreutils \
     bash \
     build-base \
-    bzip2-dev \
     curl \
-    gcc \
-    g++ \
-    git \
-    sudo \
     util-linux \
     libevent \
-    jpeg-dev \
-    libffi-dev \
-    libpq \
-    libwebp-dev \
-    libxml2 \
-    libxml2-dev \
-    libxslt-dev \
-    linux-headers \
     musl \
     openssl-dev \
     openssl \
     wget \
-    python \
-    python-dev \
+    git \
     python3 \
-    python3-dev \
-    readline-dev \
-    zlib-dev \
-    jpeg \
-    zip \
-    freetype-dev
+    python3-dev
 
 RUN python3 -m ensurepip \
     && pip3 install --upgrade pip setuptools \
