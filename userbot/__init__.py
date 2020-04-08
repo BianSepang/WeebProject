@@ -49,7 +49,12 @@ LOGSPAMMER = sb(os.environ.get("LOGSPAMMER", "False"))
 
 # Heroku Credentials for updater.
 HEROKU_APP_NAME = os.environ.get("HEROKU_APP_NAME", None)
+HEROKU_APP_FALLBACK_NAME = os.environ.get("HEROKU_APP_FALLBACK_NAME", None)
 HEROKU_API_KEY = os.environ.get("HEROKU_API_KEY", None)
+
+# Updater
+UPSTREAM_REPO_URL = os.environ.get("UPSTREAM_REPO_URL", None)
+UPSTREAM_REPO_BRANCH = os.environ.get("UPSTREAM_REPO_BRANCH", None)
 
 
 # 'bot' variable

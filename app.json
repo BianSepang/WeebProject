@@ -30,8 +30,23 @@
       "required": true
     },
     "HEROKU_APP_NAME": {
-      "description": "Add the Heroku app name here. It helps with userbot updates.",
+      "description": "Heroku app name main, the first app you deploy for userbot.",
       "value": "",
+      "required": true
+    },
+    "HEROKU_APP_FALLBACK_NAME": {
+      "description": "Heroku app name fallback, this should be app name you make now.",
+      "value": "",
+      "required": true
+    },
+    "UPSTREAM_REPO_URL": {
+      "description": "Your forked repo.",
+      "value": "https://github.com/adekmaulana/ProjectBish",
+      "required": true
+    },
+    "UPSTREAM_REPO_BRANCH": {
+      "description": "Your forked repo branch.",
+      "value": "master",
       "required": true
     },
     "BOTLOG": {

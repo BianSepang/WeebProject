@@ -31,7 +31,7 @@ RUN python3 -m ensurepip \
     if [ ! -e /usr/bin/pip ]; then ln -s pip3 /usr/bin/pip ; fi && \
     if [[ ! -e /usr/bin/python ]]; then ln -sf /usr/bin/python3 /usr/bin/python; fi
 
-RUN pip3 install heroku3 telethon && rm -r /root/.cache
+RUN pip3 install heroku3 telethon gitpython && rm -r /root/.cache
 
 #
 # Clone repo and prepare working directory
