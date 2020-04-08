@@ -80,7 +80,6 @@ async def dyno_manage(dyno):
     elif exe == "usage":
         """ - Get your account Dyno Usage - """
         await dyno.edit("`Getting information...`")
-        Apps = Heroku.apps()
         user_id = Heroku.account().id
         headers = {
             'User-Agent': useragent,
@@ -105,7 +104,7 @@ async def dyno_manage(dyno):
 
         """ - Used per/App Usage - """
         Apps = result['apps']
-        msg = None
+        msg = "**Dyno Usage Applications**:\n\n"
         for App in Apps:
             try:
                 AppQuota = App['quota_used']
@@ -117,14 +116,14 @@ async def dyno_manage(dyno):
             finally:
                 AppHours = math.floor(AppQuotaUsed / 60)
                 AppMinutes = math.floor(AppQuotaUsed % 60)
-                msg += ("**Dyno Usage**:\n\n"
-                        f" -> `Dyno usage for`  **{App.name}**:\n"
-                        f"     •  `{AppHours}`**h**  `{AppMinutes}`**m**  "
-                        f"**|**  [`{AppPercentage}`**%**]\n")
-        if msg is None:
+                msg += (
+                    f"     •  `{AppHours}`**h**  `{AppMinutes}`**m**  "
+                    f"**|**  [`{AppPercentage}`**%**]\n"
+                )
+        if not msg:
             msg = (" -> `No quota used for any of your Apps`:\n")
             for App in Heroku.apps():
-                msg += f"     •  **⬢{App.name}**.\n"
+                msg += f"     •  ⬢**{App.name}**.\n"
         return await dyno.edit(
             f"{msg}\n"
             " -> `Dyno hours quota remaining this month`:\n"
@@ -134,7 +133,8 @@ async def dyno_manage(dyno):
     elif exe == "help":
         return await dyno.edit(
             ">.`dyno usage`"
-            "\nUsage: Check your heroku App usage dyno quota"
+            "\nUsage: Check your heroku App usage dyno quota."
+            "\nIf one of your app usage is empty, it won't be write in output."
             "\n\n>.`dyno restart`"
             "\nUsage: Restart your dyno application, turn it on if off"
             "\n\n>.`dyno shutdown`"
