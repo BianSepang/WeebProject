@@ -36,7 +36,7 @@ async def dyno_manage(dyno):
             sleep = 1
             dot = "."
             await dyno.edit(text)
-            while (sleep <= 30):
+            while (sleep <= 24):
                 await dyno.edit(text + f"`{dot}`")
                 await asyncio.sleep(1)
                 if len(dot) == 3:
@@ -60,7 +60,7 @@ async def dyno_manage(dyno):
             sleep = 1
             dot = "."
             await dyno.edit(text)
-            while (sleep <= 30):
+            while (sleep <= 24):
                 await dyno.edit(text + f"`{dot}`")
                 await asyncio.sleep(1)
                 if len(dot) == 3:
@@ -140,6 +140,8 @@ async def dyno_manage(dyno):
             ">`.dyno usage`"
             "\nUsage: Check your heroku App usage dyno quota."
             "\nIf one of your app usage is empty, it won't be write in output."
+            "\n\n>`.dyno on`"
+            "\nUsage: Restart your dyno application, turn it on if off."
             "\n\n>`.dyno restart`"
             "\nUsage: Restart your dyno application, turn it on if off."
             "\n\n>`.dyno shutdown`"
