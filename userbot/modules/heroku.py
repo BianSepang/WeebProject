@@ -45,7 +45,7 @@ async def dyno_manage(dyno):
                     dot += "."
                 sleep += 1
             return await dyno.respond(f"⬢**{HEROKU_APP_NAME}** `is up...`")
-            return dyno.delete()
+            return await dyno.delete()
         else:
             return await dyno.edit(f"⬢**{HEROKU_APP_NAME}** `already on...`")
     if exe == "restart":
@@ -69,7 +69,7 @@ async def dyno_manage(dyno):
                     dot += "."
                 sleep += 1
             await dyno.respond(f"⬢**{HEROKU_APP_NAME}** `restarted...`")
-            return dyno.delete()
+            return await dyno.delete()
     elif exe == "shutdown":
         """ - Complete shutdown - """
         app.scale_formation_process("worker", 0)
@@ -81,7 +81,7 @@ async def dyno_manage(dyno):
             dot += "."
             sleep += 1
         await dyno.respond(f"⬢**{HEROKU_APP_NAME}** `turned off...`")
-        return dyno.delete()
+        return await dyno.delete()
     elif exe == "usage":
         """ - Get your account Dyno Usage - """
         await dyno.edit("`Getting information...`")
