@@ -37,15 +37,11 @@ async def dyno_manage(dyno):
             dot = "."
             await dyno.edit(text)
             while (sleep <= 30):
-                state = Dyno.state
-                if state == 'starting':
-                    await dyno.edit(text + f"`{dot}`")
-                    dot += "."
-                    await asyncio.sleep(1)
-                    if len(dot) == 3:
-                        dot = "."
-                elif state == 'up':
-                    break
+                await dyno.edit(text + f"`{dot}`")
+                dot += "."
+                await asyncio.sleep(1)
+                if len(dot) == 3:
+                    dot = "."
                 sleep += 1
             return await dyno.edit(f"⬢**{HEROKU_APP_NAME}** `is up...`")
         else:
@@ -63,15 +59,11 @@ async def dyno_manage(dyno):
             dot = "."
             await dyno.edit(text)
             while (sleep <= 30):
-                state = Dyno.state
-                if state == 'starting':
-                    await dyno.edit(text + f"`{dot}`")
-                    dot += "."
-                    await asyncio.sleep(1)
-                    if len(dot) == 3:
-                        dot = "."
-                elif state == 'up':
-                    break
+                await dyno.edit(text + f"`{dot}`")
+                dot += "."
+                await asyncio.sleep(1)
+                if len(dot) == 3:
+                    dot = "."
                 sleep += 1
             return await dyno.edit(f"⬢**{HEROKU_APP_NAME}** `restarted...`")
     elif exe == "shutdown":
