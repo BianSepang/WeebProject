@@ -44,7 +44,8 @@ async def dyno_manage(dyno):
                 else:
                     dot += "."
                 sleep += 1
-            return await dyno.edit(f"⬢**{HEROKU_APP_NAME}** `is up...`")
+            return await dyno.respond(f"⬢**{HEROKU_APP_NAME}** `is up...`")
+            return dyno.delete()
         else:
             return await dyno.edit(f"⬢**{HEROKU_APP_NAME}** `already on...`")
     if exe == "restart":
@@ -52,7 +53,7 @@ async def dyno_manage(dyno):
             """ - Catch error if dyno not on - """
             Dyno = app.dynos()[0]
         except IndexError:
-            return await dyno.edit(f"⬢**{HEROKU_APP_NAME}** `is not on...`")
+            return await dyno.respond(f"⬢**{HEROKU_APP_NAME}** `is not on...`")
         else:
             text = f"`Restarting` ⬢**{HEROKU_APP_NAME}**"
             Dyno.restart()
@@ -67,7 +68,8 @@ async def dyno_manage(dyno):
                 else:
                     dot += "."
                 sleep += 1
-            return await dyno.edit(f"⬢**{HEROKU_APP_NAME}** `restarted...`")
+            await dyno.respond(f"⬢**{HEROKU_APP_NAME}** `restarted...`")
+            return dyno.delete()
     elif exe == "shutdown":
         """ - Complete shutdown - """
         app.scale_formation_process("worker", 0)
@@ -78,7 +80,8 @@ async def dyno_manage(dyno):
             await dyno.edit(text + f"`{dot}`")
             dot += "."
             sleep += 1
-        await dyno.edit(f"⬢**{HEROKU_APP_NAME}** `turned off...`")
+        await dyno.respond(f"⬢**{HEROKU_APP_NAME}** `turned off...`")
+        return dyno.delete()
     elif exe == "usage":
         """ - Get your account Dyno Usage - """
         await dyno.edit("`Getting information...`")
