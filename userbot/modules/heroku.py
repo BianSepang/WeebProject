@@ -20,63 +20,71 @@ useragent = ('Mozilla/5.0 (Linux; Android 10; SM-G975F) '
              )
 
 
-@register(outgoing=True, pattern="^.dyno (restart|shutdown|usage|help)(?: |$)")
+@register(outgoing=True,
+          pattern="^.dyno (on|restart|shutdown|usage|help)(?: |$)")
 async def dyno_manage(dyno):
     """ - Restart/Kill dyno - """
     await dyno.edit("`Sending information...`")
     app = Heroku.app(HEROKU_APP_NAME)
     exe = dyno.pattern_match.group(1)
+    if exe == "on":
+        try:
+            Dyno = app.dynos()[0]
+        except IndexError:
+            app.scale_formation_process("worker", 1)
+            text = f"`Starting` ⬢**{HEROKU_APP_NAME}**"
+            sleep = 1
+            dot = "."
+            await dyno.edit(text)
+            while (sleep <= 30):
+                state = Dyno.state
+                if state == 'starting':
+                    await dyno.edit(text + f"`{dot}`")
+                    dot += "."
+                    await asyncio.sleep(1)
+                    if len(dot) == 3:
+                        dot = "."
+                elif state == 'up':
+                    break
+                sleep += 1
+            return await dyno.edit(f"⬢**{HEROKU_APP_NAME}** `is up...`")
+        else:
+            return await dyno.edit(f"⬢**{HEROKU_APP_NAME}** `already on...`")
     if exe == "restart":
         try:
             """ - Catch error if dyno not on - """
             Dyno = app.dynos()[0]
         except IndexError:
-            app.scale_formation_process("worker", 1)
-            return await dyno.edit(
-                f"`Starting` ⬢**{HEROKU_APP_NAME}**`...`")
-        wait = 0.03
-        dot = "."
-        i = 0
-        text = f"`Restarting` ⬢**{HEROKU_APP_NAME}**"
-        await dyno.edit(text)
-        Dyno.restart()
-        up = False
-        await asyncio.sleep(wait)
-        while not up:
-            loading_dot = text + dot
-            await dyno.edit(loading_dot)
-            i = i + 1
-            await asyncio.sleep(wait)
-            if i == 3:
-                loading_dot = None
-                i = 0
-            state = Dyno.state
-            if state == "up":
-                up = True
-                if i == 0:
-                    await asyncio.sleep(0.05)
-                    loading_dot = text + dot
-                    await dyno.edit(loading_dot)
-                    await asyncio.sleep(0.05)
-                    loading_dot = loading_dot + dot
-                    await dyno.edit(loading_dot)
-                    await asyncio.sleep(0.05)
-                    await dyno.edit(loading_dot + dot)
-                if i == 1:
-                    await asyncio.sleep(0.05)
-                    loading_dot = loading_dot + dot
-                    await dyno.edit(loading_dot)
-                    await asyncio.sleep(0.05)
-                    await dyno.edit(loading_dot + dot)
-                elif i == 2:
-                    await asyncio.sleep(0.05)
-                    await dyno.edit(loading_dot + dot)
-        return await dyno.edit(
-            f"`Restarting` ⬢**{HEROKU_APP_NAME}**`... done`")
+            return await dyno.edit(f"⬢**{HEROKU_APP_NAME}** `is not on...`")
+        else:
+            text = f"`Restarting` ⬢**{HEROKU_APP_NAME}**"
+            Dyno.restart()
+            sleep = 1
+            dot = "."
+            await dyno.edit(text)
+            while (sleep <= 30):
+                state = Dyno.state
+                if state == 'starting':
+                    await dyno.edit(text + f"`{dot}`")
+                    dot += "."
+                    await asyncio.sleep(1)
+                    if len(dot) == 3:
+                        dot = "."
+                elif state == 'up':
+                    break
+                sleep += 1
+            return await dyno.edit(f"⬢**{HEROKU_APP_NAME}** `restarted...`")
     elif exe == "shutdown":
         """ - Complete shutdown - """
         app.scale_formation_process("worker", 0)
-        await dyno.edit(f"`Shutdown` ⬢**{HEROKU_APP_NAME}**`... done`")
+        text = f"`Shutdown` ⬢**{HEROKU_APP_NAME}**"
+        sleep = 1
+        dot = "."
+        while (sleep <= 3):
+            await dyno.edit(text + f"`{dot}`")
+            dot += "."
+            sleep += 1
+        await dyno.edit(f"⬢**{HEROKU_APP_NAME}** `turned off...`")
     elif exe == "usage":
         """ - Get your account Dyno Usage - """
         await dyno.edit("`Getting information...`")
@@ -132,11 +140,13 @@ async def dyno_manage(dyno):
         )
     elif exe == "help":
         return await dyno.edit(
-            ">.`dyno usage`"
+            ">`.dyno usage`"
             "\nUsage: Check your heroku App usage dyno quota."
             "\nIf one of your app usage is empty, it won't be write in output."
-            "\n\n>.`dyno restart`"
-            "\nUsage: Restart your dyno application, turn it on if off"
-            "\n\n>.`dyno shutdown`"
-            "\nUsage: Shutdown dyno completly"
+            "\n\n>`.dyno restart`"
+            "\nUsage: Restart your dyno application, turn it on if off."
+            "\n\n>`.dyno shutdown`"
+            "\nUsage: Shutdown dyno completly."
+            "\n\n>`.dyno help`"
+            "\nUsage: print this help."
         )
