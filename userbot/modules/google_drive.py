@@ -106,9 +106,9 @@ async def progress(current, total, gdrive, start, type_of_ps, file_name=None):
         elapsed_time = round(diff) * 1000
         time_to_completion = round((total - current) / speed) * 1000
         estimated_total_time = elapsed_time + time_to_completion
-        progress_str = "`Downloading...` | [{0}{1}] `{2}%`\n".format(
-            ''.join(["#" for i in range(math.floor(percentage / 5))]),
-            ''.join(["**-**" for i in range(20 - math.floor(percentage / 5))]),
+        progress_str = "`Downloading` | [{0}{1}] `{2}%`\n".format(
+            ''.join(["**#**" for i in range(math.floor(percentage / 5))]),
+            ''.join(["**--**" for i in range(20 - math.floor(percentage / 5))]),
             round(percentage, 2))
         tmp = (progress_str + "\n" +
                f"{humanbytes(current)} of {humanbytes(total)}\n"
@@ -357,9 +357,9 @@ async def download_gdrive(gdrive, service, uri):
                 percentage = downloaded / file_size * 100
                 speed = round(downloaded / diff, 2)
                 eta = round((file_size - downloaded) / speed)
-                prog_str = "`Downloading...` | [{0}{1}] `{2}%`".format(
-                    "".join(["#" for i in range(math.floor(percentage / 5))]),
-                    "".join(["**-**"
+                prog_str = "`Downloading` | [{0}{1}] `{2}%`".format(
+                    "".join(["**#**" for i in range(math.floor(percentage / 5))]),
+                    "".join(["**--**"
                              for i in range(20 - math.floor(percentage / 5))]),
                     round(percentage, 2))
                 current_message = (
@@ -506,9 +506,9 @@ async def upload(gdrive, service, file_path, file_name, mimeType):
             percentage = uploaded / file_size * 100
             speed = round(uploaded / diff, 2)
             eta = round((file_size - uploaded) / speed)
-            prog_str = "`Uploading...` | [{0}{1}] `{2}%`".format(
-                "".join(["#" for i in range(math.floor(percentage / 5))]),
-                "".join(["**-**"
+            prog_str = "`Uploading` | [{0}{1}] `{2}%`".format(
+                "".join(["**#**" for i in range(math.floor(percentage / 5))]),
+                "".join(["**--**"
                          for i in range(20 - math.floor(percentage / 5))]),
                 round(percentage, 2))
             current_message = (
@@ -945,9 +945,9 @@ async def check_progress_for_dl(gdrive, gid, previous):
             if not complete and not file.error_message:
                 percentage = int(file.progress)
                 downloaded = percentage * int(file.total_length) / 100
-                prog_str = "`Downloading...` | [{0}{1}] `{2}`".format(
-                    "".join(["#" for i in range(math.floor(percentage / 5))]),
-                    "".join(["**-**"
+                prog_str = "`Downloading` | [{0}{1}] `{2}`".format(
+                    "".join(["**#**" for i in range(math.floor(percentage / 5))]),
+                    "".join(["**--**"
                              for i in range(20 - math.floor(percentage / 5))]),
                     file.progress_string())
                 msg = (
