@@ -944,6 +944,7 @@ async def check_progress_for_dl(gdrive, gid, previous):
         try:
             if not complete and not file.error_message:
                 percentage = int(file.progress)
+                downloaded = percentage * int(file.total_length) / 100
                 prog_str = "`Downloading...` | [{0}{1}] `{2}`".format(
                     "".join(["#" for i in range(math.floor(percentage / 5))]),
                     "".join(["**-**"
@@ -951,11 +952,11 @@ async def check_progress_for_dl(gdrive, gid, previous):
                     file.progress_string())
                 msg = (
                     "`[URI - DOWNLOAD]`\n\n"
-                    f"`Name :` `{file.name}`\n"
+                    f"`Name :`\n`{file.name}`\n"
                     f"`Status` -> **{file.status.capitalize()}**\n"
                     f"{prog_str}\n"
-                    f"`{file.total_length_string()} "
-                    f"@ {file.download_speed_string()}`\n"
+                    f"`{humanbytes(downloaded)} of {file.total_length_string()}"
+                    f" @ {file.download_speed_string()}`\n"
                     f"`ETA` -> {file.eta_string()}\n"
                 )
                 if msg != previous:
