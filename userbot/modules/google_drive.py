@@ -227,6 +227,7 @@ async def get_mimeType(name):
 
 
 async def download(gdrive, service, uri=None):
+    reply = ''
     """ - Download files to local then upload - """
     if not isdir(TEMP_DOWNLOAD_DIRECTORY):
         os.makedirs(TEMP_DOWNLOAD_DIRECTORY)
@@ -267,50 +268,55 @@ async def download(gdrive, service, uri=None):
     try:
         file_name = await get_raw_name(required_file_name)
     except AttributeError:
-        return await gdrive.edit(
+        reply += (
             "`[ENTRY - ERROR]`\n\n"
             "`Status :` **BAD**\n"
-            "`Reason :` Replied entry is not media/file it's a messages."
+            "`Reason :` Replied entry is not media/file it's a messages.\n\n"
         )
+        return reply
     mimeType = await get_mimeType(required_file_name)
     try:
         status = "[FILE - UPLOAD]"
         if isfile(required_file_name):
             result = await upload(
                      gdrive, service, required_file_name, file_name, mimeType)
-            return await gdrive.respond(
+            reply += (
                 f"`{status}`\n\n"
                 f"`Name     :`\n`{file_name}`\n"
                 f"`Size     :` `{humanbytes(result[0])}`\n"
                 f"`Download :` [{file_name}]({result[1]})\n"
-                "`Status   :` **OK**",
-                link_preview=False
+                "`Status   :` **OK**\n\n"
             )
+            return reply
         else:
             status = status.replace("[FILE", "[FOLDER")
             global parent_Id
-            parent_Id = await create_dir(service, file_name)
+            folder = await create_dir(service, file_name)
+            parent_Id = folder.get('id')
             await task_directory(gdrive, service, required_file_name)
             webViewURL = "https://drive.google.com/drive/folders/" + parent_Id
             await reset_parentId()
-            return await gdrive.edit(
+            reply += (
                 f"`{status}`\n\n"
                 f"`Name   :`\n`{file_name}`\n"
                 "`Status :` **OK**\n"
-                f"`URL    :` [{file_name}]({webViewURL})\n"
+                f"`URL    :` [{file_name}]({webViewURL})\n\n"
             )
+            return reply
     except Exception as e:
         status = status.replace("DOWNLOAD]", "ERROR]")
-        return await gdrive.edit(
+        reply += (
             f"`{status}`\n\n"
             "`Status :` **FAILED**\n"
             "`Reason :` failed to upload.\n"
-            f"`{str(e)}`"
+            f"`{str(e)}`\n\n"
         )
+        return reply
     return
 
 
 async def download_gdrive(gdrive, service, uri):
+    reply = ''
     """ - remove drivesdk and export=download from link - """
     if not isdir(TEMP_DOWNLOAD_DIRECTORY):
         os.mkdir(TEMP_DOWNLOAD_DIRECTORY)
@@ -330,8 +336,7 @@ async def download_gdrive(gdrive, service, uri):
             except IndexError:
                 """ - if error parse in url, assume given value is Id - """
                 file_Id = uri
-    file = service.files().get(fileId=file_Id,
-                               fields='name, mimeType').execute()
+    file = await get_information(service, file_Id)
     file_name = file.get('name')
     mimeType = file.get('mimeType')
     if mimeType == 'application/vnd.google-apps.folder':
@@ -372,13 +377,13 @@ async def download_gdrive(gdrive, service, uri):
                         display_message = current_message
                     except Exception:
                         pass
-        await gdrive.edit(
+        reply += (
             "`[FILE - DOWNLOAD]`\n\n"
             f"`Name   :`\n`{file_name}`\n"
-            "`Size   :` `{humanbytes(file_size)}`\n"
+            f"`Size   :` `{humanbytes(file_size)}`\n"
             f"`Path   :` `{file_path}`\n"
             "`Status :` **OK**\n"
-            "`Reason :` Successfully downloaded..."
+            "`Reason :` Successfully downloaded...\n\n"
         )
         msg = await gdrive.respond("`Answer the question in your BOTLOG group`")
     async with gdrive.client.conversation(BOTLOG_CHATID) as conv:
@@ -395,34 +400,51 @@ async def download_gdrive(gdrive, service, uri):
         await gdrive.client.delete_messages(gdrive.chat_id, msg.id)
         await gdrive.client.delete_messages(BOTLOG_CHATID, ask.id)
     if ans.capitalize() == 'N':
-        return
+        return reply
     elif ans.capitalize() == "Y":
         result = await upload(gdrive, service, file_path, file_name, mimeType)
-        await gdrive.respond(
+        reply += (
             "`[FILE - UPLOAD]`\n\n"
             f"`Name     :`\n`{file_name}`\n"
             f"`Size     :` `{humanbytes(result[0])}`\n"
             f"`Download :` [{file_name}]({result[1]})\n"
-            "`Status   :` **OK**\n"
+            "`Status   :` **OK**\n\n"
         )
-        return await gdrive.delete()
+        return reply
     else:
-        return await gdrive.client.send_message(
+        await gdrive.client.send_message(
             BOTLOG_CHATID,
             "`Invalid answer type [Y/N] only...`"
         )
+        return reply
+
+
+async def change_permission(service, Id):
+    permission = {
+        "role": "reader",
+        "type": "anyone",
+        "allowFileDiscovery": True,
+        "value": None,
+    }
+    try:
+        service.permissions().create(fileId=Id, body=permission
+                                     ).execute()
+    except Exception:
+        pass
+    return True
+
+
+async def get_information(service, Id):
+    r = service.files().get(fileId=Id, fields="name, id, size, mimeType, "
+                            "webViewLink, webContentLink,"
+                            "description").execute()
+    return r
 
 
 async def create_dir(service, folder_name):
     metadata = {
         'name': folder_name,
         'mimeType': 'application/vnd.google-apps.folder',
-    }
-    permission = {
-        "role": "reader",
-        "type": "anyone",
-        "allowFileDiscovery": True,
-        "value": None,
     }
     try:
         if parent_Id is not None:
@@ -434,14 +456,13 @@ async def create_dir(service, folder_name):
     else:
         """ - Override G_DRIVE_FOLDER_ID because parent_Id not empty - """
         metadata['parents'] = [parent_Id]
-    folder = service.files().create(body=metadata, fields="id").execute()
-    folder_id = folder.get('id')
+    folder = service.files().create(
+           body=metadata, fields="id, webViewLink").execute()
     try:
-        service.permissions().create(fileId=folder_id, body=permission
-                                     ).execute()
+        await change_permission(service, folder.get('id'))
     except Exception:
         pass
-    return folder_id
+    return folder
 
 
 async def upload(gdrive, service, file_path, file_name, mimeType):
@@ -464,12 +485,6 @@ async def upload(gdrive, service, file_path, file_name, mimeType):
     else:
         """ - Override G_DRIVE_FOLDER_ID because parent_Id not empty - """
         body['parents'] = [parent_Id]
-    permission = {
-        "role": "reader",
-        "type": "anyone",
-        "allowFileDiscovery": True,
-        "value": None,
-    }
     media_body = MediaFileUpload(
         file_path,
         mimetype=mimeType,
@@ -516,10 +531,10 @@ async def upload(gdrive, service, file_path, file_name, mimeType):
     downloadURL = response.get("webContentLink")
     """ - Change permission - """
     try:
-        service.permissions().create(fileId=file_id, body=permission).execute()
-    except HttpError as e:
-        return await gdrive.edit("`" + str(e) + "`")
-    return file_size, downloadURL
+        await change_permission(service, file_id)
+    except Exception:
+        pass
+    return int(file_size), downloadURL
 
 
 async def task_directory(gdrive, service, folder_path):
@@ -531,7 +546,8 @@ async def task_directory(gdrive, service, folder_path):
     for f in lists:
         current_f_name = join(folder_path, f)
         if isdir(current_f_name):
-            parent_Id = await create_dir(service, f)
+            folder = await create_dir(service, f)
+            parent_Id = folder.get('id')
             root_parent_Id = await task_directory(gdrive,
                                                   service, current_f_name)
         else:
@@ -555,159 +571,153 @@ async def reset_parentId():
     return
 
 
-@register(pattern="^.gdf (mkdir|rm|chck)(.*)", outgoing=True)
+@register(pattern="^.gdf (mkdir|rm|chck) (.*)", outgoing=True)
 async def google_drive_managers(gdrive):
     """ - Google Drive folder/file management - """
     await gdrive.edit("`Sending information...`")
     service = await create_app(gdrive)
     if service is False:
         return
-    f_name = gdrive.pattern_match.group(2).strip()
+    """ - Split name if contains spaces by using ; - """
+    f_name = gdrive.pattern_match.group(2).split(';')
     exe = gdrive.pattern_match.group(1)
-    """ - Only if given value are mkdir - """
-    metadata = {
-        'name': f_name,
-        'mimeType': 'application/vnd.google-apps.folder',
-    }
-    try:
-        if parent_Id is not None:
-            pass
-    except NameError:
-        """ - Fallback to G_DRIVE_FOLDER_ID else to root dir - """
-        if G_DRIVE_FOLDER_ID is not None:
-            metadata['parents'] = [G_DRIVE_FOLDER_ID]
-    else:
-        """ - Override G_DRIVE_FOLDER_ID because parent_Id not empty - """
-        metadata['parents'] = [parent_Id]
-    permission = {
-        "role": "reader",
-        "type": "anyone",
-        "allowFileDiscovery": True,
-        "value": None,
-    }
-    page_token = None
-    result = service.files().list(
-        q=f'name="{f_name}"',
-        spaces='drive',
-        fields=(
-            'nextPageToken, files(parents, name, id, size, '
-            'mimeType, webViewLink, webContentLink, description)'
-        ),
-        pageToken=page_token
-    ).execute()
-    if exe == "mkdir":
-        """ - Create a directory, abort if exist when parent not given - """
-        status = "[FOLDER - EXIST]"
+    reply = ''
+    for name_or_id in f_name:
+        """ - in case given name has a space beetween ; - """
+        name_or_id = name_or_id.strip()
+        metadata = {
+            'name': name_or_id,
+            'mimeType': 'application/vnd.google-apps.folder',
+        }
         try:
-            folder = result.get('files', [])[0]
-        except IndexError:
-            folder = service.files().create(
-                   body=metadata,
-                   fields="id, webViewLink"
-             ).execute()
-            status = status.replace("EXIST]", "CREATED]")
-        folder_id = folder.get('id')
-        webViewURL = folder.get('webViewLink')
-        if "CREATED" in status:
-            """ - Change permission - """
-            try:
-                service.permissions().create(
-                   fileId=folder_id, body=permission).execute()
-            except Exception:
+            if parent_Id is not None:
                 pass
-        await gdrive.edit(
-            f"`{status}`\n\n"
-            f"`Name :` `{f_name}`\n"
-            f"`ID   :` `{folder_id}`\n"
-            f"`URL  :` [Open]({webViewURL})"
-        )
-    elif exe == "rm":
-        """ - Permanently delete, skipping the trash - """
-        try:
-            """ - Try if given value is a name not a folderId/fileId - """
-            f = result.get('files', [])[0]
-            f_id = f.get('id')
-        except IndexError:
-            """ - If failed assumming value is folderId/fileId - """
-            f_id = f_name
+        except NameError:
+            """ - Fallback to G_DRIVE_FOLDER_ID else to root dir - """
+            if G_DRIVE_FOLDER_ID is not None:
+                metadata['parents'] = [G_DRIVE_FOLDER_ID]
+        else:
+            """ - Override G_DRIVE_FOLDER_ID because parent_Id not empty - """
+            metadata['parents'] = [parent_Id]
+        page_token = None
+        result = service.files().list(
+            q=f'name="{name_or_id}"',
+            spaces='drive',
+            fields=(
+                'nextPageToken, files(parents, name, id, size, '
+                'mimeType, webViewLink, webContentLink, description)'
+            ),
+            pageToken=page_token
+        ).execute()
+        if exe == "mkdir":
+            """ - Create a directory, abort if exist when parent not given - """
+            status = "[FOLDER - EXIST]"
             try:
-                f = service.files().get(fileId=f_id,
-                                        fields="name, mimeType").execute()
-            except Exception as e:
-                return await gdrive.edit(
-                    f"`[FILE/FOLDER - ERROR]`\n\n"
-                    f"`Status :` `{str(e)}`"
-                )
-        name = f.get('name')
-        mimeType = f.get('mimeType')
-        if mimeType == 'application/vnd.google-apps.folder':
-            status = "[FOLDER - DELETE]"
-        else:
-            status = "[FILE - DELETE]"
-        try:
-            service.files().delete(fileId=f_id).execute()
-        except HttpError as e:
-            status.replace("DELETE]", "ERROR]")
-            return await gdrive.edit(
+                folder = result.get('files', [])[0]
+            except IndexError:
+                folder = await create_dir(service, name_or_id)
+                status = status.replace("EXIST]", "CREATED]")
+            folder_id = folder.get('id')
+            webViewURL = folder.get('webViewLink')
+            if "CREATED" in status:
+                """ - Change permission - """
+                try:
+                    await change_permission(service, folder_id)
+                except Exception:
+                    pass
+            reply += (
                 f"`{status}`\n\n"
-                f"`Status :` `{str(e)}`"
+                f"`Name :` `{name_or_id}`\n"
+                f"`ID   :` `{folder_id}`\n"
+                f"`URL  :` [Open]({webViewURL})\n\n"
             )
-        else:
-            await gdrive.edit(
+        elif exe == "rm":
+            """ - Permanently delete, skipping the trash - """
+            try:
+                """ - Try if given value is a name not a folderId/fileId - """
+                f = result.get('files', [])[0]
+                f_id = f.get('id')
+            except IndexError:
+                """ - If failed assumming value is folderId/fileId - """
+                f_id = name_or_id
+                try:
+                    f = await get_information(service, f_id)
+                except Exception as e:
+                    reply += (
+                        f"`[FILE/FOLDER - ERROR]`\n\n"
+                        f"`Status :` `{str(e)}`\n\n"
+                    )
+                    continue
+            name = f.get('name')
+            mimeType = f.get('mimeType')
+            if mimeType == 'application/vnd.google-apps.folder':
+                status = "[FOLDER - DELETE]"
+            else:
+                status = "[FILE - DELETE]"
+            try:
+                service.files().delete(fileId=f_id).execute()
+            except HttpError as e:
+                status.replace("DELETE]", "ERROR]")
+                reply += (
+                    f"`{status}`\n\n"
+                    f"`Status :` `{str(e)}`\n\n"
+                )
+                continue
+            else:
+                reply += (
                     f"`{status}`\n\n"
                     f"`Name   :`\n`{name}`\n"
-                    "`Status :` `OK`"
-            )
-    elif exe == "chck":
-        """ - Check file/folder if exists - """
-        try:
-            f = result.get('files', [])[0]
-        except IndexError:
-            """ - If failed assumming value is folderId/fileId - """
-            f_id = f_name
-            try:
-                f = service.files().get(
-                       fileId=f_id,
-                       fields="name, id, size, mimeType, "
-                              "webViewLink, webContentLink, description"
-                ).execute()
-            except Exception as e:
-                return await gdrive.edit(
-                    "`[FILE/FOLDER - ERROR]`\n\n"
-                    "`Status :` **BAD**\n"
-                    f"`Reason :` `{str(e)}`"
+                    "`Status :` `OK`\n\n"
                 )
-        """ - If exists parse file/folder information - """
-        f_name = f.get('name')  # override input value
-        f_id = f.get('id')
-        f_size = f.get('size')
-        mimeType = f.get('mimeType')
-        webViewLink = f.get('webViewLink')
-        downloadURL = f.get('webContentLink')
-        description = f.get('description')
-        if mimeType == "application/vnd.google-apps.folder":
-            status = "[FOLDER - EXIST]"
-        else:
-            status = "[FILE - EXIST]"
-        msg = (
-            f"`{status}`\n\n"
-            f"`Name     :`\n`{f_name}`\n"
-            f"`ID       :` `{f_id}`\n"
-        )
-        if mimeType != "application/vnd.google-apps.folder":
-            msg += f"`Size     :` `{humanbytes(f_size)}`\n"
-            msg += f"`Download :` [{f_name}]({downloadURL})\n"
-        else:
-            msg += f"`URL      :` [Open]({webViewLink})\n"
-        if description:
-            msg += f"`About    :`\n`{description}`"
-        await gdrive.edit(msg)
-    page_token = result.get('nextPageToken', None)
+        elif exe == "chck":
+            """ - Check file/folder if exists - """
+            try:
+                f = result.get('files', [])[0]
+            except IndexError:
+                """ - If failed assumming value is folderId/fileId - """
+                f_id = name_or_id
+                try:
+                    f = await get_information(service, f_id)
+                except Exception as e:
+                    reply += (
+                        "`[FILE/FOLDER - ERROR]`\n\n"
+                        "`Status :` **BAD**\n"
+                        f"`Reason :` `{str(e)}`\n\n"
+                    )
+                    continue
+            """ - If exists parse file/folder information - """
+            name_or_id = f.get('name')  # override input value
+            f_id = f.get('id')
+            f_size = f.get('size')
+            mimeType = f.get('mimeType')
+            webViewLink = f.get('webViewLink')
+            downloadURL = f.get('webContentLink')
+            description = f.get('description')
+            if mimeType == "application/vnd.google-apps.folder":
+                status = "[FOLDER - EXIST]"
+            else:
+                status = "[FILE - EXIST]"
+            msg = (
+                f"`{status}`\n\n"
+                f"`Name     :`\n`{name_or_id}`\n"
+                f"`ID       :` `{f_id}`\n"
+            )
+            if mimeType != "application/vnd.google-apps.folder":
+                msg += f"`Size     :` `{humanbytes(f_size)}`\n"
+                msg += f"`Download :` [{name_or_id}]({downloadURL})\n\n"
+            else:
+                msg += f"`URL      :` [Open]({webViewLink})\n\n"
+            if description:
+                msg += f"`About    :`\n`{description}`\n\n"
+            reply += msg
+        page_token = result.get('nextPageToken', None)
+    await gdrive.edit(reply)
     return
 
 
 @register(pattern="^.gd(?: |$)(.*)", outgoing=True)
 async def google_drive(gdrive):
+    reply = ''
     """ - Parsing all google drive function - """
     value = gdrive.pattern_match.group(1)
     file_path = None
@@ -725,14 +735,15 @@ async def google_drive(gdrive):
         return
     if isfile(value):
         file_path = value
-        if file_path.endswith(".torrent"):
+        if ".torrent" in file_path:
             uri = file_path
             file_path = None
     elif isdir(value):
         folder_path = value
         global parent_Id
         folder_name = await get_raw_name(folder_path)
-        parent_Id = await create_dir(service, folder_name)
+        folder = await create_dir(service, folder_name)
+        parent_Id = folder.get('id')
         await task_directory(gdrive, service, folder_path)
         webViewURL = "https://drive.google.com/drive/folders/" + parent_Id
         await reset_parentId()
@@ -743,56 +754,93 @@ async def google_drive(gdrive):
             f"`URL    :` [{folder_name}]({webViewURL})\n"
         )
     else:
-        if re.findall(r'\bhttps?://.*\.\S+', value) or "magnet:?" in value:
-            try:
-                uri = re.findall(r'\bhttps?://drive\.google\.com\S+', value)[0]
-            except IndexError:
-                uri = value.split()
-            else:
-                """ - Link is google drive fallback to download - """
-                return await download_gdrive(gdrive, service, uri)
+        if re.findall(r'\bhttps?://drive\.google\.com\S+', value):
+            """ - Link is google drive fallback to download - """
+            value = re.findall(r'\bhttps?://drive\.google\.com\S+', value)
+            for uri in value:
+                try:
+                    reply += await download_gdrive(gdrive, service, uri)
+                except Exception as e:
+                    reply += (
+                        "`[FILE - ERROR]`\n\n"
+                        "`Status :` **BAD**\n"
+                        f"`Reason :` {str(e)}\n\n"
+                    )
+                    continue
+            await gdrive.respond(reply)
+            return await gdrive.delete()
+        elif re.findall(r'\bhttps?://.*\.\S+', value) or "magnet:?" in value:
+            uri = value.split()
         else:
-            if any(map(str.isdigit, value)):
-                one = True
-            else:
-                one = False
-            if "-" in value or "_" in value:
-                two = True
-            else:
-                two = False
-            if True in [one or two]:
-                return await download_gdrive(gdrive, service, value)
+            for fileId in value.split():
+                if any(map(str.isdigit, fileId)):
+                    one = True
+                else:
+                    one = False
+                if "-" in fileId or "_" in fileId:
+                    two = True
+                else:
+                    two = False
+                if True in [one or two]:
+                    try:
+                        reply += await download_gdrive(gdrive, service, fileId)
+                    except Exception as e:
+                        reply += (
+                            "`[FILE - ERROR]`\n\n"
+                            "`Status :` **BAD**\n"
+                            f"`Reason :` {str(e)}\n\n"
+                        )
+                        continue
+                else:
+                    break
+            await gdrive.respond(reply)
+            return await gdrive.delete()
         if not uri and not gdrive.reply_to_msg_id:
             return await gdrive.edit(
                 "`[VALUE - ERROR]`\n\n"
                 "`Status :` **BAD**\n"
-                "`Reason :` given value is not URL nor file path."
+                "`Reason :` given value is not URL nor file/folder path.\n"
+                "If you think this is wrong, maybe you use .gd with multiple "
+                "value of files/folders, e.g `.gd <filename1> <filename2>` "
+                "for upload from files/folders path this doesn't support it."
             )
     if not file_path and gdrive.reply_to_msg_id:
-        return await download(gdrive, service)
+        """ - not looping this, because reply can only run one by one - """
+        reply += await download(gdrive, service)
+        return await gdrive.edit(reply)
     if uri and not gdrive.reply_to_msg_id:
         for dl in uri:
             try:
-                await download(gdrive, service, dl)
+                reply += await download(gdrive, service, dl)
             except Exception as e:
                 """ - If cancelled, cancel all download queue - """
                 if " not found" in str(e) or "'file'" in str(e):
                     await asyncio.sleep(2.5)
                     return await gdrive.delete()
-                """ - if something bad happened, continue to next uri - """
-                continue
+                else:
+                    """ - if something bad happened, continue to next uri - """
+                    reply += (
+                        "`[UNKNOWN - ERROR]`\n\n"
+                        "`Status :` **BAD**\n"
+                        f"`Reason :``{dl}`\n"
+                        f"{str(e)}`\n\n"
+                    )
+                    continue
+        await gdrive.respond(reply)
         return await gdrive.delete()
     mimeType = await get_mimeType(file_path)
     file_name = await get_raw_name(file_path)
-    result = await upload(gdrive, service, file_path, file_name, mimeType)
+    result = await upload(gdrive, service,
+                          file_path, file_name, mimeType)
     if result:
-        await gdrive.edit(
+        await gdrive.respond(
             "`[FILE - UPLOAD]`\n\n"
             f"`Name     :` `{file_name}`\n"
             f"`Size     :` `{humanbytes(result[0])}`\n"
             f"`Download :` [{file_name}]({result[1]})\n"
             "`Status   :` **OK**\n"
-        )
+            )
+    await gdrive.delete()
     return
 
 
@@ -921,8 +969,7 @@ async def check_progress_for_dl(gdrive, gid, previous):
             complete = file.is_complete
             if complete:
                 return await gdrive.edit(f"`{file.name}`\n\n"
-                                         "Successfully downloaded,\n"
-                                         "Initializing upload...")
+                                         "Successfully downloaded...")
         except Exception as e:
             if " depth exceeded" in str(e):
                 file.remove(force=True)
@@ -942,18 +989,24 @@ CMD_HELP.update({
     ">`.gdauth`"
     "\nUsage: generate token to enable all cmd google drive service."
     "\nThis only need to run once in life time."
-    "\n\n>.`gd`"
+    "\n\n>.`gd <path>` or >`.gd <url1> <url2>`"
     "\nUsage: Upload file from local or uri/url into google drive."
-    "\n\n>`.gdf mkdir <folder name>`"
-    "\nUsage: create google drive folder."
-    "\n\n>`.gdf chck <folder/file|name/id>`"
-    "\nUsage: check given value is exist or not."
-    "\n\n>`.gdf rm <folder/file|name/id>`"
-    "\nUsage: delete a file/folder, and can't be undone"
-    "\nThis method skipping file trash, so be caution..."
+    "\n\n>.`gd <drive-link>`"
+    "\nUsage: Download google drive file, mirror if you want to."
+    "\n\n>`.gdf mkdir <name>` or >`.gdf mkdir <name1>; <name2>`"
+    "\nUsage: create gdrive folder, for multiple creation use ; as divider."
+    "\n\n>`.gdf chck <name/id>` or >`.gdf chck <name1>; <id>`"
+    "\nUsage: check file/folder exist/no, for multiple check use ; as divider."
+    "\n\n>`.gdf rm <name/id>` or >`.gdf rm <name1>; <id1>`"
+    "\nUsage: delete files/folders, for multiple delete use ; as divider."
+    "\nCan't be undone, this method skipping file trash, so be caution..."
     "\n\n>`.gdfset put <folderURL/folderID>`"
     "\nUsage: change upload directory."
     "\n\n>`.gdfset rm`"
     "\nUsage: remove set parentId from cmd\n>`.gdfset put` "
     "into **G_DRIVE_FOLDER_ID** and if empty upload will go to root."
+    "\n\nNOTE: for >`.gd` cmd don't abuse it by using multiple use\n"
+    "example: you give cmd by give value a url to download and a filepath "
+    "to upload, this programs logic not that complicated.\n"
+    "And .gd upload from file path or folder path don't support multiples."
 })
