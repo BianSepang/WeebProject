@@ -115,6 +115,12 @@ async def dyno_manage(dyno):
         Apps = sorted(Apps, key=itemgetter('quota_used'), reverse=True)
         apps = Heroku.apps()
         msg = "**Dyno Usage**:\n\n"
+        try:
+            Apps[0]
+        except IndexError:
+            msg += (" -> `No quota used for any of your Apps`:\n")
+            for App in apps:
+                msg += f"     •  **{App.name}**.\n"
         for App in Apps:
             AppName = 'Deleted or transferred app'
             ID = App.get('app_uuid')
@@ -139,10 +145,6 @@ async def dyno_manage(dyno):
                     f"     •  `{AppHours}`**h**  `{AppMinutes}`**m**  "
                     f"**|**  [`{AppPercentage}`**%**]\n\n"
                 )
-        if not msg:
-            msg = (" -> `No quota used for any of your Apps`:\n")
-            for App in apps:
-                msg += f"     •  ⬢**{App.name}**.\n"
         return await dyno.edit(
             f"{msg}\n"
             " -> `Dyno hours quota remaining this month`:\n"
