@@ -9,6 +9,8 @@ import asyncio
 import requests
 import math
 
+from operator import itemgetter
+
 from userbot import HEROKU_APP_NAME, HEROKU_API_KEY
 from userbot.events import register
 
@@ -109,6 +111,8 @@ async def dyno_manage(dyno):
 
         """ - Used per/App Usage - """
         Apps = result['apps']
+        """ - Sort from larger usage to lower usage - """
+        Apps = sorted(Apps, key=itemgetter('quota_used'), reverse=True)
         apps = Heroku.apps()
         msg = "**Dyno Usage**:\n\n"
         for App in Apps:
