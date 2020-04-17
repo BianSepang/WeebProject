@@ -122,7 +122,7 @@ async def dyno_manage(dyno):
             for App in apps:
                 msg += f"     •  **{App.name}**.\n"
         for App in Apps:
-            AppName = 'Deleted or transferred app'
+            AppName = '~~Deleted or transferred app~~'
             ID = App.get('app_uuid')
             try:
                 AppQuota = App.get('quota_used')
@@ -136,17 +136,17 @@ async def dyno_manage(dyno):
                 AppMinutes = math.floor(AppQuotaUsed % 60)
                 for names in apps:
                     if ID == names.id:
-                        AppName = names.name
+                        AppName = f"**{names.name}**"
                         break
                     else:
                         continue
                 msg += (
-                    f" -> `Dyno usage for`  ~~{AppName}~~:\n"
+                    f" -> `Dyno usage for`  {AppName}:\n"
                     f"     •  `{AppHours}`**h**  `{AppMinutes}`**m**  "
                     f"**|**  [`{AppPercentage}`**%**]\n\n"
                 )
         return await dyno.edit(
-            f"{msg}\n"
+            f"{msg}"
             " -> `Dyno hours quota remaining this month`:\n"
             f"     •  `{hours}`**h**  `{minutes}`**m**  "
             f"**|**  [`{percentage}`**%**]"
