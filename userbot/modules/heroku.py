@@ -46,7 +46,7 @@ async def dyno_manage(dyno):
                 else:
                     dot += "."
                 sleep += 1
-            return await dyno.respond(f"⬢**{HEROKU_APP_NAME}** `is up...`")
+            await dyno.respond(f"⬢**{HEROKU_APP_NAME}** `is up...`")
             return await dyno.delete()
         else:
             return await dyno.edit(f"⬢**{HEROKU_APP_NAME}** `already on...`")
@@ -80,6 +80,7 @@ async def dyno_manage(dyno):
         dot = "."
         while (sleep <= 3):
             await dyno.edit(text + f"`{dot}`")
+            await asyncio.sleep(1)
             dot += "."
             sleep += 1
         await dyno.respond(f"⬢**{HEROKU_APP_NAME}** `turned off...`")
