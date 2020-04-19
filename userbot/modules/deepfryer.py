@@ -3,7 +3,7 @@ from telethon import events
 from telethon.errors.rpcerrorlist import YouBlockedUserError
 
 from userbot.events import register
-from userbot import bot, TEMP_DOWNLOAD_DIRECTORY
+from userbot import bot, TEMP_DOWNLOAD_DIRECTORY, CMD_HELP
 
 
 @register(outgoing=True, pattern='^.df(:? |$)')
@@ -27,12 +27,12 @@ async def _(fry):
         try:
             response = conv.wait_event(events.NewMessage(incoming=True,
                                        from_users=432858024))
-            await fry.client.send_message(chat, reply_message)
+            msg = await fry.client.send_message(chat, reply_message)
             response = await response
             """ - don't spam notif - """
             await bot.send_read_acknowledge(conv.chat_id)
         except YouBlockedUserError:
-            await fry.reply("Please unblock` @image_deepfrybot`...`")
+            await fry.reply("`Please unblock` @image_deepfrybot`...`")
             return
         if response.text.startswith("Forward"):
             await fry.edit("`Please disable your forward privacy setting...`")
@@ -47,5 +47,16 @@ async def _(fry):
                 force_document=False,
                 reply_to=message_id_to_reply
             )
+            """ - cleanup chat after completed - """
+            await fry.client.delete_messages(conv.chat_id,
+                                             [msg.id, response.id])
             await fry.delete()
             return os.remove(downloaded_file_name)
+
+
+CMD_HELP.update({
+    "deepfry":
+    ">`.df`"
+    "\nUsage: deepfry image/sticker from the reply."
+    "\n@image_deepfrybot"
+})
