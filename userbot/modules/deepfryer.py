@@ -50,8 +50,8 @@ async def _(fry):
             """ - cleanup chat after completed - """
             await fry.client.delete_messages(conv.chat_id,
                                              [msg.id, response.id])
-            await fry.delete()
-            return os.remove(downloaded_file_name)
+    await fry.delete()
+    return os.remove(downloaded_file_name)
 
 
 CMD_HELP.update({
