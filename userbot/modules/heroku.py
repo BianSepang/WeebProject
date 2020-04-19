@@ -181,21 +181,24 @@ async def dyno_usage(dyno):
     Apps = result['apps']
     for apps in Apps:
         if apps.get('app_uuid') == app.id:
-            App = apps
-            AppQuotaUsed = App.get('quota_used') / 60
-            AppPercentage = math.floor(App.get('quota_used') * 100 / quota)
-            AppHours = math.floor(AppQuotaUsed / 60)
-            AppMinutes = math.floor(AppQuotaUsed % 60)
+            AppQuotaUsed = apps.get('quota_used') / 60
+            AppPercentage = math.floor(apps.get('quota_used') * 100 / quota)
             break
         else:
-            AppQuotaUsed = 0
-            AppPercentage = 0
-            AppHours = 0
-            AppMinutes = 0
+            continue
+    try:
+        AppQuotaUsed
+        AppPercentage
+    except NameError:
+        AppQuotaUsed = 0
+        AppPercentage = 0
+
+    AppHours = math.floor(AppQuotaUsed / 60)
+    AppMinutes = math.floor(AppQuotaUsed % 60)
 
     return await dyno.edit(
          "**Dyno Usage**:\n\n"
-         f" -> `Dyno usage for`  **{HEROKU_APP_NAME}**:\n"
+         f" -> `Dyno usage for`  **{app.name}**:\n"
          f"     •  `{AppHours}`**h**  `{AppMinutes}`**m**  "
          f"**|**  [`{AppPercentage}`**%**]"
          "\n\n"
