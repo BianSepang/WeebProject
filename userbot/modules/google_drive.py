@@ -334,8 +334,12 @@ async def download_gdrive(gdrive, service, uri):
                 if "/view" in uri:
                     file_Id = uri.split("/")[-2]
             except IndexError:
-                """ - if error parse in url, assume given value is Id - """
-                file_Id = uri
+                try:
+                    file_Id = uri.split("uc?export=download&confirm="
+                                        )[1].split("id=")[1]
+                except IndexError:
+                    """ - if error parse in url, assume given value is Id - """
+                    file_Id = uri
     file = await get_information(service, file_Id)
     file_name = file.get('name')
     mimeType = file.get('mimeType')
@@ -767,7 +771,7 @@ async def google_drive(gdrive):
                         f"`Reason :` {str(e)}\n\n"
                     )
                     continue
-            await gdrive.respond(reply)
+            await gdrive.respond(reply, link_preview=False)
             return await gdrive.delete()
         elif re.findall(r'\bhttps?://.*\.\S+', value) or "magnet:?" in value:
             uri = value.split()
@@ -793,7 +797,7 @@ async def google_drive(gdrive):
                         continue
                 else:
                     break
-            await gdrive.respond(reply)
+            await gdrive.respond(reply, link_preview=False)
             return await gdrive.delete()
         if not uri and not gdrive.reply_to_msg_id:
             return await gdrive.edit(
@@ -826,7 +830,7 @@ async def google_drive(gdrive):
                         f"{str(e)}`\n\n"
                     )
                     continue
-        await gdrive.respond(reply)
+        await gdrive.respond(reply, link_preview=False)
         return await gdrive.delete()
     mimeType = await get_mimeType(file_path)
     file_name = await get_raw_name(file_path)
@@ -838,7 +842,8 @@ async def google_drive(gdrive):
             f"`Name     :` `{file_name}`\n"
             f"`Size     :` `{humanbytes(result[0])}`\n"
             f"`Download :` [{file_name}]({result[1]})\n"
-            "`Status   :` **OK**\n"
+            "`Status   :` **OK**\n",
+            link_preview=False
             )
     await gdrive.delete()
     return
