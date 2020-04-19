@@ -44,7 +44,7 @@ config = dict({"api_url": "http://api.antiddos.systems",
                                    "#62d4e3", "#65bdf3", "#ff5694"],
                "default_username_color": "#b48bf2"})
 
-@register(outgoing=True, pattern="^.quote(?: |$)(.*)")
+@register(outgoing=True, pattern="^.q(?: |$)(.*)")
 async def quotecmd(message):  # noqa: C901
     """Quote a message.
     Usage: .pch [template]
@@ -205,6 +205,6 @@ async def get_markdown(reply):
 
 CMD_HELP.update({
     "stickerchat":
-    ">`.quote`"
+    ">`.q`"
     "\nUsage: Same as quotly, enhance ur text to sticker."
 })
