@@ -788,6 +788,8 @@ async def google_drive(gdrive):
                 if True in [one or two]:
                     try:
                         reply += await download_gdrive(gdrive, service, fileId)
+                        await gdrive.respond(reply, link_preview=False)
+                        return await gdrive.delete()
                     except Exception as e:
                         reply += (
                             "`[FILE - ERROR]`\n\n"
@@ -797,8 +799,6 @@ async def google_drive(gdrive):
                         continue
                 else:
                     break
-            await gdrive.respond(reply, link_preview=False)
-            return await gdrive.delete()
         if not uri and not gdrive.reply_to_msg_id:
             return await gdrive.edit(
                 "`[VALUE - ERROR]`\n\n"
@@ -808,7 +808,7 @@ async def google_drive(gdrive):
                 "value of files/folders, e.g `.gd <filename1> <filename2>` "
                 "for upload from files/folders path this doesn't support it."
             )
-    if not file_path and gdrive.reply_to_msg_id:
+    if not value and gdrive.reply_to_msg_id:
         """ - not looping this, because reply can only run one by one - """
         reply += await download(gdrive, service)
         return await gdrive.edit(reply)
