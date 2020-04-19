@@ -3,7 +3,7 @@ from telethon import events
 from telethon.errors.rpcerrorlist import YouBlockedUserError
 
 from userbot.events import register
-from userbot import TEMP_DOWNLOAD_DIRECTORY
+from userbot import bot, TEMP_DOWNLOAD_DIRECTORY
 
 
 @register(outgoing=True, pattern='^.df(:? |$)')
@@ -29,6 +29,8 @@ async def _(fry):
                                        from_users=432858024))
             await fry.client.send_message(chat, reply_message)
             response = await response
+            """ - don't spam notif - """
+            await bot.send_read_acknowledge(conv.chat_id)
         except YouBlockedUserError:
             await fry.reply("Please unblock` @image_deepfrybot`...`")
             return
