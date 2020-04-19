@@ -340,6 +340,10 @@ async def download_gdrive(gdrive, service, uri):
                 except IndexError:
                     """ - if error parse in url, assume given value is Id - """
                     file_Id = uri
+    try:
+        file_Id
+    except NameError:
+        file_Id = uri
     file = await get_information(service, file_Id)
     file_name = file.get('name')
     mimeType = file.get('mimeType')
@@ -739,8 +743,8 @@ async def google_drive(gdrive):
         return
     if isfile(value):
         file_path = value
-        if ".torrent" in file_path:
-            uri = file_path
+        if file_path.endswith(".torrent"):
+            uri = [file_path]
             file_path = None
     elif isdir(value):
         folder_path = value
@@ -788,8 +792,6 @@ async def google_drive(gdrive):
                 if True in [one or two]:
                     try:
                         reply += await download_gdrive(gdrive, service, fileId)
-                        await gdrive.respond(reply, link_preview=False)
-                        return await gdrive.delete()
                     except Exception as e:
                         reply += (
                             "`[FILE - ERROR]`\n\n"
@@ -797,8 +799,9 @@ async def google_drive(gdrive):
                             f"`Reason :` {str(e)}\n\n"
                         )
                         continue
-                else:
-                    break
+            if reply:
+                await gdrive.respond(reply, link_preview=False)
+                return await gdrive.delete()
         if not uri and not gdrive.reply_to_msg_id:
             return await gdrive.edit(
                 "`[VALUE - ERROR]`\n\n"
