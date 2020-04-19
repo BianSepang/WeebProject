@@ -47,4 +47,5 @@ async def _(fry):
                 force_document=False,
                 reply_to=message_id_to_reply
             )
+            await fry.delete()
             return os.remove(downloaded_file_name)
