@@ -293,9 +293,13 @@ async def download(gdrive, service, uri=None):
             global parent_Id
             folder = await create_dir(service, file_name)
             parent_Id = folder.get('id')
-            await task_directory(gdrive, service, required_file_name)
+            try:
+                await task_directory(gdrive, service, required_file_name)
+            except Exception:
+                return await reset_parentId()
+            else:
+                await reset_parentId()
             webViewURL = "https://drive.google.com/drive/folders/" + parent_Id
-            await reset_parentId()
             reply += (
                 f"`{status}`\n\n"
                 f"`Name   :`\n`{file_name}`\n"
@@ -752,9 +756,13 @@ async def google_drive(gdrive):
         folder_name = await get_raw_name(folder_path)
         folder = await create_dir(service, folder_name)
         parent_Id = folder.get('id')
-        await task_directory(gdrive, service, folder_path)
+        try:
+            await task_directory(gdrive, service, folder_path)
+        except Exception:
+            return await reset_parentId()
+        else:
+            await reset_parentId()
         webViewURL = "https://drive.google.com/drive/folders/" + parent_Id
-        await reset_parentId()
         return await gdrive.edit(
             "`[FOLDER - UPLOAD]`\n\n"
             f"`Name   :` `{folder_name}`\n"
