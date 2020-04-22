@@ -380,13 +380,13 @@ async def download_gdrive(gdrive, service, uri):
                         display_message = current_message
                     except Exception:
                         pass
-        reply += (
+        await gdrive.edit(
             "`[FILE - DOWNLOAD]`\n\n"
             f"`Name   :`\n`{file_name}`\n"
             f"`Size   :` `{humanbytes(file_size)}`\n"
             f"`Path   :` `{file_path}`\n"
             "`Status :` **OK**\n"
-            "`Reason :` Successfully downloaded...\n\n"
+            "`Reason :` Successfully downloaded..."
         )
         msg = await gdrive.respond("`Answer the question in your BOTLOG group`")
     async with gdrive.client.conversation(BOTLOG_CHATID) as conv:
@@ -760,6 +760,10 @@ async def google_drive(gdrive):
             "`Status :` **OK**\n"
             f"`URL    :` [{folder_name}]({webViewURL})\n"
         )
+    elif not value and gdrive.reply_to_msg_id:
+        """ - not looping this, because reply can only run one by one - """
+        reply += await download(gdrive, service)
+        return await gdrive.edit(reply)
     else:
         if re.findall(r'\bhttps?://drive\.google\.com\S+', value):
             """ - Link is google drive fallback to download - """
@@ -774,8 +778,11 @@ async def google_drive(gdrive):
                         f"`Reason :` {str(e)}\n\n"
                     )
                     continue
-            await gdrive.respond(reply, link_preview=False)
-            return await gdrive.delete()
+            if reply:
+                await gdrive.respond(reply, link_preview=False)
+                return await gdrive.delete()
+            else:
+                return
         elif re.findall(r'\bhttps?://.*\.\S+', value) or "magnet:?" in value:
             uri = value.split()
         else:
@@ -801,6 +808,8 @@ async def google_drive(gdrive):
             if reply:
                 await gdrive.respond(reply, link_preview=False)
                 return await gdrive.delete()
+            else:
+                return
         if not uri and not gdrive.reply_to_msg_id:
             return await gdrive.edit(
                 "`[VALUE - ERROR]`\n\n"
@@ -810,10 +819,6 @@ async def google_drive(gdrive):
                 "value of files/folders, e.g `.gd <filename1> <filename2>` "
                 "for upload from files/folders path this doesn't support it."
             )
-    if not value and gdrive.reply_to_msg_id:
-        """ - not looping this, because reply can only run one by one - """
-        reply += await download(gdrive, service)
-        return await gdrive.edit(reply)
     if uri and not gdrive.reply_to_msg_id:
         for dl in uri:
             try:
