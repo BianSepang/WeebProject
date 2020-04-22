@@ -1,8 +1,6 @@
 # Copyright (C) 2020 Adek Maulana.
 # All rights reserved.
-"""
-   Heroku manager for your userbot
-"""
+""" - a fallback for main userbot - """
 
 import heroku3
 import asyncio
@@ -16,10 +14,11 @@ from userbot.events import register
 
 Heroku = heroku3.from_key(HEROKU_API_KEY)
 heroku_api = "https://api.heroku.com"
-useragent = ('Mozilla/5.0 (Linux; Android 10; SM-G975F) '
-             'AppleWebKit/537.36 (KHTML, like Gecko) '
-             'Chrome/80.0.3987.149 Mobile Safari/537.36'
-             )
+useragent = (
+    'Mozilla/5.0 (Linux; Android 10; SM-G975F) '
+    'AppleWebKit/537.36 (KHTML, like Gecko) '
+    'Chrome/81.0.4044.117 Mobile Safari/537.36'
+)
 
 
 @register(outgoing=True,
@@ -46,7 +45,11 @@ async def dyno_manage(dyno):
                 else:
                     dot += "."
                 sleep += 1
-            await dyno.respond(f"⬢**{HEROKU_APP_NAME}** `is up...`")
+            state = Dyno.state
+            if state == "up":
+                await dyno.respond(f"⬢**{HEROKU_APP_NAME}** `up...`")
+            elif state == "crashed":
+                await dyno.respond(f"⬢**{HEROKU_APP_NAME}** `crashed...`")
             return await dyno.delete()
         else:
             return await dyno.edit(f"⬢**{HEROKU_APP_NAME}** `already on...`")
@@ -70,7 +73,11 @@ async def dyno_manage(dyno):
                 else:
                     dot += "."
                 sleep += 1
-            await dyno.respond(f"⬢**{HEROKU_APP_NAME}** `restarted...`")
+            state = Dyno.state
+            if state == "up":
+                await dyno.respond(f"⬢**{HEROKU_APP_NAME}** `restarted...`")
+            elif state == "crashed":
+                await dyno.respond(f"⬢**{HEROKU_APP_NAME}** `crashed...`")
             return await dyno.delete()
     elif exe == "shutdown":
         """ - Complete shutdown - """
