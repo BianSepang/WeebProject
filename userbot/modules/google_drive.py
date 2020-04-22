@@ -69,8 +69,6 @@ if __ is not None:
         try:
             G_DRIVE_FOLDER_ID = __.split("open?id=")[1]
         except IndexError:
-            pass
-        finally:
             if "/view" in __:
                 G_DRIVE_FOLDER_ID = __.split("/")[-2]
             else:
@@ -920,8 +918,6 @@ async def set_upload_folder(gdrive):
             try:
                 parent_Id = ext_id.split("open?id=")[1]
             except IndexError:
-                pass
-            finally:
                 if "/view" in ext_id:
                     parent_Id = ext_id.split("/")[-2]
                 else:
