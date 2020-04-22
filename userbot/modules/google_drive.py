@@ -69,10 +69,11 @@ if __ is not None:
         try:
             G_DRIVE_FOLDER_ID = __.split("open?id=")[1]
         except IndexError:
-            try:
-                if "/view" in __:
-                    G_DRIVE_FOLDER_ID = __.split("/")[-2]
-            except IndexError:
+            pass
+        finally:
+            if "/view" in __:
+                G_DRIVE_FOLDER_ID = __.split("/")[-2]
+            else:
                 try:
                     G_DRIVE_FOLDER_ID = __.split(
                                       "folderview?id=")[1]
@@ -89,7 +90,8 @@ if __ is not None:
                         pass
                     else:
                         LOGS.info(
-                           "G_DRIVE_FOLDER_ID not valid...")
+                            "G_DRIVE_FOLDER_ID "
+                            "not a valid ID/URL...")
                         G_DRIVE_FOLDER_ID = None
 # =========================================================== #
 #                                                             #
@@ -891,7 +893,7 @@ async def set_upload_folder(gdrive):
             c2 = False
         if True in [c1 or c2]:
             parent_Id = inp
-            await gdrive.edit(
+            return await gdrive.edit(
                 "`[PARENT - FOLDER]`\n\n"
                 "`Status :` **OK**\n"
                 "`Reason :` Successfully changed."
@@ -918,11 +920,11 @@ async def set_upload_folder(gdrive):
             try:
                 parent_Id = ext_id.split("open?id=")[1]
             except IndexError:
-                try:
-                    if "/view" in ext_id:
-                        parent_Id = ext_id.split("/")[-2]
-                except IndexError:
-                    """ - Last attemp to catch - """
+                pass
+            finally:
+                if "/view" in ext_id:
+                    parent_Id = ext_id.split("/")[-2]
+                else:
                     try:
                         parent_Id = ext_id.split("folderview?id=")[1]
                     except IndexError:
