@@ -837,7 +837,7 @@ async def google_drive(gdrive):
                     reply += (
                         "`[UNKNOWN - ERROR]`\n\n"
                         "`Status :` **BAD**\n"
-                        f"`Reason :``{dl}`\n"
+                        f"`Reason :` `{dl}`\n"
                         f"{str(e)}`\n\n"
                     )
                     continue
