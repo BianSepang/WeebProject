@@ -23,6 +23,7 @@ import asyncio
 import math
 import time
 import re
+import logging
 
 import userbot.modules.sql_helper.google_drive_sql as helper
 
@@ -91,6 +92,11 @@ if __ is not None:
                             "G_DRIVE_FOLDER_ID "
                             "not a valid ID/URL...")
                         G_DRIVE_FOLDER_ID = None
+# =========================================================== #
+#                           LOG                               #
+# =========================================================== #
+logger = logging.getLogger('googleapiclient.discovery')
+logger.setLevel(logging.ERROR)
 # =========================================================== #
 #                                                             #
 # =========================================================== #
