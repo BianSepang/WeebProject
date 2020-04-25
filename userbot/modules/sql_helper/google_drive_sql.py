@@ -4,7 +4,7 @@ from sqlalchemy import Column, String, Text
 
 class GoogleDriveCreds(BASE):
     __tablename__ = 'gdrive'
-    user = Column(String(9), primary_key=True)
+    user = Column(String, primary_key=True)
     credentials = Column(Text, nullable=False)
 
     def __init__(self, user):
