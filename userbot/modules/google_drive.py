@@ -292,18 +292,28 @@ async def download(gdrive, service, uri=None):
             parent_Id = folder.get('id')
             try:
                 await task_directory(gdrive, service, required_file_name)
-            except Exception:
-                return await reset_parentId()
-            else:
+            except Exception as e:
+                reply += (
+                    f"`{status}`\n\n"
+                    f"`Name   :`\n`{file_name}`\n"
+                    "`Status :` **BAD**\n"
+                    f"`Reason :` {str(e)}"
+                )
                 await reset_parentId()
-            webViewURL = "https://drive.google.com/drive/folders/" + parent_Id
-            reply += (
-                f"`{status}`\n\n"
-                f"`Name   :`\n`{file_name}`\n"
-                "`Status :` **OK**\n"
-                f"`URL    :` [{file_name}]({webViewURL})\n\n"
-            )
-            return reply
+                return reply
+            else:
+                webViewURL = (
+                    "https://drive.google.com/drive/folders/"
+                    + parent_Id
+                )
+                reply += (
+                    f"`{status}`\n\n"
+                    f"`Name   :`\n`{file_name}`\n"
+                    "`Status :` **OK**\n"
+                    f"`URL    :` [{file_name}]({webViewURL})\n\n"
+                )
+                await reset_parentId()
+                return reply
     except Exception as e:
         status = status.replace("DOWNLOAD]", "ERROR]")
         reply += (
@@ -755,17 +765,23 @@ async def google_drive(gdrive):
         parent_Id = folder.get('id')
         try:
             await task_directory(gdrive, service, folder_path)
-        except Exception:
+        except Exception as e:
+            await gdrive.edit(
+                "`[FOLDER - UPLOAD]`\n\n"
+                f"`Name   :` `{folder_name}`\n"
+                "`Status :` **BAD**\n"
+                f"`Reason :` {str(e)}"
+            )
             return await reset_parentId()
         else:
-            await reset_parentId()
-        webViewURL = "https://drive.google.com/drive/folders/" + parent_Id
-        return await gdrive.edit(
-            "`[FOLDER - UPLOAD]`\n\n"
-            f"`Name   :` `{folder_name}`\n"
-            "`Status :` **OK**\n"
-            f"`URL    :` [{folder_name}]({webViewURL})\n"
-        )
+            webViewURL = "https://drive.google.com/drive/folders/" + parent_Id
+            await gdrive.edit(
+                "`[FOLDER - UPLOAD]`\n\n"
+                f"`Name   :` `{folder_name}`\n"
+                "`Status :` **OK**\n"
+                f"`URL    :` [{folder_name}]({webViewURL})\n"
+            )
+            return await reset_parentId()
     elif not value and gdrive.reply_to_msg_id:
         """ - not looping this, because reply can only run one by one - """
         reply += await download(gdrive, service)
