@@ -330,7 +330,7 @@ async def download(gdrive, service, uri=None):
         status = status.replace("DOWNLOAD]", "ERROR]")
         reply += (
             f"`{status}`\n\n"
-            "`Status :` **FAILED**\n"
+            "`Status :` **failed**\n"
             "`Reason :` failed to upload.\n"
             f"`{str(e)}`\n\n"
         )
@@ -758,7 +758,7 @@ async def google_drive(gdrive):
     elif value and gdrive.reply_to_msg_id:
         return await gdrive.edit(
             "`[UNKNOWN - ERROR]`\n\n"
-            "`Status :` **FAILED**\n"
+            "`Status :` **failed**\n"
             "`Reason :` Confused to upload file or the replied message/media."
         )
     service = await create_app(gdrive)
