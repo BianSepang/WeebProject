@@ -295,7 +295,7 @@ async def download(gdrive, service, uri=None):
                      gdrive, service, required_file_name, file_name, mimeType)
             reply += (
                 f"`{status}`\n\n"
-                f"`Name     :`\n`{file_name}`\n"
+                f"`Name     :` `{file_name}`\n"
                 f"`Size     :` `{humanbytes(result[0])}`\n"
                 f"`Download :` [{file_name}]({result[1]})\n"
                 "`Status   :` **OK** - Successfully uploaded.\n\n"
@@ -317,7 +317,7 @@ async def download(gdrive, service, uri=None):
                 )
                 reply += (
                     f"`{status}`\n\n"
-                    f"`Name   :`\n`{file_name}`\n"
+                    f"`Name   :` `{file_name}`\n"
                     "`Status :` **OK** - Successfully uploaded.\n"
                     f"`URL    :` [{file_name}]({webViewURL})\n\n"
                 )
@@ -391,7 +391,7 @@ async def download_gdrive(gdrive, service, uri):
                     round(percentage, 2))
                 current_message = (
                     "`[FILE - DOWNLOAD]`\n\n"
-                    f"`Name   :`\n`{file_name}`\n\n"
+                    f"`Name   :` `{file_name}`\n"
                     "`Status :`\n"
                     f"{prog_str}\n"
                     f"`{humanbytes(downloaded)} of {humanbytes(file_size)} "
@@ -406,7 +406,7 @@ async def download_gdrive(gdrive, service, uri):
                         pass
         await gdrive.edit(
             "`[FILE - DOWNLOAD]`\n\n"
-            f"`Name   :`\n`{file_name}`\n"
+            f"`Name   :` `{file_name}`\n"
             f"`Size   :` `{humanbytes(file_size)}`\n"
             f"`Path   :` `{file_path}`\n"
             "`Status :` **OK** - Successfully downloaded..."
@@ -431,7 +431,7 @@ async def download_gdrive(gdrive, service, uri):
         result = await upload(gdrive, service, file_path, file_name, mimeType)
         reply += (
             "`[FILE - UPLOAD]`\n\n"
-            f"`Name     :`\n`{file_name}`\n"
+            f"`Name     :` `{file_name}`\n"
             f"`Size     :` `{humanbytes(result[0])}`\n"
             f"`Download :` [{file_name}]({result[1]})\n"
             "`Status   :` **OK**\n\n"
@@ -539,7 +539,7 @@ async def upload(gdrive, service, file_path, file_name, mimeType):
                 round(percentage, 2))
             current_message = (
                 "`[FILE - UPLOAD]`\n\n"
-                f"`Name   :`\n`{file_name}`\n\n"
+                f"`Name   :` `{file_name}`\n"
                 "`Status :`\n"
                 f"{prog_str}\n"
                 f"`{humanbytes(uploaded)} of {humanbytes(file_size)} "
@@ -692,7 +692,7 @@ async def google_drive_managers(gdrive):
             else:
                 reply += (
                     f"`{status}`\n\n"
-                    f"`Name   :`\n`{name}`\n"
+                    f"`Name   :` `{name}`\n"
                     "`Status :` `OK`\n\n"
                 )
         elif exe == "chck":
@@ -725,7 +725,7 @@ async def google_drive_managers(gdrive):
                 status = "[FILE - EXIST]"
             msg = (
                 f"`{status}`\n\n"
-                f"`Name     :`\n`{name_or_id}`\n"
+                f"`Name     :` `{name_or_id}`\n"
                 f"`ID       :` `{f_id}`\n"
             )
             if mimeType != "application/vnd.google-apps.folder":
@@ -989,7 +989,7 @@ async def check_progress_for_dl(gdrive, gid, previous):
                     file.progress_string())
                 msg = (
                     "`[URI - DOWNLOAD]`\n\n"
-                    f"`Name :`\n`{file.name}`\n"
+                    f"`Name :` `{file.name}`\n"
                     f"`Status` -> **{file.status.capitalize()}**\n"
                     f"{prog_str}\n"
                     f"`{humanbytes(downloaded)} of {file.total_length_string()}"
@@ -1014,7 +1014,7 @@ async def check_progress_for_dl(gdrive, gid, previous):
                 try:
                     await gdrive.edit(
                         "`[URI - DOWNLOAD]`\n\n"
-                        f"`Name   :`\n`{file.name}`\n"
+                        f"`Name   :` `{file.name}`\n"
                         "`Status :` **failed**\n"
                         "`Reason :` Auto cancelled download, URI/Torrent dead."
                     )
