@@ -126,9 +126,13 @@ async def dyno_manage(dyno):
         try:
             Apps[0]
         except IndexError:
-            msg += (" -> `No quota used for any of your Apps`:\n")
+            """ - If all apps usage are zero - """
             for App in apps:
-                msg += f"     •  **{App.name}**.\n"
+                msg += (
+                    f" -> `Dyno usage for`  {App.name}:\n"
+                    f"     •  `0`**h**  `0`**m**  "
+                    f"**|**  [`0`**%**]\n\n"
+                )
         for App in Apps:
             AppName = '~~Deleted or transferred app~~'
             ID = App.get('app_uuid')
