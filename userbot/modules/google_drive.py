@@ -898,11 +898,18 @@ async def set_upload_folder(gdrive):
                 "`Status :` **OK** - using `G_DRIVE_FOLDER_ID` now."
             )
         else:
-            del parent_Id
-            return await gdrive.edit(
-                "`[FOLDER - SET]`\n\n"
-                "`Status :` **OK** - `G_DRIVE_FOLDER_ID` empty, will use root."
-            )
+            try:
+                del parent_Id
+            except NameError:
+                return await gdrive.edit(
+                    "`[FOLDER - SET]`\n\n"
+                    "`Status :` **BAD** - No parent_Id is set."
+                )
+            else:
+                return await gdrive.edit(
+                    "`[FOLDER - SET]`\n\n"
+                    "`Status :` **OK** - `G_DRIVE_FOLDER_ID` empty, will use root."
+                )
     inp = gdrive.pattern_match.group(2)
     if not inp:
         return await gdrive.edit(">`.gdfset put <folderURL/folderID>`")
