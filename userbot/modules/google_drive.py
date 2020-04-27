@@ -242,14 +242,19 @@ async def download(gdrive, service, uri=None):
         os.makedirs(TEMP_DOWNLOAD_DIRECTORY)
         required_file_name = None
     if uri:
+        full_path = os.getcwd() + TEMP_DOWNLOAD_DIRECTORY.strip('.')
         if isfile(uri) and uri.endswith(".torrent"):
-            downloads = aria2.add_torrent(uri,
-                                          uris=None,
-                                          options=None,
-                                          position=None)
+            downloads = aria2.add_torrent(
+                uri,
+                dict(dir=full_path),
+                uris=None,
+                position=None)
         else:
             uri = [uri]
-            downloads = aria2.add_uris(uri, options=None, position=None)
+            downloads = aria2.add_uris(
+                uri,
+                dict(dir=full_path),
+                position=None)
         gid = downloads.gid
         await check_progress_for_dl(gdrive, gid, previous=None)
         file = aria2.get_download(gid)
@@ -258,9 +263,9 @@ async def download(gdrive, service, uri=None):
             new_gid = await check_metadata(gid)
             await check_progress_for_dl(gdrive, new_gid, previous=None)
         try:
-            required_file_name = filenames
+            required_file_name = TEMP_DOWNLOAD_DIRECTORY + filenames
         except Exception:
-            required_file_name = filename
+            required_file_name = TEMP_DOWNLOAD_DIRECTORY + filename
     else:
         try:
             current_time = time.time()
@@ -280,7 +285,6 @@ async def download(gdrive, service, uri=None):
         reply += (
             "`[ENTRY - ERROR]`\n\n"
             "`Status :` **BAD**\n"
-            "`Reason :` Replied entry is not media/file it's a messages.\n\n"
         )
         return reply
     mimeType = await get_mimeType(required_file_name)
@@ -304,15 +308,8 @@ async def download(gdrive, service, uri=None):
             parent_Id = folder.get('id')
             try:
                 await task_directory(gdrive, service, required_file_name)
-            except Exception as e:
-                reply += (
-                    f"`{status}`\n\n"
-                    f"`Name   :`\n`{file_name}`\n"
-                    "`Status :` **BAD**\n"
-                    f"`Reason :` {str(e)}"
-                )
+            except Exception:
                 await reset_parentId()
-                return reply
             else:
                 webViewURL = (
                     "https://drive.google.com/drive/folders/"
