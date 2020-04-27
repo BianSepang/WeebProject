@@ -298,7 +298,7 @@ async def download(gdrive, service, uri=None):
                 f"`Name     :`\n`{file_name}`\n"
                 f"`Size     :` `{humanbytes(result[0])}`\n"
                 f"`Download :` [{file_name}]({result[1]})\n"
-                "`Status   :` **OK**\n\n"
+                "`Status   :` **OK** - Successfully uploaded.\n\n"
             )
             return reply
         else:
@@ -318,7 +318,7 @@ async def download(gdrive, service, uri=None):
                 reply += (
                     f"`{status}`\n\n"
                     f"`Name   :`\n`{file_name}`\n"
-                    "`Status :` **OK**\n"
+                    "`Status :` **OK** - Successfully uploaded.\n"
                     f"`URL    :` [{file_name}]({webViewURL})\n\n"
                 )
                 await reset_parentId()
@@ -328,8 +328,7 @@ async def download(gdrive, service, uri=None):
         reply += (
             f"`{status}`\n\n"
             "`Status :` **failed**\n"
-            "`Reason :` failed to upload.\n"
-            f"`{str(e)}`\n\n"
+            f"`Reason :` `{str(e)}`\n\n"
         )
         return reply
     return
@@ -410,8 +409,7 @@ async def download_gdrive(gdrive, service, uri):
             f"`Name   :`\n`{file_name}`\n"
             f"`Size   :` `{humanbytes(file_size)}`\n"
             f"`Path   :` `{file_path}`\n"
-            "`Status :` **OK**\n"
-            "`Reason :` Successfully downloaded..."
+            "`Status :` **OK** - Successfully downloaded..."
         )
         msg = await gdrive.respond("`Answer the question in your BOTLOG group`")
     async with gdrive.client.conversation(BOTLOG_CHATID) as conv:
@@ -787,7 +785,7 @@ async def google_drive(gdrive):
             await gdrive.edit(
                 "`[FOLDER - UPLOAD]`\n\n"
                 f"`Name   :` `{folder_name}`\n"
-                "`Status :` **OK**\n"
+                "`Status :` **OK** - Successfully uploaded.\n"
                 f"`URL    :` [{folder_name}]({webViewURL})\n"
             )
             return await reset_parentId()
@@ -864,8 +862,7 @@ async def google_drive(gdrive):
                     reply += (
                         "`[UNKNOWN - ERROR]`\n\n"
                         "`Status :` **BAD**\n"
-                        f"`Reason :` `{dl}`\n"
-                        f"{str(e)}`\n\n"
+                        f"`Reason :` `{dl}` - {str(e)}`\n\n"
                     )
                     continue
         await gdrive.respond(reply, link_preview=False)
@@ -880,7 +877,7 @@ async def google_drive(gdrive):
             f"`Name     :` `{file_name}`\n"
             f"`Size     :` `{humanbytes(result[0])}`\n"
             f"`Download :` [{file_name}]({result[1]})\n"
-            "`Status   :` **OK**\n",
+            "`Status   :` **OK** - Successfully uploaded.\n",
             link_preview=False
             )
     await gdrive.delete()
@@ -898,15 +895,13 @@ async def set_upload_folder(gdrive):
             parent_Id = G_DRIVE_FOLDER_ID
             return await gdrive.edit(
                 "`[FOLDER - SET]`\n\n"
-                "`Status :` **OK**\n"
-                "`Reason :` will use `G_DRIVE_FOLDER_ID`."
+                "`Status :` **OK** - using `G_DRIVE_FOLDER_ID` now."
             )
         else:
             del parent_Id
             return await gdrive.edit(
                 "`[FOLDER - SET]`\n\n"
-                "`Status :` **OK**\n"
-                "`Reason :` `G_DRIVE_FOLDER_ID` is empty, will use root."
+                "`Status :` **OK** - `G_DRIVE_FOLDER_ID` empty, will use root."
             )
     inp = gdrive.pattern_match.group(2)
     if not inp:
@@ -928,23 +923,19 @@ async def set_upload_folder(gdrive):
             parent_Id = inp
             return await gdrive.edit(
                 "`[PARENT - FOLDER]`\n\n"
-                "`Status :` **OK**\n"
-                "`Reason :` Successfully changed."
+                "`Status :` **OK** - Successfully changed."
             )
         else:
             await gdrive.edit(
                 "`[PARENT - FOLDER]`\n\n"
-                "`Status :` **WARNING**\n"
-                "`Reason :` given value doesn't seems folderId/folderURL."
-                "\n\n`Forcing to use it as parent_Id...`"
+                "`Status :` **WARNING** - forcing use..."
             )
             parent_Id = inp
     else:
         if "uc?id=" in ext_id:
             return await gdrive.edit(
                 "`[URL - ERROR]`\n\n"
-                "`Status :` **BAD**\n"
-                "`Reason :` Not a valid folderURL."
+                "`Status :` **BAD** - Not a valid folderURL."
             )
         try:
             parent_Id = ext_id.split("folders/")[1]
@@ -961,13 +952,11 @@ async def set_upload_folder(gdrive):
                     except IndexError:
                         return await gdrive.edit(
                             "`[URL - ERROR]`\n\n"
-                            "`Status :` **BAD**\n"
-                            "`Reason :` Not a valid folderURL or empty."
+                            "`Status :` **BAD** - Not a valid folderURL."
                         )
         await gdrive.edit(
                 "`[PARENT - FOLDER]`\n\n"
-                "`Status :` **OK**\n"
-                "`Reason :` Successfully changed."
+                "`Status :` **OK** - Successfully changed."
         )
     return
 
@@ -1019,7 +1008,7 @@ async def check_progress_for_dl(gdrive, gid, previous):
                     await gdrive.edit(
                         "`[URI - DOWNLOAD]`\n\n"
                         f"`Name   :`\n`{file.name}`\n"
-                        "`Status :` **BAD**\n"
+                        "`Status :` **failed**\n"
                         "`Reason :` Auto cancelled download, URI/Torrent dead."
                     )
                 except Exception:
