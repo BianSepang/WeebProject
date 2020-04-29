@@ -1,15 +1,11 @@
 {
-  "name": "Project Bish UserBot",
-  "description": "[projectbish] A modular Telegram userbot running on Python 3.8",
+  "name": "Project Bish UserBot fallback",
+  "description": "[projectbish] A modular Telegram userbot running on Python 3.8, this is a fallback for main userbot.",
   "keywords": [
     "telegram",
-    "userbot",
-    "plugin",
-    "modular",
-    "productivity"
+    "userbot"
   ],
   "repository": "https://github.com/adekmaulana/ProjectBish",
-  "website": "https://telegra.ph/How-to-host-a-Telegram-Userbot-11-02",
   "stack": "container",
   "env": {
     "API_KEY": {
@@ -25,7 +21,7 @@
       "required": true
     },
     "HEROKU_API_KEY": {
-      "description": "Your Heroku API key, get it from 'https://dashboard.heroku.com/account'",
+      "description": "Your Heroku main account API key, get it from 'https://dashboard.heroku.com/account'",
       "value": "",
       "required": true
     },
@@ -33,6 +29,10 @@
       "description": "Heroku app name main, the first app you deploy for userbot.",
       "value": "",
       "required": true
+    },
+    "HEROKU_API_KEY_FALLBACK": {
+      "description": "Your Heroku fallback account API key this is only needed if you choose to run fallback into different heroku account, get it from 'https://dashboard.heroku.com/account'",
+      "required": false
     },
     "HEROKU_APP_FALLBACK_NAME": {
       "description": "Heroku app name fallback, this should be app name you make now.",

@@ -2,17 +2,19 @@
 # All rights reserved.
 """ - a fallback for main userbot - """
 
-import heroku3
 import asyncio
 import requests
 import math
 
 from operator import itemgetter
 
-from userbot import HEROKU_APP_NAME, HEROKU_API_KEY
+from userbot import (
+    heroku, fallback,
+    HEROKU_APP_NAME, HEROKU_API_KEY, HEROKU_API_KEY_FALLBACK
+)
 from userbot.events import register
 
-Heroku = heroku3.from_key(HEROKU_API_KEY)
+
 heroku_api = "https://api.heroku.com"
 useragent = (
     'Mozilla/5.0 (Linux; Android 10; SM-G975F) '
@@ -26,7 +28,7 @@ useragent = (
 async def dyno_manage(dyno):
     """ - Restart/Kill dyno - """
     await dyno.edit("`Sending information...`")
-    app = Heroku.app(HEROKU_APP_NAME)
+    app = heroku.app(HEROKU_APP_NAME)
     exe = dyno.pattern_match.group(1)
     if exe == "on":
         try:
@@ -95,74 +97,88 @@ async def dyno_manage(dyno):
     elif exe == "usage":
         """ - Get your account Dyno Usage - """
         await dyno.edit("`Getting information...`")
-        user_id = Heroku.account().id
         headers = {
             'User-Agent': useragent,
-            'Authorization': f'Bearer {HEROKU_API_KEY}',
             'Accept': 'application/vnd.heroku+json; version=3.account-quotas',
         }
-        path = "/accounts/" + user_id + "/actions/get-quota"
-        r = requests.get(heroku_api + path, headers=headers)
-        if r.status_code != 200:
-            return await dyno.edit("`Error: something bad happened`\n\n"
-                                   f">.`{r.reason}`\n")
-        result = r.json()
-        quota = result['account_quota']
-        quota_used = result['quota_used']
+        user_id = []
+        user_id.append(heroku.account().id)
+        if fallback is not None:
+            user_id.append(fallback.account().id)
+        msg = ''
+        for aydi in user_id:
+            if fallback is not None and fallback.account().id == aydi:
+                headers['Authorization'] = f'Bearer {HEROKU_API_KEY_FALLBACK}'
+            else:
+                headers['Authorization'] = f'Bearer {HEROKU_API_KEY}'
+            path = "/accounts/" + aydi + "/actions/get-quota"
+            r = requests.get(heroku_api + path, headers=headers)
+            if r.status_code != 200:
+                await dyno.edit("`Cannot get information...`")
+                continue
+            result = r.json()
+            quota = result['account_quota']
+            quota_used = result['quota_used']
 
-        """ - Used - """
-        remaining_quota = quota - quota_used
-        percentage = math.floor(remaining_quota / quota * 100)
-        minutes_remaining = remaining_quota / 60
-        hours = math.floor(minutes_remaining / 60)
-        minutes = math.floor(minutes_remaining % 60)
+            """ - Used - """
+            remaining_quota = quota - quota_used
+            percentage = math.floor(remaining_quota / quota * 100)
+            minutes_remaining = remaining_quota / 60
+            hours = math.floor(minutes_remaining / 60)
+            minutes = math.floor(minutes_remaining % 60)
 
-        """ - Used per/App Usage - """
-        Apps = result['apps']
-        """ - Sort from larger usage to lower usage - """
-        Apps = sorted(Apps, key=itemgetter('quota_used'), reverse=True)
-        apps = Heroku.apps()
-        msg = "**Dyno Usage**:\n\n"
-        try:
-            Apps[0]
-        except IndexError:
-            """ - If all apps usage are zero - """
-            for App in apps:
-                msg += (
-                    f" -> `Dyno usage for`  {App.name}:\n"
-                    f"     •  `0`**h**  `0`**m**  "
-                    f"**|**  [`0`**%**]\n\n"
-                )
-        for App in Apps:
-            AppName = '~~Deleted or transferred app~~'
-            ID = App.get('app_uuid')
+            """ - Used per/App Usage - """
+            Apps = result['apps']
+            """ - Sort from larger usage to lower usage - """
+            Apps = sorted(Apps, key=itemgetter('quota_used'), reverse=True)
+            if fallback is not None and fallback.account().id == aydi:
+                apps = fallback.apps()
+                msg += f"**Dyno Usage {fallback.account().email}**:\n\n"
+            else:
+                apps = heroku.apps()
+                msg += f"**Dyno Usage {heroku.account().email}**:\n\n"
             try:
-                AppQuota = App.get('quota_used')
-                AppQuotaUsed = AppQuota / 60
-                AppPercentage = math.floor(AppQuota * 100 / quota)
+                Apps[0]
             except IndexError:
-                AppQuotaUsed = 0
-                AppPercentage = 0
-            finally:
-                AppHours = math.floor(AppQuotaUsed / 60)
-                AppMinutes = math.floor(AppQuotaUsed % 60)
-                for names in apps:
-                    if ID == names.id:
-                        AppName = f"**{names.name}**"
-                        break
-                    else:
-                        continue
-                msg += (
-                    f" -> `Dyno usage for`  {AppName}:\n"
-                    f"     •  `{AppHours}`**h**  `{AppMinutes}`**m**  "
-                    f"**|**  [`{AppPercentage}`**%**]\n\n"
-                )
-        return await dyno.edit(
-            f"{msg}"
-            " -> `Dyno hours quota remaining this month`:\n"
-            f"     •  `{hours}`**h**  `{minutes}`**m**  "
-            f"**|**  [`{percentage}`**%**]"
-        )
+                """ - If all apps usage are zero - """
+                for App in apps:
+                    msg += (
+                        f" -> `Dyno usage for`  **{App.name}**:\n"
+                        f"     •  `0`**h**  `0`**m**  "
+                        f"**|**  [`0`**%**]\n\n"
+                    )
+            for App in Apps:
+                AppName = '__~~Deleted or transferred app~~__'
+                ID = App.get('app_uuid')
+                try:
+                    AppQuota = App.get('quota_used')
+                    AppQuotaUsed = AppQuota / 60
+                    AppPercentage = math.floor(AppQuota * 100 / quota)
+                except IndexError:
+                    AppQuotaUsed = 0
+                    AppPercentage = 0
+                finally:
+                    AppHours = math.floor(AppQuotaUsed / 60)
+                    AppMinutes = math.floor(AppQuotaUsed % 60)
+                    for names in apps:
+                        if ID == names.id:
+                            AppName = f"**{names.name}**"
+                            break
+                    msg += (
+                        f" -> `Dyno usage for`  {AppName}:\n"
+                        f"     •  `{AppHours}`**h**  `{AppMinutes}`**m**  "
+                        f"**|**  [`{AppPercentage}`**%**]\n\n"
+                    )
+            msg = (
+                f"{msg}"
+                " -> `Dyno hours quota remaining this month`:\n"
+                f"     •  `{hours}`**h**  `{minutes}`**m**  "
+                f"**|**  [`{percentage}`**%**]\n\n"
+            )
+        if msg:
+            return await dyno.edit(msg)
+        else:
+            return
     elif exe == "help":
         return await dyno.edit(
             ">`.dyno usage`"
