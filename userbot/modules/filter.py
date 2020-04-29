@@ -47,8 +47,13 @@ async def add_new_filter(new_handler):
     except AttributeError:
         await new_handler.edit("`Running on Non-SQL mode!`")
         return
-    keyword = new_handler.pattern_match.group(1)
-    string = new_handler.text.partition(keyword)[2]
+    value = new_handler.pattern_match.group(1).split(None, 1)
+    """ - The first words after .filter(space) is the keyword - """
+    keyword = value[0]
+    try:
+        string = value[1]
+    except IndexError:
+        string = None
     msg = await new_handler.get_reply_message()
     msg_id = None
     if msg and msg.media and not string:
@@ -70,7 +75,7 @@ async def add_new_filter(new_handler):
     elif new_handler.reply_to_msg_id and not string:
         rep_msg = await new_handler.get_reply_message()
         string = rep_msg.text
-    success = "`Filter` **{}** `{} successfully`"
+    success = "`Filter`  **{}**  `{} successfully`."
     if add_filter(str(new_handler.chat_id), keyword, string, msg_id) is True:
         await new_handler.edit(success.format(keyword, 'added'))
     else:
@@ -86,10 +91,10 @@ async def remove_a_filter(r_handler):
         return await r_handler.edit("`Running on Non-SQL mode!`")
     filt = r_handler.pattern_match.group(1)
     if not remove_filter(r_handler.chat_id, filt):
-        await r_handler.edit("`Filter` **{}** `doesn't exist.`".format(filt))
+        await r_handler.edit("`Filter`  **{}**  `doesn't exist`.".format(filt))
     else:
         await r_handler.edit(
-            "`Filter` **{}** `was deleted successfully`".format(filt))
+            "`Filter`  **{}**  `was deleted successfully`.".format(filt))
 
 
 @register(outgoing=True, pattern="^.rmbotfilters (.*)")
