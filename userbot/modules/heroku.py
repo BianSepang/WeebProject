@@ -5,16 +5,12 @@ import os
 import asyncio
 import requests
 import math
-import shutil
 
 from operator import itemgetter
-from git import Repo
-from git.exc import GitCommandError
 
 from userbot import (
     heroku, fallback,
-    HEROKU_APP_NAME, HEROKU_API_KEY, HEROKU_API_KEY_FALLBACK,
-    UPSTREAM_REPO_URL, MAIN_REPO_BRANCH
+    HEROKU_APP_NAME, HEROKU_API_KEY, HEROKU_API_KEY_FALLBACK
 )
 from userbot.events import register
 
@@ -30,7 +26,7 @@ useragent = (
 @register(outgoing=True,
           pattern=(
               "^.dyno "
-              "(on|restart|off|usage|deploy|cancel deploy|get log|help|update)"
+              "(on|restart|off|usage|cancel deploy|get log|help|update)"
               "(?: |$)")
           )
 async def dyno_manage(dyno):
@@ -187,51 +183,6 @@ async def dyno_manage(dyno):
             return await dyno.edit(msg)
         else:
             return
-    elif exe == "deploy":
-        home = os.getcwd()
-        if not os.path.isdir('deploy'):
-            os.mkdir('deploy')
-        txt = (
-            "`Oops.. cannot continue deploy due to "
-            "some problems occured.`\n\n**LOGTRACE:**\n"
-        )
-        heroku_app = None
-        apps = heroku.apps()
-        for app in apps:
-            if app.name == HEROKU_APP_NAME:
-                heroku_app = app
-                break
-        if heroku_app is None:
-            await dyno.edit(
-                f"{txt}\n"
-                "`Invalid Heroku credentials for deploying userbot dyno.`"
-            )
-            return
-        await dyno.edit(
-            '`[HEROKU - MAIN]`\n'
-            '`Userbot main dyno build in progress, please wait...`'
-        )
-        os.chdir('deploy')
-        repo = Repo.init()
-        origin = repo.create_remote('deploy', UPSTREAM_REPO_URL)
-        try:
-            origin.pull(MAIN_REPO_BRANCH)
-        except GitCommandError:
-            await dyno.edit(
-                f"{txt}\n"
-                f"`Invalid`  **{MAIN_REPO_BRANCH}** `branch name.`"
-            )
-            os.remove('deploy')
-            return
-        heroku_git_url = heroku_app.git_url.replace(
-            "https://", "https://api:" + HEROKU_API_KEY + "@")
-        remote = repo.create_remote("heroku", heroku_git_url)
-        remote.push(refspec="HEAD:refs/heads/master", force=True)
-        await dyno.edit('`Successfully deployed!\n'
-                        'Restarting, please wait...`')
-        os.chdir(home)
-        shutil.rmtree('deploy')
-        return
     elif exe == "cancel deploy":
         """ - Don't support for user that have multiple build at same time - """
         pending = False
@@ -288,10 +239,8 @@ async def dyno_manage(dyno):
             "\nUsage: Restart your dyno application."
             "\n\n>`.dyno off`"
             "\nUsage: Shutdown dyno completly."
-            "\n\n>`.dyno deploy`"
-            "\nUsage: Deploy your main userbot without checking update."
             "\n\n>`.dyno cancel deploy`"
-            "\nUsage: Cancel deploy from >`.dyno deploy` cmd."
+            "\nUsage: Cancel deploy from main app."
             "\n\n>`.dyno get log`"
             "\nUsage: Get your main dyno recent logs."
             "\n\n>`.dyno help`"
