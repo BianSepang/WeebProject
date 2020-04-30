@@ -56,8 +56,9 @@ async def deploy(event, repo, ups_rem, ac_br, txt):
     apps = heroku.apps()
     if HEROKU_APP_FALLBACK_NAME is None:
         await event.edit(
-            '`[HEROKU]: Please set up the` **HEROKU_APP_FALLBACK_NAME** `variable'
-            ' to be able to deploy newest changes of userbot.`'
+            '`[HEROKU]`\n'
+            '`Please set up the` **HEROKU_APP_FALLBACK_NAME** `variable '
+            'to be able to deploy newest changes of userbot.`'
         )
         repo.__del__()
         return
@@ -71,7 +72,7 @@ async def deploy(event, repo, ups_rem, ac_br, txt):
         )
         return repo.__del__()
     await event.edit(
-        '`[HEROKU]`:\n'
+        '`[HEROKU]`\n'
         '`Userbot fallback dyno build in progress, please wait...`'
     )
     ups_rem.fetch(ac_br)
@@ -141,7 +142,7 @@ async def upstream(event):
     ac_br = repo.active_branch.name
     if ac_br != UPSTREAM_REPO_BRANCH:
         await event.edit(
-            '**[UPDATER]:**\n'
+            '**[UPDATER]**\n'
             f'`Looks like you are using your own custom branch ({ac_br}). '
             'in that case, Updater is unable to identify '
             'which branch is to be merged. '
