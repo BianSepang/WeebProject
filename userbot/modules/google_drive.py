@@ -349,20 +349,15 @@ async def download_gdrive(gdrive, service, uri):
         try:
             file_Id = uri.split("open?id=")[1]
         except IndexError:
-            try:
-                if "/view" in uri:
-                    file_Id = uri.split("/")[-2]
-            except IndexError:
+            if "/view" in uri:
+                file_Id = uri.split("/")[-2]
+            else:
                 try:
                     file_Id = uri.split("uc?export=download&confirm="
                                         )[1].split("id=")[1]
                 except IndexError:
                     """ - if error parse in url, assume given value is Id - """
                     file_Id = uri
-    try:
-        file_Id
-    except NameError:
-        file_Id = uri
     file = await get_information(service, file_Id)
     file_name = file.get('name')
     mimeType = file.get('mimeType')
