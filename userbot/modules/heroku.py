@@ -30,7 +30,7 @@ useragent = (
 @register(outgoing=True,
           pattern=(
               "^.dyno "
-              "(on|restart|off|usage|deploy|get log|help)"
+              "(on|restart|off|usage|deploy|cancel deploy|get log|help)"
               "(?: |$)")
           )
 async def dyno_manage(dyno):
@@ -232,6 +232,37 @@ async def dyno_manage(dyno):
         os.chdir(home)
         shutil.rmtree('deploy')
         return
+    elif exe == "cancel deploy":
+        """ - Don't support for user that have multiple build at same time - """
+        pending = False
+        builds = app.builds()
+        for build in builds:
+            if build.status == "pending":
+                build_id = build.id
+                build_app = build.app.id
+                pending = True
+                break
+        if pending is False:
+            return await dyno.edit("`No builds to cancel...`")
+        headers = {
+            'User-Agent': useragent,
+            'Authorization': f'Bearer {HEROKU_API_KEY}',
+            'Accept': 'application/vnd.heroku+json; version=3.cancel-build',
+        }
+        path = "/apps/" + build_app + "/builds/" + build_id
+        r = requests.delete(heroku_api + path, headers=headers)
+        text = f"`Stopping build`  **{build_id}**"
+        await dyno.edit(text)
+        sleep = 0
+        dot = "."
+        await asyncio.sleep(1)
+        while (sleep <= 3):
+            await dyno.edit(text + f"`{dot}`")
+            await asyncio.sleep(1)
+            dot += "."
+            sleep += 1
+        await dyno.respond(f"**{build_id}**  `Stopped...`")
+        return await dyno.delete()
     elif exe == "get log":
         await dyno.edit("`Getting information...`")
         with open('logs.txt', 'w') as log:
@@ -259,6 +290,8 @@ async def dyno_manage(dyno):
             "\nUsage: Shutdown dyno completly."
             "\n\n>`.dyno deploy`"
             "\nUsage: Deploy your main userbot without checking update."
+            "\n\n>`.dyno cancel deploy`"
+            "\nUsage: Cancel deploy from >`.dyno deploy` cmd."
             "\n\n>`.dyno get log`"
             "\nUsage: Get your main dyno recent logs."
             "\n\n>`.dyno help`"
