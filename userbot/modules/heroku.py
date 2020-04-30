@@ -137,10 +137,10 @@ async def dyno_manage(dyno):
             Apps = sorted(Apps, key=itemgetter('quota_used'), reverse=True)
             if fallback is not None and fallback.account().id == aydi:
                 apps = fallback.apps()
-                msg += f"**Dyno Usage {fallback.account().email}**:\n\n"
+                msg += "**Dyno Usage fallback-account**:\n\n"
             else:
                 apps = heroku.apps()
-                msg += f"**Dyno Usage {heroku.account().email}**:\n\n"
+                msg += "**Dyno Usage main-account**:\n\n"
             try:
                 Apps[0]
             except IndexError:
@@ -191,6 +191,7 @@ async def dyno_manage(dyno):
             if build.status == "pending":
                 build_id = build.id
                 build_app = build.app.id
+                build_app_name = build.app.name
                 pending = True
                 break
         if pending is False:
@@ -214,7 +215,7 @@ async def dyno_manage(dyno):
             sleep += 1
         await dyno.respond(
             "`[HEROKU]`\n"
-            f"**{build_id}**: `Stopped...`")
+            f"Build: ⬢**{build_app_name}**  `Stopped...`")
         """ - Restart main if builds cancelled - """
         try:
             app.dynos()[0].restart()
