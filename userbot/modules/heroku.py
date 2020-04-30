@@ -26,8 +26,8 @@ useragent = (
 @register(outgoing=True,
           pattern=(
               "^.dyno "
-              "(on|restart|off|usage|cancel deploy|get log|help|update)"
-              "(?: (.*)|$)")
+              "(on|restart|off|usage|cancel deploy|cancel build"
+              "|get log|help|update)(?: (.*)|$)")
           )
 async def dyno_manage(dyno):
     """ - Restart/Kill dyno - """
@@ -183,7 +183,7 @@ async def dyno_manage(dyno):
             return await dyno.edit(msg)
         else:
             return
-    elif exe == "cancel deploy":
+    elif exe == "cancel deploy" or exe == "cancel build":
         """ - Only cancel 1 recent builds from activity - """
         try:
             build_id = dyno.pattern_match.group(2)
@@ -251,8 +251,9 @@ async def dyno_manage(dyno):
             "\nUsage: Restart your dyno application."
             "\n\n>`.dyno off`"
             "\nUsage: Shutdown dyno completly."
-            "\n\n>`.dyno cancel deploy`"
-            "\nUsage: Cancel deploy from main app."
+            "\n\n>`.dyno cancel deploy` or >`.dyno cancel build`"
+            "\nUsage: Cancel deploy from main app "
+            "give build.id to specify build to cancel."
             "\n\n>`.dyno get log`"
             "\nUsage: Get your main dyno recent logs."
             "\n\n>`.dyno help`"
