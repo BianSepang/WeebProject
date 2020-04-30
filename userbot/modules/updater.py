@@ -15,8 +15,9 @@ import sys
 from git import Repo
 from git.exc import GitCommandError, InvalidGitRepositoryError, NoSuchPathError
 
-from userbot import (HEROKU_API_KEY, HEROKU_APP_FALLBACK_NAME,
-                     UPSTREAM_REPO_URL, UPSTREAM_REPO_BRANCH)
+from userbot import (
+    HEROKU_API_KEY_FALLBACK, HEROKU_APP_FALLBACK_NAME, fallback,
+    HEROKU_API_KEY, UPSTREAM_REPO_URL, UPSTREAM_REPO_BRANCH)
 from userbot.events import register
 
 requirements_path = path.join(
@@ -45,50 +46,50 @@ async def update_requirements():
 
 
 async def deploy(event, repo, ups_rem, ac_br, txt):
-    if HEROKU_API_KEY is not None:
-        import heroku3
-        heroku = heroku3.from_key(HEROKU_API_KEY)
-        heroku_app = None
-        heroku_applications = heroku.apps()
-        if HEROKU_APP_FALLBACK_NAME is None:
-            await event.edit(
-                '`[HEROKU]: Please set up the` **HEROKU_APP_FALLBACK_NAME** `variable'
-                ' to be able to deploy newest changes of userbot.`'
-            )
-            repo.__del__()
-            return
-        for app in heroku_applications:
-            if app.name == HEROKU_APP_FALLBACK_NAME:
-                heroku_app = app
-                break
-        if heroku_app is None:
-            await event.edit(
-                f'{txt}\n`Invalid Heroku credentials for deploying userbot dyno.`'
-            )
-            return repo.__del__()
-        await event.edit('`[HEROKU]:'
-                         '\nUserbot dyno build in progress, please wait...`'
-                         )
-        ups_rem.fetch(ac_br)
-        repo.git.reset("--hard", "FETCH_HEAD")
-        heroku_git_url = heroku_app.git_url.replace(
-            "https://", "https://api:" + HEROKU_API_KEY + "@")
-        if "heroku" in repo.remotes:
-            remote = repo.remote("heroku")
-            remote.set_url(heroku_git_url)
-        else:
-            remote = repo.create_remote("heroku", heroku_git_url)
-        try:
-            remote.push(refspec="HEAD:refs/heads/master", force=True)
-        except GitCommandError as error:
-            await event.edit(f'{txt}\n`Here is the error log:\n{error}`')
-            return repo.__del__()
-        await event.edit('`Successfully Updated!\n'
-                         'Restarting, please wait...`')
+    if fallback is not None:
+        heroku = fallback
+        KEY = HEROKU_API_KEY_FALLBACK
     else:
-        await event.edit('`[HEROKU]:'
-                         '\nPlease set up` **HEROKU_API_KEY** `variable.`'
-                         )
+        from userbot import heroku
+        KEY = HEROKU_API_KEY
+    heroku_app = None
+    apps = heroku.apps()
+    if HEROKU_APP_FALLBACK_NAME is None:
+        await event.edit(
+            '`[HEROKU]: Please set up the` **HEROKU_APP_FALLBACK_NAME** `variable'
+            ' to be able to deploy newest changes of userbot.`'
+        )
+        repo.__del__()
+        return
+    for app in apps:
+        if app.name == HEROKU_APP_FALLBACK_NAME:
+            heroku_app = app
+            break
+    if heroku_app is None:
+        await event.edit(
+            f'{txt}\n`Invalid Heroku credentials for deploying userbot dyno.`'
+        )
+        return repo.__del__()
+    await event.edit(
+        '`[HEROKU]`:\n'
+        '`Userbot fallback dyno build in progress, please wait...`'
+    )
+    ups_rem.fetch(ac_br)
+    repo.git.reset("--hard", "FETCH_HEAD")
+    heroku_git_url = heroku_app.git_url.replace(
+        "https://", "https://api:" + KEY + "@")
+    if "heroku" in repo.remotes:
+        remote = repo.remote("heroku")
+        remote.set_url(heroku_git_url)
+    else:
+        remote = repo.create_remote("heroku", heroku_git_url)
+    try:
+        remote.push(refspec="HEAD:refs/heads/master", force=True)
+    except GitCommandError as error:
+        await event.edit(f'{txt}\n`Here is the error log:\n{error}`')
+        return repo.__del__()
+    await event.edit('`Successfully Updated!\n'
+                     'Restarting, please wait...`')
     return
 
 
