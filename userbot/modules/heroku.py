@@ -27,7 +27,7 @@ useragent = (
           pattern=(
               "^.dyno "
               "(on|restart|off|usage|cancel deploy|get log|help|update)"
-              "(?: |$)")
+              "(?: (.*)|$)")
           )
 async def dyno_manage(dyno):
     """ - Restart/Kill dyno - """
@@ -185,7 +185,15 @@ async def dyno_manage(dyno):
             return
     elif exe == "cancel deploy":
         """ - Only cancel 1 recent builds from activity - """
-        build = app.builds(order_by='created_at', sort='desc')[0]
+        try:
+            build_id = dyno.pattern_match.group(2)
+        except IndexError:
+            build = app.builds(order_by='created_at', sort='desc')[0]
+        else:
+            if build_id == '':
+                build = app.builds(order_by='created_at', sort='desc')[0]
+            else:
+                build = app.builds().get(build_id)
         if build.status != "pending":
             return await dyno.edit("`Zero active builds to cancel...`")
         headers = {
