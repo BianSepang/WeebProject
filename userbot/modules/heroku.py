@@ -185,18 +185,14 @@ async def dyno_manage(dyno):
             return
     elif exe == "cancel deploy" or exe == "cancel build":
         """ - Only cancel 1 recent builds from activity - """
-        try:
-            build_id = dyno.pattern_match.group(2)
-        except IndexError:
+        build_id = dyno.pattern_match.group(2)
+        if build_id is None:
             build = app.builds(order_by='created_at', sort='desc')[0]
         else:
-            if build_id == '':
-                build = app.builds(order_by='created_at', sort='desc')[0]
-            else:
-                build = app.builds().get(build_id)
-                if build is None:
-                    return await dyno.edit(
-                        f"`There is no such build.id`:  **{build_id}**")
+            build = app.builds().get(build_id)
+            if build is None:
+                return await dyno.edit(
+                    f"`There is no such build.id`:  **{build_id}**")
         if build.status != "pending":
             return await dyno.edit("`Zero active builds to cancel...`")
         headers = {
