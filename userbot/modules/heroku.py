@@ -196,7 +196,7 @@ async def dyno_manage(dyno):
                 build = app.builds().get(build_id)
                 if build is None:
                     return await dyno.edit(
-                        "`There is no such build.id`:  **{build_id}**")
+                        f"`There is no such build.id`:  **{build_id}**")
         if build.status != "pending":
             return await dyno.edit("`Zero active builds to cancel...`")
         headers = {
