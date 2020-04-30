@@ -30,7 +30,7 @@ useragent = (
 @register(outgoing=True,
           pattern=(
               "^.dyno "
-              "(on|restart|off|usage|deploy|cancel deploy|get log|help)"
+              "(on|restart|off|usage|deploy|cancel deploy|get log|help|update)"
               "(?: |$)")
           )
 async def dyno_manage(dyno):
@@ -296,4 +296,21 @@ async def dyno_manage(dyno):
             "\nUsage: Get your main dyno recent logs."
             "\n\n>`.dyno help`"
             "\nUsage: print this help."
+        )
+    elif exe == "update":
+        return await dyno.edit(
+            ">`.updatef`"
+            "\nUsage: Check fallback if there are any updates."
+            "\n\n>`.updatef deploy`"
+            "\nUsage: If there are any updates, you can deploy fallback app."
+            "\n\n>`.updatef now`"
+            "\nUsage: If there are any updates, you can update fallback app."
+            "\n\n"
+            "**FAQ**:\n"
+            "`Q`: What's different >`.updatef now` and >`.updatef deploy`?\n"
+            "`A`: >`.updatef now` update your fallback without deploying, "
+            "but the app will back to latest successfully deployed state if "
+            "fallback restarted.\n"
+            ">`.updatef deploy` is more same but if fallback restarted it "
+            "won't rollback."
         )
