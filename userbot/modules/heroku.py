@@ -1,7 +1,7 @@
 # Copyright (C) 2020 Adek Maulana.
 # All rights reserved.
 """ - a fallback for main userbot - """
-
+import os
 import asyncio
 import requests
 import math
@@ -24,7 +24,7 @@ useragent = (
 
 
 @register(outgoing=True,
-          pattern="^.dyno (on|restart|shutdown|usage|help)(?: |$)")
+          pattern="^.dyno (on|restart|shutdown|usage|get log|help)(?: |$)")
 async def dyno_manage(dyno):
     """ - Restart/Kill dyno - """
     await dyno.edit("`Sending information...`")
@@ -179,6 +179,16 @@ async def dyno_manage(dyno):
             return await dyno.edit(msg)
         else:
             return
+    elif exe == "get log":
+        with open('logs.txt', 'w') as log:
+            log.write(app.get_log())
+        await dyno.client.send_file(
+            dyno.chat_id,
+            "logs.txt",
+            reply_to=dyno.id,
+            caption="`Main dyno logs...`",
+        )
+        return os.remove('logs.txt')
     elif exe == "help":
         return await dyno.edit(
             ">`.dyno usage`"
@@ -190,6 +200,8 @@ async def dyno_manage(dyno):
             "\nUsage: Restart your dyno application."
             "\n\n>`.dyno shutdown`"
             "\nUsage: Shutdown dyno completly."
+            "\n\n>`.dyno get log`"
+            "\nUsage: Get your main dyno recent logs."
             "\n\n>`.dyno help`"
             "\nUsage: print this help."
         )
