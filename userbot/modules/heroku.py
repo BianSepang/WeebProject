@@ -180,6 +180,7 @@ async def dyno_manage(dyno):
         else:
             return
     elif exe == "get log":
+        await dyno.edit("`Getting information...`")
         with open('logs.txt', 'w') as log:
             log.write(app.get_log())
         await dyno.client.send_file(
@@ -188,6 +189,9 @@ async def dyno_manage(dyno):
             reply_to=dyno.id,
             caption="`Main dyno logs...`",
         )
+        await dyno.edit("`Information gets and sent back...`")
+        await asyncio.sleep(5)
+        await dyno.delete()
         return os.remove('logs.txt')
     elif exe == "help":
         return await dyno.edit(
