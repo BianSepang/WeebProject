@@ -59,6 +59,9 @@ HEROKU_API_KEY_FALLBACK = os.environ.get("HEROKU_API_KEY_FALLBACK", None)
 UPSTREAM_REPO_URL = os.environ.get("UPSTREAM_REPO_URL", None)
 UPSTREAM_REPO_BRANCH = os.environ.get("UPSTREAM_REPO_BRANCH", None)
 
+# Deploy
+MAIN_REPO_BRANCH = os.environ.get("MAIN_REPO_BRANCH", None)
+
 
 # 'bot' variable
 if STRING_SESSION:

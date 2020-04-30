@@ -44,9 +44,14 @@
       "value": "https://github.com/adekmaulana/ProjectBish",
       "required": true
     },
+    "MAIN_REPO_BRANCH": {
+      "description": "Your main branch repo.",
+      "value": "experimental",
+      "required": true
+    },
     "UPSTREAM_REPO_BRANCH": {
       "description": "Your forked repo branch.",
-      "value": "master",
+      "value": "master-fallback",
       "required": true
     },
     "BOTLOG": {
