@@ -184,26 +184,18 @@ async def dyno_manage(dyno):
         else:
             return
     elif exe == "cancel deploy":
-        """ - Don't support for user that have multiple build at same time - """
-        pending = False
-        builds = app.builds()
-        for build in builds:
-            if build.status == "pending":
-                build_id = build.id
-                build_app = build.app.id
-                build_app_name = build.app.name
-                pending = True
-                break
-        if pending is False:
-            return await dyno.edit("`No builds to cancel...`")
+        """ - Only cancel 1 recent builds from activity - """
+        build = app.builds(order_by='created_at', sort='desc')[0]
+        if build.status != "pending":
+            return await dyno.edit("`Zero active builds to cancel...`")
         headers = {
             'User-Agent': useragent,
             'Authorization': f'Bearer {HEROKU_API_KEY}',
             'Accept': 'application/vnd.heroku+json; version=3.cancel-build',
         }
-        path = "/apps/" + build_app + "/builds/" + build_id
+        path = "/apps/" + build.app.id + "/builds/" + build.id
         r = requests.delete(heroku_api + path, headers=headers)
-        text = f"`Stopping build`  **{build_id}**"
+        text = f"`Stopping build`  ⬢**{build.app.name}**"
         await dyno.edit(text)
         sleep = 1
         dot = "."
@@ -215,7 +207,7 @@ async def dyno_manage(dyno):
             sleep += 1
         await dyno.respond(
             "`[HEROKU]`\n"
-            f"Build: ⬢**{build_app_name}**  `Stopped...`")
+            f"Build: ⬢**{build.app.name}**  `Stopped...`")
         """ - Restart main if builds cancelled - """
         try:
             app.dynos()[0].restart()
