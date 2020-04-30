@@ -204,15 +204,23 @@ async def dyno_manage(dyno):
         r = requests.delete(heroku_api + path, headers=headers)
         text = f"`Stopping build`  **{build_id}**"
         await dyno.edit(text)
-        sleep = 0
+        sleep = 1
         dot = "."
-        await asyncio.sleep(1)
+        await asyncio.sleep(2)
         while (sleep <= 3):
             await dyno.edit(text + f"`{dot}`")
             await asyncio.sleep(1)
             dot += "."
             sleep += 1
-        await dyno.respond(f"**{build_id}**  `Stopped...`")
+        await dyno.respond(
+            "`[HEROKU]`\n"
+            f"**{build_id}**: `Stopped...`")
+        """ - Restart main if builds cancelled - """
+        try:
+            app.dynos()[0].restart()
+        except IndexError:
+            await dyno.edit("`Your dyno main app is not on...`")
+            await asyncio.sleep(2.5)
         return await dyno.delete()
     elif exe == "get log":
         await dyno.edit("`Getting information...`")
