@@ -655,7 +655,8 @@ async def reset_parentId():
           outgoing=True)
 async def lists(gdrive):
     await gdrive.edit("`Getting information...`")
-    if gdrive.pattern_match.group(1) is not None:
+    checker = gdrive.pattern_match.group(1)
+    if checker is not None:
         page_size = int(gdrive.pattern_match.group(1).strip('-l '))
         if page_size > 1000:
             await gdrive.edit(
@@ -666,8 +667,8 @@ async def lists(gdrive):
             return
     else:
         page_size = 50  # default page_size is 50
-    if gdrive.pattern_match.group(2) != '':
-        checker = gdrive.pattern_match.group(2)
+    checker = gdrive.pattern_match.group(2)
+    if checker != '':
         if checker.startswith('-p'):
             parents = checker.split(None, 2)[1]
             try:
@@ -689,19 +690,23 @@ async def lists(gdrive):
     service = await create_app(gdrive)
     if service is False:
         return False
+    message = ''
+    fields = ('nextPageToken, files(name, id, '
+              'mimeType, webViewLink, webContentLink)')
     page_token = None
+    result = []
     while True:
         try:
             response = service.files().list(
+                supportsTeamDrives=True,
+                includeTeamDriveItems=True,
                 q=query,
                 spaces='drive',
-                fields=(
-                    'nextPageToken, files(parents, name, id, '
-                    'mimeType, webViewLink, webContentLink)'
-                ),
-                pageToken=page_token,
+                corpora='allDrives',
+                fields=fields,
                 pageSize=page_size,
-                orderBy='modifiedTime desc, folder'
+                orderBy='modifiedTime desc, folder',
+                pageToken=page_token
             ).execute()
         except HttpError as e:
             await gdrive.edit(
@@ -710,26 +715,33 @@ async def lists(gdrive):
                 f"`Reason` : {str(e)}"
             )
             return
-        else:
-            page_token = response.get('nextPageToken', None)
-            if page_token is None:
+        for files in response.get('files', []):
+            if len(result) >= page_size:
                 break
-    message = ''
-    for file in response.get('files', []):
-        file_name = file.get('name')
-        file_id = file.get('id')
-        if file.get('mimeType') == 'application/vnd.google-apps.folder':
-            link = file.get('webViewLink')
-            message += (
-                f"`[FOLDER]` - `{file_id}`\n"
-                f"`{file_name}`\n{link}\n\n"
-            )
-        else:
-            link = file.get('webContentLink')
-            message += (
-                f"`[FILE]` - `{file_id}`\n"
-                f"`{file_name}`\n{link}\n\n"
-            )
+
+            file_name = files.get('name')
+            file_id = files.get('id')
+            if files.get('mimeType') == 'application/vnd.google-apps.folder':
+                link = files.get('webViewLink')
+                message += (
+                    f"`[FOLDER]` - `{file_id}`\n"
+                    f"`{file_name}`\n{link}\n\n"
+                )
+            else:
+                link = files.get('webContentLink')
+                message += (
+                    f"`[FILE]` - `{file_id}`\n"
+                    f"`{file_name}`\n{link}\n\n"
+                )
+            result.append(files)
+        if len(result) >= page_size:
+            break
+
+        page_token = response.get('nextPageToken', None)
+        if page_token is None:
+            break
+
+    del result
     if query == '':
         query = 'Not specified'
     if len(message) > 4096:
