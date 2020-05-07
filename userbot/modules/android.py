@@ -10,7 +10,6 @@ import re
 import os
 import time
 import math
-import hashlib
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -21,28 +20,11 @@ from userbot import (
     CMD_HELP, TEMP_DOWNLOAD_DIRECTORY, GOOGLE_CHROME_BIN, CHROME_DRIVER
 )
 from userbot.events import register
-from userbot.modules.upload_download import humanbytes, time_formatter
+from userbot.utils import humanbytes, time_formatter, md5, human_to_bytes
 
 GITHUB = 'https://github.com'
 DEVICES_DATA = ('https://raw.githubusercontent.com/androidtrackers/'
                 'certified-android-devices/master/by_device.json')
-
-
-async def md5(fname):
-    hash_md5 = hashlib.md5()
-    with open(fname, "rb") as f:
-        for chunk in iter(lambda: f.read(4096), b""):
-            hash_md5.update(chunk)
-    return hash_md5.hexdigest()
-
-
-def human_to_bytes(size):
-    units = {"MB": 2**20, "GB": 2**30, "TB": 2**40}
-    size = size.upper()
-    if not re.match(r' ', size):
-        size = re.sub(r'([KMGT]?B)', r' \1', size)
-    number, unit = [string.strip() for string in size.split()]
-    return int(float(number)*units[unit])
 
 
 @register(outgoing=True, pattern="^.magisk$")
