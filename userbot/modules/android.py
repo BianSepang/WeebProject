@@ -196,18 +196,20 @@ async def download_api(dl):
     download.click()
     x = download.get_attribute('text').split()[-2:]
     file_size = human_to_bytes((x[0] + x[1]).strip('()'))
-    await asyncio.sleep(5)
-    start = time.time()
     display_message = None
     complete = False
+    start = time.time()
     while complete is False:
-        try:
+        if os.path.isfile(file_path + '.crdownload'):
             downloaded = os.stat(file_path + '.crdownload').st_size
             status = "Downloading"
-        except Exception:
+        elif os.path.isfile(file_path):
             downloaded = os.stat(file_path).st_size
             file_size = downloaded
             status = "Checking"
+        else:
+            await asyncio.sleep(0.3)
+            continue
         diff = time.time() - start
         percentage = downloaded / file_size * 100
         speed = round(downloaded / diff, 2)
@@ -232,18 +234,22 @@ async def download_api(dl):
             await dl.edit(current_message)
             display_message = current_message
         if downloaded == file_size:
+            if not os.path.isfile(file_path):  # Rare case
+                await asyncio.sleep(3.5)
             MD5 = await md5(file_path)
             if md5_origin == MD5:
                 complete = True
             else:
                 await dl.edit("`Download corrupt...`")
                 os.remove(file_path)
+                driver.close()
                 return
     await dl.respond(
         f"`{file_name}`\n\n"
         f"Successfully downloaded to `{file_path}`."
     )
     await dl.delete()
+    driver.close()
     return
 
 
