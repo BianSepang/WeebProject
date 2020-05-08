@@ -186,14 +186,17 @@ async def download_api(dl):
     while complete is False:
         try:
             downloaded = os.stat(file_path + '.crdownload').st_size
+            status = "Downloading"
         except Exception:
             downloaded = os.stat(file_path).st_size
             file_size = downloaded
+            status = "Checking"
         diff = time.time() - start
         percentage = downloaded / file_size * 100
         speed = round(downloaded / diff, 2)
         eta = round((file_size - downloaded) / speed)
-        prog_str = "`Downloading...` | [{0}{1}] `{2}%`".format(
+        prog_str = "`{0}` | [{1}{2}] `{3}%`".format(
+            status,
             "".join(["●" for i in range(
                     math.floor(percentage / 10))]),
             "".join(["○"for i in range(
