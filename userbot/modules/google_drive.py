@@ -282,7 +282,7 @@ async def download(gdrive, service, uri=None):
                 return reply
             else:
                 reply += (
-                    "`{status}`\n\n"
+                    f"`{status}`\n\n"
                     f"`Name   :` `{file_name}`\n"
                     f"`Size   :` `{humanbytes(result[0])}`\n"
                     f"`Link   :` [{file_name}]({result[1]})\n"
