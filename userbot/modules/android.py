@@ -13,6 +13,7 @@ import math
 
 from datetime import datetime
 from selenium import webdriver
+from selenium.common import exceptions as Exceptions
 from selenium.webdriver.chrome.options import Options
 from requests import get
 from bs4 import BeautifulSoup
@@ -131,16 +132,21 @@ async def download_api(dl):
         return
     await dl.edit("`Sending information...`")
     chrome_options = Options()
-    chrome_options.add_argument("--headless")
     chrome_options.binary_location = GOOGLE_CHROME_BIN
+    chrome_options.add_argument("--headless")
     chrome_options.add_argument("--window-size=1920x1080")
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-gpu")
-    prefs = {'download.default_directory': './'}
+    prefs = {'download.default_directory': TEMP_DOWNLOAD_DIRECTORY}
     chrome_options.add_experimental_option('prefs', prefs)
-    driver = webdriver.Chrome(executable_path=CHROME_DRIVER,
-                              options=chrome_options)
+    try:
+        driver = webdriver.Chrome(executable_path=CHROME_DRIVER,
+                                  options=chrome_options)
+    except (Exceptions.SessionNotCreatedException,
+            Exceptions.WebDriverException):
+        await dl.edit("`Failed to start driver...`")
+        return
     await dl.edit("`Getting information...`")
     driver.get(URL)
     error = driver.find_elements_by_class_name("swal2-content")
@@ -148,16 +154,6 @@ async def download_api(dl):
         if error[0].text == "File Not Found.":
             await dl.edit(f"`FileNotFoundError`: {URL} is not found.")
             return
-    driver.command_executor._commands["send_command"] = (
-         "POST", '/session/$sessionId/chromium/send_command')
-    params = {
-        'cmd': 'Page.setDownloadBehavior',
-        'params': {
-            'behavior': 'allow',
-            'downloadPath': TEMP_DOWNLOAD_DIRECTORY
-        }
-    }
-    driver.execute("send_command", params)
     if URL.endswith('/'):
         file_name = URL.split("/")[-2]
     else:
