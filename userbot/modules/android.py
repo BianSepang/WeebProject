@@ -130,6 +130,16 @@ async def download_api(dl):
     if not re.findall(r'\bhttps?://download.*pixelexperience.*\.org\S+', URL):
         await dl.edit("`Invalid information...`")
         return
+    if URL.endswith('/'):
+        file_name = URL.split("/")[-2]
+    else:
+        file_name = URL.split("/")[-1]
+    build_date = datetime.strptime(file_name.split("-")[2], '%Y%m%d'
+                                   ).strftime('%Y/%m/%d')  # Full ROM
+    android_version = file_name.split("-")[1]
+    if android_version == "9.0":
+        await dl.edit("`Abort, only support android 10...`")
+        return
     await dl.edit("`Sending information...`")
     chrome_options = Options()
     chrome_options.binary_location = GOOGLE_CHROME_BIN
@@ -154,34 +164,31 @@ async def download_api(dl):
         if error[0].text == "File Not Found.":
             await dl.edit(f"`FileNotFoundError`: {URL} is not found.")
             return
-    if URL.endswith('/'):
-        file_name = URL.split("/")[-2]
-    else:
-        file_name = URL.split("/")[-1]
-    build_date = datetime.strptime(file_name.split("-")[2], '%Y%m%d'
-                                   ).strftime('%Y/%m/%d')
-    android_version = file_name.split("-")[1]
-    if android_version == "9.0":
-        await dl.edit("`Abort, only support android 10...`")
-        return
     data = driver.find_elements_by_class_name("package__data")
     """
     - Parse index for download button so it will match with current build_date
     """
-    for index, value in enumerate(data):
-        for val in value.text.split('\n'):
-            if val == build_date:
-                i = index
+    if "-update-" in file_name:
+        """ - Incremental don't need build_date because index is known  - """
+        if '_Plus_' in file_name:
+            i = 5
+        else:
+            i = 2
+    else:
+        for index, value in enumerate(data):
+            for val in value.text.split('\n'):
+                if val == build_date:
+                    i = index
+                    break
+                else:
+                    i = None
+            if i is not None:
                 break
-            else:
-                i = None
-        if i is not None:
-            break
-    if '_Plus_' in file_name:
-        """
-        - Because of incremental package from non plus edition
-        """
-        i += 1
+        if '_Plus_' in file_name:
+            """
+            - Because of incremental package from non plus edition
+            """
+            i += 1
     data = driver.find_elements_by_class_name('download__meta')
     md5_origin = data[i].text.split('\n')[2].split(':')[1].strip()
     file_path = TEMP_DOWNLOAD_DIRECTORY + file_name
