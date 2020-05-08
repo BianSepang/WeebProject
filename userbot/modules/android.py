@@ -12,17 +12,14 @@ import time
 import math
 
 from datetime import datetime
-from selenium import webdriver
-from selenium.common import exceptions as Exceptions
-from selenium.webdriver.chrome.options import Options
 from requests import get
 from bs4 import BeautifulSoup
 
-from userbot import (
-    CMD_HELP, TEMP_DOWNLOAD_DIRECTORY, GOOGLE_CHROME_BIN, CHROME_DRIVER
-)
+from userbot import CMD_HELP, TEMP_DOWNLOAD_DIRECTORY
 from userbot.events import register
-from userbot.utils import humanbytes, time_formatter, md5, human_to_bytes
+from userbot.utils import (
+    chrome, humanbytes, time_formatter, md5, human_to_bytes
+)
 
 GITHUB = 'https://github.com'
 DEVICES_DATA = ('https://raw.githubusercontent.com/androidtrackers/'
@@ -115,8 +112,6 @@ async def codename_info(request):
 
 @register(outgoing=True, pattern="^.pixeldl(?: |$)(.*)")
 async def download_api(dl):
-    if not os.path.isdir(TEMP_DOWNLOAD_DIRECTORY):
-        os.mkdir(TEMP_DOWNLOAD_DIRECTORY)
     await dl.edit("`Collecting information...`")
     URL = dl.pattern_match.group(1)
     URL_MSG = await dl.get_reply_message()
@@ -141,22 +136,7 @@ async def download_api(dl):
         await dl.edit("`Abort, only support android 10...`")
         return
     await dl.edit("`Sending information...`")
-    chrome_options = Options()
-    chrome_options.binary_location = GOOGLE_CHROME_BIN
-    chrome_options.add_argument("--headless")
-    chrome_options.add_argument("--window-size=1920x1080")
-    chrome_options.add_argument("--disable-dev-shm-usage")
-    chrome_options.add_argument("--no-sandbox")
-    chrome_options.add_argument("--disable-gpu")
-    prefs = {'download.default_directory': TEMP_DOWNLOAD_DIRECTORY}
-    chrome_options.add_experimental_option('prefs', prefs)
-    try:
-        driver = webdriver.Chrome(executable_path=CHROME_DRIVER,
-                                  options=chrome_options)
-    except (Exceptions.SessionNotCreatedException,
-            Exceptions.WebDriverException):
-        await dl.edit("`Failed to start driver...`")
-        return
+    driver = await chrome()
     await dl.edit("`Getting information...`")
     driver.get(URL)
     error = driver.find_elements_by_class_name("swal2-content")
@@ -242,14 +222,14 @@ async def download_api(dl):
             else:
                 await dl.edit("`Download corrupt...`")
                 os.remove(file_path)
-                driver.close()
+                driver.quit()
                 return
     await dl.respond(
         f"`{file_name}`\n\n"
         f"Successfully downloaded to `{file_path}`."
     )
     await dl.delete()
-    driver.close()
+    driver.quit()
     return
 
 
