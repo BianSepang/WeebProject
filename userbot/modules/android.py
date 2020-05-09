@@ -159,8 +159,12 @@ async def download_api(dl):
     start = time.time()
     while complete is False:
         if os.path.isfile(file_path + '.crdownload'):
-            downloaded = os.stat(file_path + '.crdownload').st_size
-            status = "Downloading"
+            try:
+                downloaded = os.stat(file_path + '.crdownload').st_size
+                status = "Downloading"
+            except OSError:  # Rare case
+                await asyncio.sleep(1)
+                continue
         elif os.path.isfile(file_path):
             downloaded = os.stat(file_path).st_size
             file_size = downloaded
@@ -193,7 +197,8 @@ async def download_api(dl):
             display_message = current_message
         if downloaded == file_size:
             if not os.path.isfile(file_path):  # Rare case
-                await asyncio.sleep(3.5)
+                await asyncio.sleep(1)
+                continue
             MD5 = await md5(file_path)
             if md5_origin == MD5:
                 complete = True
