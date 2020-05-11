@@ -1,12 +1,11 @@
 import os
-import asyncio
 from telethon.errors.rpcerrorlist import YouBlockedUserError
 
 from userbot.events import register
 from userbot import bot, TEMP_DOWNLOAD_DIRECTORY, CMD_HELP
 
 
-@register(outgoing=True, pattern=r'^.df(:? |$)(\d)?')
+@register(outgoing=True, pattern=r'^.df(:? |$)([1-8])?')
 async def _(fry):
     await fry.edit("`Sending information...`")
     level = fry.pattern_match.group(2)
