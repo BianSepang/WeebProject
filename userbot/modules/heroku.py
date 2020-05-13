@@ -124,14 +124,14 @@ async def dyno_manage(dyno):
             quota = result['account_quota']
             quota_used = result['quota_used']
 
-            """ - Used - """
+            """ - Quota Limit Left and Used Quota - """
             remaining_quota = quota - quota_used
             percentage = math.floor(remaining_quota / quota * 100)
             minutes_remaining = remaining_quota / 60
             hours = math.floor(minutes_remaining / 60)
             minutes = math.floor(minutes_remaining % 60)
 
-            """ - Used per/App Usage - """
+            """ - Used Quota per/App - """
             Apps = result['apps']
             """ - Sort from larger usage to lower usage - """
             Apps = sorted(Apps, key=itemgetter('quota_used'), reverse=True)
@@ -141,48 +141,43 @@ async def dyno_manage(dyno):
             else:
                 apps = heroku.apps()
                 msg += "**Dyno Usage main-account**:\n\n"
-            try:
-                Apps[0]
-            except IndexError:
-                """ - If all apps usage are zero - """
+            if len(Apps) == 0:
                 for App in apps:
                     msg += (
                         f" -> `Dyno usage for`  **{App.name}**:\n"
                         f"     •  `0`**h**  `0`**m**  "
                         f"**|**  [`0`**%**]\n\n"
                     )
-            for App in Apps:
-                AppName = '__~~Deleted or transferred app~~__'
-                ID = App.get('app_uuid')
-                try:
+            else:
+                for App in Apps:
+                    AppName = '__~~Deleted or transferred app~~__'
+                    ID = App.get('app_uuid')
+
                     AppQuota = App.get('quota_used')
                     AppQuotaUsed = AppQuota / 60
                     AppPercentage = math.floor(AppQuota * 100 / quota)
-                except IndexError:
-                    AppQuotaUsed = 0
-                    AppPercentage = 0
-                finally:
                     AppHours = math.floor(AppQuotaUsed / 60)
                     AppMinutes = math.floor(AppQuotaUsed % 60)
-                    for names in apps:
-                        if ID == names.id:
-                            AppName = f"**{names.name}**"
+
+                    for name in apps:
+                        if ID == name.id:
+                            AppName = f"**{name.name}**"
                             break
+
                     msg += (
                         f" -> `Dyno usage for`  {AppName}:\n"
                         f"     •  `{AppHours}`**h**  `{AppMinutes}`**m**  "
                         f"**|**  [`{AppPercentage}`**%**]\n\n"
                     )
+
             msg = (
                 f"{msg}"
                 " -> `Dyno hours quota remaining this month`:\n"
                 f"     •  `{hours}`**h**  `{minutes}`**m**  "
                 f"**|**  [`{percentage}`**%**]\n\n"
             )
-        if msg:
-            return await dyno.edit(msg)
-        else:
-            return
+        await dyno.edit(msg)
+        return
     elif exe == "cancel deploy" or exe == "cancel build":
         """ - Only cancel 1 recent builds from activity - """
         build_id = dyno.pattern_match.group(2)
