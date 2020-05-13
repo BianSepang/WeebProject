@@ -204,7 +204,7 @@ async def upstream(event):
             f'**{UPSTREAM_REPO_BRANCH}**\n')
         return repo.__del__()
 
-    if conf is None and force_update is False:
+    if conf == '' and force_update is False:
         await print_changelogs(event, ac_br, changelog)
         await event.delete()
         return await event.respond(
@@ -213,9 +213,8 @@ async def upstream(event):
     if force_update:
         await event.edit(
             '`Force-Syncing to latest stable userbot code, please wait...`')
-    else:
-        await event.edit('`Updating userbot, please wait....`')
     if conf == "now":
+        await event.edit('`Updating userbot, please wait....`')
         await update(event, repo, ups_rem, ac_br)
     return
 
