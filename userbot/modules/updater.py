@@ -141,11 +141,11 @@ async def update(event, repo, ups_rem, ac_br):
     return
 
 
-@register(outgoing=True, pattern=r"^.update(?: |$)(now|deploy)?")
+@register(outgoing=True, pattern="^.update( now| deploy|$)")
 async def upstream(event):
     "For .update command, check if the bot is up to date, update if specified"
     await event.edit("`Getting information....`")
-    conf = event.pattern_match.group(1)
+    conf = event.pattern_match.group(1).strip()
     off_repo = UPSTREAM_REPO_URL
     force_update = False
     try:
