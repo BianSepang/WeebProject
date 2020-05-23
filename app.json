@@ -163,6 +163,11 @@
     "LOGSPAMMER": {
       "description": "Set this to True in case you want the error logs to be stored in the userbot log group, instead of spitting out the file in the current chat, requires a valid BOTLOG_CHATID to be set.",
       "value": "True"
+    },
+    "DEEZER_ARL_TOKEN": {
+      "description": "Input your DEEZER ARL TOKEN",
+      "value": "",
+      "required": false
     }
   },
   "addons": [

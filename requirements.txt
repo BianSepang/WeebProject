@@ -5,6 +5,7 @@ bs4
 cowpy
 cryptg
 cffi
+deezloader
 dnspython
 emoji
 gitpython
