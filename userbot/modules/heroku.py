@@ -1,6 +1,8 @@
 # Copyright (C) 2020 Adek Maulana.
 # All rights reserved.
-""" - a fallback for main userbot - """
+"""
+   fallback for main userbot
+"""
 import os
 import asyncio
 import requests
@@ -30,7 +32,9 @@ useragent = (
               "|get log|help|update)(?: (.*)|$)")
           )
 async def dyno_manage(dyno):
-    """ - Restart/Kill dyno - """
+    """
+       Restart/Kill dyno
+    """
     await dyno.edit("`Sending information...`")
     app = heroku.app(HEROKU_APP_NAME)
     exe = dyno.pattern_match.group(1)
@@ -56,15 +60,20 @@ async def dyno_manage(dyno):
                 await dyno.respond(f"⬢**{HEROKU_APP_NAME}** `up...`")
             elif state == "crashed":
                 await dyno.respond(f"⬢**{HEROKU_APP_NAME}** `crashed...`")
-            return await dyno.delete()
+            await dyno.delete()
+            return True
         else:
-            return await dyno.edit(f"⬢**{HEROKU_APP_NAME}** `already on...`")
+            await dyno.edit(f"⬢**{HEROKU_APP_NAME}** `already on...`")
+            return False
     if exe == "restart":
         try:
-            """ - Catch error if dyno not on - """
             Dyno = app.dynos()[0]
         except IndexError:
-            return await dyno.respond(f"⬢**{HEROKU_APP_NAME}** `is not on...`")
+            """
+               Tell user if main app dyno is not on
+            """
+            await dyno.respond(f"⬢**{HEROKU_APP_NAME}** `is not on...`")
+            return False
         else:
             text = f"`Restarting` ⬢**{HEROKU_APP_NAME}**"
             Dyno.restart()
@@ -84,9 +93,12 @@ async def dyno_manage(dyno):
                 await dyno.respond(f"⬢**{HEROKU_APP_NAME}** `restarted...`")
             elif state == "crashed":
                 await dyno.respond(f"⬢**{HEROKU_APP_NAME}** `crashed...`")
-            return await dyno.delete()
+            await dyno.delete()
+            return True
     elif exe == "off":
-        """ - Complete shutdown - """
+        """
+           Complete shutdown
+        """
         app.scale_formation_process("worker", 0)
         text = f"`Shutdown` ⬢**{HEROKU_APP_NAME}**"
         sleep = 1
@@ -97,9 +109,12 @@ async def dyno_manage(dyno):
             dot += "."
             sleep += 1
         await dyno.respond(f"⬢**{HEROKU_APP_NAME}** `turned off...`")
-        return await dyno.delete()
+        await dyno.delete()
+        return True
     elif exe == "usage":
-        """ - Get your account Dyno Usage - """
+        """
+           Get your account Dyno Usage
+        """
         await dyno.edit("`Getting information...`")
         headers = {
             'User-Agent': useragent,
@@ -118,22 +133,26 @@ async def dyno_manage(dyno):
             path = "/accounts/" + aydi + "/actions/get-quota"
             r = requests.get(heroku_api + path, headers=headers)
             if r.status_code != 200:
-                await dyno.edit("`Cannot get information...`")
+                msg += f"`Cannot get {aydi} information...`\n\n"
                 continue
             result = r.json()
             quota = result['account_quota']
             quota_used = result['quota_used']
 
-            """ - Quota Limit Left and Used Quota - """
+            """
+               Quota Limit Left and Used Quota
+            """
             remaining_quota = quota - quota_used
             percentage = math.floor(remaining_quota / quota * 100)
             minutes_remaining = remaining_quota / 60
             hours = math.floor(minutes_remaining / 60)
             minutes = math.floor(minutes_remaining % 60)
 
-            """ - Used Quota per/App - """
+            """
+               Used Quota per/App
+            """
             Apps = result['apps']
-            """ - Sort from larger usage to lower usage - """
+            """Sort from larger usage to lower usage"""
             Apps = sorted(Apps, key=itemgetter('quota_used'), reverse=True)
             if fallback is not None and fallback.account().id == aydi:
                 apps = fallback.apps()
@@ -179,17 +198,21 @@ async def dyno_manage(dyno):
         await dyno.edit(msg)
         return
     elif exe == "cancel deploy" or exe == "cancel build":
-        """ - Only cancel 1 recent builds from activity - """
+        """
+           Only cancel 1 recent builds from activity if build.id not supplied
+        """
         build_id = dyno.pattern_match.group(2)
         if build_id is None:
             build = app.builds(order_by='created_at', sort='desc')[0]
         else:
             build = app.builds().get(build_id)
             if build is None:
-                return await dyno.edit(
-                    f"`There is no such build.id`:  **{build_id}**")
+                await dyno.edit(
+                    f"`There is no such build.id`:\n**{build_id}**")
+                return False
         if build.status != "pending":
-            return await dyno.edit("`Zero active builds to cancel...`")
+            await dyno.edit("`Zero active builds to cancel...`")
+            return False
         headers = {
             'User-Agent': useragent,
             'Authorization': f'Bearer {HEROKU_API_KEY}',
@@ -210,13 +233,8 @@ async def dyno_manage(dyno):
         await dyno.respond(
             "`[HEROKU]`\n"
             f"Build: ⬢**{build.app.name}**  `Stopped...`")
-        """ - Restart main if builds cancelled - """
-        try:
-            app.dynos()[0].restart()
-        except IndexError:
-            await dyno.edit("`Your dyno main app is not on...`")
-            await asyncio.sleep(2.5)
-        return await dyno.delete()
+        await dyno.delete()
+        return True
     elif exe == "get log":
         await dyno.edit("`Getting information...`")
         with open('logs.txt', 'w') as log:
@@ -227,12 +245,13 @@ async def dyno_manage(dyno):
             reply_to=dyno.id,
             caption="`Main dyno logs...`",
         )
-        await dyno.edit("`Information gets and sent back...`")
+        await dyno.edit("`Information gets...`")
         await asyncio.sleep(5)
         await dyno.delete()
-        return os.remove('logs.txt')
+        os.remove('logs.txt')
+        return True
     elif exe == "help":
-        return await dyno.edit(
+        await dyno.edit(
             ">`.dyno usage`"
             "\nUsage: Check your heroku App usage dyno quota."
             "\nIf one of your app usage is empty, it won't be write in output."
@@ -250,8 +269,9 @@ async def dyno_manage(dyno):
             "\n\n>`.dyno help`"
             "\nUsage: print this help."
         )
+        return True
     elif exe == "update":
-        return await dyno.edit(
+        await dyno.edit(
             ">`.updatef`"
             "\nUsage: Check fallback if there are any updates."
             "\n\n>`.updatef deploy`"
@@ -267,3 +287,4 @@ async def dyno_manage(dyno):
             ">`.updatef deploy` is more same but if fallback restarted it "
             "won't rollback."
         )
+        return True
