@@ -12,6 +12,14 @@
   "website": "https://telegra.ph/How-to-host-a-Telegram-Userbot-11-02",
   "stack": "container",
   "env": {
+    "ALIVE_NAME": {
+      "description": "Name to show in .alive message",
+      "required": false
+    },
+    "ALIVE_LOGO": {
+      "description": "Show Image/Logo in .alive message. Fill value of image your link image, use telegra.ph or any direct link image",
+      "required": false
+    },  	
     "API_KEY": {
       "description": "Get this value from my.telegram.org.",
       "required": true

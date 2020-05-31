@@ -11,13 +11,16 @@ from os import remove
 from platform import python_version, uname
 from shutil import which
 
+from git import Repo
 from telethon import version
+from telethon.errors.rpcerrorlist import MediaEmptyError
 
-from userbot import ALIVE_NAME, CMD_HELP
+from userbot import ALIVE_LOGO, ALIVE_NAME, CMD_HELP, bot
 from userbot.events import register
 
 # ================= CONSTANT =================
 DEFAULTUSER = str(ALIVE_NAME) if ALIVE_NAME else uname().node
+repo = Repo()
 # ============================================
 
 
@@ -125,19 +128,30 @@ async def pipcheck(pip):
             await pip.edit("`Use .help pip to see an example`")
 
 
-@register(outgoing=True, pattern="^.alive$")
+@register(outgoing=True, pattern=r"^\.(alive|on)$")
 async def amireallyalive(alive):
-    """ For .on command, check if the bot is running.  """
-    await alive.edit(
-        "`"
-        "I'm alive, at your services....\n"
-        f"------------------------------------\n"
-        f"•  User             : {DEFAULTUSER}\n"
-        f"•  Python           : {python_version()}\n"
-        f"•  Telethon version : {version.__version__}\n"
-        f"------------------------------------\n"
-        "`"
+    """For .alive command, check if the bot is running."""
+    logo = ALIVE_LOGO
+    output = (
+        f"`ProjectBish` is running on `{repo.active_branch.name}`\n"
+        "`====================================`\n"
+        f"🐍 `Python         :` v{python_version()}\n"
+        f"⚙️ `Telethon       :` v{version.__version__}\n"
+        f"👤 `User           :` {DEFAULTUSER}\n"
+        "`====================================`\n"
     )
+    if ALIVE_LOGO:
+        try:
+            logo = ALIVE_LOGO
+            await bot.send_file(alive.chat_id, logo, caption=output)
+            await alive.delete()
+        except MediaEmptyError:
+            await alive.edit(
+                output + "\n\n *`The provided logo is invalid."
+                "\nMake sure the link is directed to the logo picture`"
+            )
+    else:
+        await alive.edit(output)
 
 
 @register(outgoing=True, pattern="^.aliveu")
