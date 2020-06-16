@@ -50,3 +50,4 @@ urbandict
 wikipedia
 telegraph
 python-dateutil
+validators
