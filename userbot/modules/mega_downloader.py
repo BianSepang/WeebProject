@@ -74,13 +74,15 @@ async def mega_downloader(megadl):
             await megadl.edit("`folder download support are removed...`")
             return
     except IndexError:
-        return await megadl.edit("`MEGA.nz link not found...`")
+        await megadl.edit("`MEGA.nz link not found...`")
+        return None
     cmd = f'bin/megadown -q -m {link}'
     result = await subprocess_run(megadl, cmd)
     try:
         data = json.loads(result[0])
     except json.JSONDecodeError:
-        return await megadl.edit("`Err: failed to extract link...`\n")
+        await megadl.edit("**JSONDecodeError**: `failed to extract link...`")
+        return None
     except (IndexError, TypeError):
         return
     file_name = data["file_name"]
@@ -95,14 +97,16 @@ async def mega_downloader(megadl):
             raise FileExistsError(
                 errno.EEXIST, os.strerror(errno.EEXIST), file_path)
         except FileExistsError as e:
-            return await megadl.edit(f"`{str(e)}`")
+            await megadl.edit(f"`{str(e)}`")
+            return None
     downloader = SmartDL(
         file_url, temp_file_path, progress_bar=False)
     display_message = None
     try:
         downloader.start(blocking=False)
     except HTTPError as e:
-        return await megadl.edit(f"`Err: {str(e)}`")
+        await megadl.edit(f"**HTTPError**: `{str(e)}`")
+        return None
     start = time.time()
     while not downloader.isFinished():
         status = downloader.get_status().capitalize()
@@ -129,7 +133,7 @@ async def mega_downloader(megadl):
                 f"`ETA` -> {time_formatter(estimated_total_time)}\n"
                 f"`Duration` -> {time_formatter(round(diff))}"
             )
-            if round(diff % 10.00) == 0 and (
+            if round(diff % 15.00) == 0 and (
               display_message != current_message or total_length == downloaded
               ):
                 await megadl.edit(current_message)
@@ -151,15 +155,17 @@ async def mega_downloader(megadl):
             P.start()
             P.join()
         except FileNotFoundError as e:
-            return await megadl.edit(f"`{str(e)}`")
+            await megadl.edit(f"`{str(e)}`")
+            return None
         else:
-            return await megadl.edit(
+            await megadl.edit(
                 f"`{file_name}`\n\n"
-                f"Successfully downloaded in: `'{file_path}'`.\n"
+                f"Successfully downloaded in: '`{file_path}`'.\n"
                 f"Download took: {time_formatter(download_time)}.")
+            return None
     else:
         await megadl.edit("`Failed to download, "
-                          "check heroku Logs for more details`.")
+                          "check heroku Logs for more details.`")
         for e in downloader.get_errors():
             LOGS.info(str(e))
     return
