@@ -571,6 +571,8 @@ async def change_permission(service, Id):
           '"Sharing folders that are inside a shared drive is not supported."'
           in str(e)):
             return
+        else:
+            raise e
     return
 
 
