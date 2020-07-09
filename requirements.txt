@@ -18,10 +18,13 @@ gTTS
 gTTS-token
 hachoir
 heroku3
+html_telegraph_poster
 httplib2
 humanize
+jikanpy
 lxml
 oauth2client
+pendulum
 Pillow
 psycopg2
 psycopg2-binary
