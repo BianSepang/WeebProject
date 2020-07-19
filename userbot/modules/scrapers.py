@@ -6,20 +6,18 @@
 """ Userbot module containing various scrapers. """
 
 import asyncio
+import json
 import os
 import re
 import shutil
 import time
 from asyncio import sleep
-from html import unescape
 from re import findall
 from urllib.error import HTTPError
 from urllib.parse import quote_plus
 
 from bs4 import BeautifulSoup
 from emoji import get_emoji_regexp
-from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
 from googletrans import LANGUAGES, Translator
 from gtts import gTTS
 from gtts.lang import tts_langs
@@ -40,14 +38,9 @@ from youtube_dl.utils import (
     UnavailableVideoError,
     XAttrMetadataError,
 )
+from youtube_search import YoutubeSearch
 
-from userbot import (
-    BOTLOG,
-    BOTLOG_CHATID,
-    CMD_HELP,
-    TEMP_DOWNLOAD_DIRECTORY,
-    YOUTUBE_API_KEY,
-)
+from userbot import BOTLOG, BOTLOG_CHATID, CMD_HELP, TEMP_DOWNLOAD_DIRECTORY
 from userbot.events import register
 from userbot.utils import chrome, googleimagesdownload, progress
 
@@ -489,68 +482,46 @@ async def lang(value):
         )
 
 
-@register(outgoing=True, pattern="^.yt (.*)")
-async def yt_search(video_q):
-    """ For .yt command, do a YouTube search from Telegram. """
-    query = video_q.pattern_match.group(1)
-    result = ""
+@register(outgoing=True, pattern=r"^\.yt (\d*) *(.*)")
+async def yt_search(event):
+    """For .yt command, do a YouTube search from Telegram."""
 
-    if not YOUTUBE_API_KEY:
-        return await video_q.edit(
-            "`Error: YouTube API key missing! Add it to environment vars or config.env.`"
-        )
+    if event.pattern_match.group(1) != "":
+        counter = int(event.pattern_match.group(1))
+        if counter > 10:
+            counter = int(10)
+        if counter <= 0:
+            counter = int(1)
+    else:
+        counter = int(3)
 
-    await video_q.edit("```Processing...```")
+    query = event.pattern_match.group(2)
 
-    full_response = await youtube_search(query)
-    videos_json = full_response[1]
+    if not query:
+        return await event.edit("`Enter a query to search.`")
+    await event.edit("`Processing...`")
 
-    for video in videos_json:
-        title = f"{unescape(video['snippet']['title'])}"
-        link = f"https://youtu.be/{video['id']['videoId']}"
-        result += f"{title}\n{link}\n\n"
-
-    reply_text = f"**Search Query:**\n`{query}`\n\n**Results:**\n\n{result}"
-
-    await video_q.edit(reply_text)
-
-
-async def youtube_search(
-    query, order="relevance", token=None, location=None, location_radius=None
-):
-    """ Do a YouTube search. """
-    youtube = build(
-        "youtube", "v3", developerKey=YOUTUBE_API_KEY, cache_discovery=False
-    )
-    search_response = (
-        youtube.search()
-        .list(
-            q=query,
-            type="video",
-            pageToken=token,
-            order=order,
-            part="id,snippet",
-            maxResults=10,
-            location=location,
-            locationRadius=location_radius,
-        )
-        .execute()
-    )
-
-    videos = []
-
-    for search_result in search_response.get("items", []):
-        if search_result["id"]["kind"] == "youtube#video":
-            videos.append(search_result)
     try:
-        nexttok = search_response["nextPageToken"]
-        return (nexttok, videos)
-    except HttpError:
-        nexttok = "last_page"
-        return (nexttok, videos)
+        results = json.loads(YoutubeSearch(query, max_results=counter).to_json())
     except KeyError:
-        nexttok = "KeyError, try again."
-        return (nexttok, videos)
+        return await event.edit(
+            "`Youtube Search gone retard.\nCan't search this query!`"
+        )
+
+    output = f"**Search Query:**\n`{query}`\n\n**Results:**\n"
+
+    for i in results["videos"]:
+        try:
+            title = i["title"]
+            link = "https://youtube.com" + i["url_suffix"]
+            channel = i["channel"]
+            duration = i["duration"]
+            views = i["views"]
+            output += f"[{title}]({link})\nChannel: `{channel}`\nDuration: {duration} | {views}\n\n"
+        except IndexError:
+            break
+
+    await event.edit(output, link_preview=False)
 
 
 @register(outgoing=True, pattern=r".rip(audio|video) (.*)")

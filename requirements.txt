@@ -31,6 +31,7 @@ pySmartDL
 python-barcode
 python-dotenv
 youtube-dl
+youtube-search
 pytz
 qrcode
 requests
