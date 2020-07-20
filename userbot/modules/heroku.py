@@ -7,6 +7,7 @@ import os
 import asyncio
 import requests
 import math
+import codecs
 
 from operator import itemgetter
 
@@ -239,15 +240,12 @@ async def dyno_manage(dyno):
         await dyno.edit("`Getting information...`")
         with open('logs.txt', 'w') as log:
             log.write(app.get_log())
-        await dyno.client.send_file(
-            dyno.chat_id,
-            "logs.txt",
-            reply_to=dyno.id,
-            caption="`Main dyno logs...`",
-        )
-        await dyno.edit("`Information gets...`")
-        await asyncio.sleep(5)
-        await dyno.delete()
+        fd = codecs.open("logs.txt", "r", encoding="utf-8")
+        data = fd.read()
+        key = (requests.post("https://nekobin.com/api/documents",
+                             json={"content": data}) .json() .get("result") .get("key"))
+        url = f"https://nekobin.com/raw/{key}"
+        await dyno.edit(f"`Here the heroku logs:`\n\nPasted to: [Nekobin]({url})")
         os.remove('logs.txt')
         return True
     elif exe == "help":
