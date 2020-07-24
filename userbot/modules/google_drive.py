@@ -96,12 +96,12 @@ if __ is not None:
                         else:
                             LOGS.info(
                                 "G_DRIVE_FOLDER_ID "
-                                "not a valid URL...")
+                                "not a valid ID...")
                             G_DRIVE_FOLDER_ID = None
                     else:
                         LOGS.info(
                             "G_DRIVE_FOLDER_ID "
-                            "not a valid ID")
+                            "not a valid URL...")
                         G_DRIVE_FOLDER_ID = None
 # =========================================================== #
 #                           LOG                               #
