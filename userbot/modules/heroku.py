@@ -8,6 +8,7 @@ import asyncio
 import requests
 import math
 import codecs
+import shutil
 
 from operator import itemgetter
 
@@ -25,21 +26,16 @@ useragent = (
     'Chrome/81.0.4044.117 Mobile Safari/537.36'
 )
 
-
-@register(outgoing=True,
-          pattern=(
-              "^.dyno "
-              "(on|restart|off|usage|cancel deploy|cancel build"
-              "|get log|help|update)(?: (.*)|$)")
-          )
+@register(outgoing=True, pattern=r"^\.dyno on(?: |$)(.*)")
 async def dyno_manage(dyno):
-    """
-       Restart/Kill dyno
-    """
     await dyno.edit("`Sending information...`")
-    app = heroku.app(HEROKU_APP_NAME)
     exe = dyno.pattern_match.group(1)
-    if exe == "on":
+    if not exe:
+        await dyno.edit(f"`Heroku App not found.\nPlease run` `'.dyno on <your app name>'`")
+        return
+    else:
+        HEROKU_APP_NAME = exe
+        app = heroku.app(HEROKU_APP_NAME)
         try:
             Dyno = app.dynos()[0]
         except IndexError:
@@ -66,7 +62,19 @@ async def dyno_manage(dyno):
         else:
             await dyno.edit(f"⬢**{HEROKU_APP_NAME}** `already on...`")
             return False
-    if exe == "restart":
+
+
+@register(outgoing=True,
+           pattern=r"^\.dyno restart(?: |$)(.*)")
+async def dyno_manage(dyno):
+    await dyno.edit("`Sending information...`")
+    exe = dyno.pattern_match.group(1)
+    if not exe:
+        await dyno.edit(f"`Heroku App not found.\nPlease run` `'.dyno restart <your app name>'`")
+        return
+    else:
+        HEROKU_APP_NAME = exe
+        app = heroku.app(HEROKU_APP_NAME)
         try:
             Dyno = app.dynos()[0]
         except IndexError:
@@ -96,7 +104,19 @@ async def dyno_manage(dyno):
                 await dyno.respond(f"⬢**{HEROKU_APP_NAME}** `crashed...`")
             await dyno.delete()
             return True
-    elif exe == "off":
+
+
+@register(outgoing=True,
+           pattern=r"^\.dyno off(?: |$)(.*)")
+async def dyno_manage(dyno):
+    await dyno.edit("`Sending information...`")
+    exe = dyno.pattern_match.group(1)
+    if not exe:
+        await dyno.edit(f"`Heroku App not found.\nPlease run` `'.dyno off <your app name>'`")
+        return
+    else:
+        HEROKU_APP_NAME = exe
+        app = heroku.app(HEROKU_APP_NAME)
         """
            Complete shutdown
         """
@@ -112,7 +132,19 @@ async def dyno_manage(dyno):
         await dyno.respond(f"⬢**{HEROKU_APP_NAME}** `turned off...`")
         await dyno.delete()
         return True
-    elif exe == "usage":
+
+
+@register(outgoing=True,
+          pattern=(
+              "^.dyno "
+              "(usage|deploy|cancel deploy"
+              "|cancel build|get log|help|update)(?: (.*)|$)")
+          )
+async def dyno_manage(dyno):
+    await dyno.edit("`Sending information...`")
+    exe = dyno.pattern_match.group(1)
+    app = heroku.app(HEROKU_APP_NAME)
+    if exe == "usage":
         """
            Get your account Dyno Usage
         """
@@ -198,6 +230,51 @@ async def dyno_manage(dyno):
             )
         await dyno.edit(msg)
         return
+    if exe == "deploy":
+        home = os.getcwd()
+        if not os.path.isdir('deploy'):
+            os.mkdir('deploy')
+        txt = (
+            "`Oops.. cannot continue deploy due to "
+            "some problems occured.`\n\n**LOGTRACE:**\n"
+        )
+        heroku_app = None
+        apps = heroku.apps()
+        for app in apps:
+            if app.name == HEROKU_APP_NAME:
+                heroku_app = app
+                break
+        if heroku_app is None:
+            await dyno.edit(
+                f"{txt}\n"
+                "`Invalid Heroku credentials for deploying userbot dyno.`"
+            )
+            return
+        await dyno.edit(
+            '`[HEROKU - MAIN]`\n'
+            '`Userbot deploy in progress, please wait...`'
+        )
+        os.chdir('deploy')
+        repo = Repo.init()
+        origin = repo.create_remote('deploy', UPSTREAM_REPO_URL)
+        try:
+            origin.pull(MAIN_REPO_BRANCH)
+        except GitCommandError:
+            await dyno.edit(
+                f"{txt}\n"
+                f"`Invalid`  **{MAIN_REPO_BRANCH}** `branch name.`"
+            )
+            os.remove('deploy')
+            return
+        heroku_git_url = heroku_app.git_url.replace(
+            "https://", "https://api:" + HEROKU_API_KEY + "@")
+        remote = repo.create_remote("heroku", heroku_git_url)
+        remote.push(refspec="HEAD:refs/heads/master", force=True)
+        await dyno.edit('`Successfully deployed!\n'
+                        'Restarting, please wait...`')
+        os.chdir(home)
+        shutil.rmtree('deploy')
+        return
     elif exe == "cancel deploy" or exe == "cancel build":
         """
            Only cancel 1 recent builds from activity if build.id not supplied
@@ -253,11 +330,11 @@ async def dyno_manage(dyno):
             ">`.dyno usage`"
             "\nUsage: Check your heroku App usage dyno quota."
             "\nIf one of your app usage is empty, it won't be write in output."
-            "\n\n>`.dyno on`"
-            "\nUsage: Turn on your main dyno application."
-            "\n\n>`.dyno restart`"
+            "\n\n>`.dyno on <app name>`"
+            "\nUsage: Turn on your your dyno application."
+            "\n\n>`.dyno restart <app name>`"
             "\nUsage: Restart your dyno application."
-            "\n\n>`.dyno off`"
+            "\n\n>`.dyno off <app name>`"
             "\nUsage: Shutdown dyno completly."
             "\n\n>`.dyno cancel deploy` or >`.dyno cancel build`"
             "\nUsage: Cancel deploy from main app "
