@@ -11,12 +11,14 @@ from asyncio.subprocess import PIPE as asyncPIPE
 import re
 import urllib.parse
 import json
+import aiohttp
+import time
 from random import choice
 import requests
 from bs4 import BeautifulSoup
 from humanize import naturalsize
 
-from userbot import CMD_HELP
+from userbot import CMD_HELP, USR_TOKEN
 from userbot.events import register
 
 
@@ -70,6 +72,8 @@ async def direct_link_generator(request):
             reply += await github(link)
         elif 'androidfilehost.com' in link:
             reply += await androidfilehost(link)
+        elif 'uptobox.com' in link:
+            reply += await uptobox(link)
         else:
             reply += re.findall(r"\bhttps?://(.*?[^/]+)",
                                 link)[0] + 'is not supported'
@@ -279,6 +283,65 @@ async def androidfilehost(url: str) -> str:
         dl_url = item['url']
         reply += f'[{name}]({dl_url}) '
     return reply
+
+
+async def uptobox(url: str) -> str:
+    """ Uptobox direct links generator """
+    try:
+        link = re.findall(r'\bhttps?://.*uptobox\.com\S+', url)[0]
+    except IndexError:
+        reply = "`No Uptobox links found`\n"
+        return reply
+    reply = ''
+    if USR_TOKEN is None:
+        reply += "`Please setup USR_TOKEN_UPTOBOX first.`"
+        return reply
+    if link.endswith('/'):
+        index = -2
+    else:
+        index = -1
+    FILE_CODE = link.split('/')[index]
+    """ Get waiting token """
+    origin = 'https://uptobox.com/api/link'
+    uri = f'{origin}?token={USR_TOKEN}&file_code={FILE_CODE}'
+    async with aiohttp.ClientSession() as session:
+        async with session.get(uri) as response:
+            result = await response.text()
+            result = json.loads(result)
+            status = result.get('message')
+            if status != "Waiting needed" or status != "Success":
+                reply += (
+                    f"`[ERROR]`\n\nstatusCode: {result.get('statusCode')}\n"
+                    f"reason: {result.get('data')}\n"
+                    f"status: {status}"
+                )
+                return reply
+            is_premium = "dlLink" in result.get('data')
+            if is_premium is True:
+                reply += (
+                    f"[direct link]({result.get('data').get('dlLink')})"
+                )
+                return reply
+            else:
+                wait = result.get('data').get('waiting')
+                waitingToken = result.get('data').get('waitingToken')
+                time.sleep(wait)
+                uri += f"&waitingToken={waitingToken}"
+                async with session.get(uri) as response:
+                    result = await response.text()
+                    result = json.loads(result)
+                    status = result.get('message')
+                    if status != "Success":
+                        reply += (
+                            f"`[ERROR]`\n\nstatusCode: {result.get('statusCode')}\n"
+                            f"reason: {result.get('data')}\n"
+                            f"status: {status}"
+                        )
+                        return reply
+                    reply += (
+                        f"[direct link]({result.get('data').get('dlLink')})"
+                    )
+                    return reply
 
 
 async def useragent():
