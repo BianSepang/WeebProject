@@ -5,7 +5,9 @@
 #
 """ Userbot module containing various sites direct links generators"""
 
-from subprocess import PIPE, Popen
+from asyncio import create_subprocess_shell as asyncSubprocess
+from asyncio.subprocess import PIPE as asyncPIPE
+
 import re
 import urllib.parse
 import json
@@ -18,19 +20,19 @@ from userbot import CMD_HELP
 from userbot.events import register
 
 
-def subprocess_run(cmd):
+async def subprocess_run(cmd):
     reply = ""
-    subproc = Popen(cmd, stdout=PIPE, stderr=PIPE,
-                    shell=True, universal_newlines=True)
-    talk = subproc.communicate()
+    subproc = await asyncSubprocess(cmd, stdout=asyncPIPE, stderr=asyncPIPE)
+    result = await subproc.communicate()
     exitCode = subproc.returncode
     if exitCode != 0:
-        reply += ('```An error was detected while running the subprocess:\n'
-                  f'exit code: {exitCode}\n'
-                  f'stdout: {talk[0]}\n'
-                  f'stderr: {talk[1]}```')
+        reply += (
+            '**An error was detected while running subprocess.**\n'
+            f'exitCode : `{exitCode}`\n'
+            f'stdout : `{result[0].decode().strip()}`\n'
+            f'stderr : `{result[1].decode().strip()}`')
         return reply
-    return talk
+    return result
 
 
 @register(outgoing=True, pattern=r"^.direct(?: |$)([\s\S]*)")
