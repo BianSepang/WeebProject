@@ -330,7 +330,9 @@ async def uptobox(request, url: str) -> str:
                 waitingToken = result.get('data').get('waitingToken')
                 await request.edit(
                     f'`Waiting for about {time_formatter(wait)}.`')
-                await asyncio.sleep(wait + 15)
+                # for some reason it doesn't go as i planned
+                # so make it 1 minute just to be save enough
+                await asyncio.sleep(wait + 60)
                 uri += f"&waitingToken={waitingToken}"
                 async with session.get(uri) as response:
                     await request.edit('`Generating direct download link...`')
