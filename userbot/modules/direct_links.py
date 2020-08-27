@@ -311,9 +311,9 @@ async def uptobox(request, url: str) -> str:
             data = result.get('data').get('list')[0]
             if 'error' in data:
                 await request.edit(
-                    '`[ERROR]`\n'
-                    f'`statusCode`: *{data.get("error").get("code")}*\n'
-                    f'`reason`: *{data.get("error").get("message")}*'
+                    "`[ERROR]`\n"
+                    f"`statusCode`: **{data.get('error').get('code')}**\n"
+                    f"`reason`: **{data.get('error').get('message')}**"
                 )
                 return
             file_name = data.get('file_name')
@@ -343,9 +343,9 @@ async def uptobox(request, url: str) -> str:
                     else:
                         await request.edit(
                             "`[ERROR]`\n"
-                            f"`statusCode`: *{result.get('statusCode')}*\n"
-                            f"`reason`: *{result.get('data')}*\n"
-                            f"`status`: *{status}*"
+                            f"`statusCode`: **{result.get('statusCode')}**\n"
+                            f"`reason`: **{result.get('data')}**\n"
+                            f"`status`: **{status}**"
                         )
                         return
             elif status == "Success":
@@ -357,9 +357,9 @@ async def uptobox(request, url: str) -> str:
             else:
                 await request.edit(
                     "`[ERROR]`\n"
-                    f"`statusCode`: *{result.get('statusCode')}*\n"
-                    f"`reason`: *{result.get('data')}*\n"
-                    f"`status`: *{status}*"
+                    f"`statusCode`: **{result.get('statusCode')}**\n"
+                    f"`reason`: **{result.get('data')}**\n"
+                    f"`status`: **{status}**"
                 )
                 return
 
