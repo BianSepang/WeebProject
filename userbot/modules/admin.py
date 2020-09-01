@@ -14,6 +14,7 @@ from telethon.errors import (
     ChatAdminRequiredError,
     ImageProcessFailedError,
     PhotoCropSizeSmallError,
+    RightForbiddenError,
     UserAdminInvalidError,
 )
 from telethon.errors.rpcerrorlist import MessageTooLongError, UserIdInvalidError
@@ -80,7 +81,7 @@ UNMUTE_RIGHTS = ChatBannedRights(until_date=None, send_messages=False)
 # ================================================
 
 
-@register(outgoing=True, pattern=r"^\.setgpic$")
+@register(outgoing=True, disable_errors=True, pattern=r"^\.setgpic$")
 async def set_group_photo(gpic):
     """ For .setgpic command, changes the picture of a group """
     if not gpic.is_group:
@@ -116,7 +117,7 @@ async def set_group_photo(gpic):
             await gpic.edit(PP_ERROR)
 
 
-@register(outgoing=True, pattern=r"^\.promote(?: |$)(.*)")
+@register(outgoing=True, disable_errors=True, pattern=r"^\.promote(?: |$)(.*)")
 async def promote(promt):
     """ For .promote command, promotes the replied/tagged person """
     # Get targeted chat
@@ -151,6 +152,8 @@ async def promote(promt):
     try:
         await promt.client(EditAdminRequest(promt.chat_id, user.id, new_rights, rank))
         await promt.edit("`Promoted Successfully!`")
+    except RightForbiddenError:
+        return await promt.edit(NO_PERM)
 
     # If Telethon spit BadRequestError, assume
     # we don't have Promote permission
@@ -167,7 +170,7 @@ async def promote(promt):
         )
 
 
-@register(outgoing=True, pattern=r"^\.demote(?: |$)(.*)")
+@register(outgoing=True, disable_errors=True, pattern=r"^\.demote(?: |$)(.*)")
 async def demote(dmod):
     """ For .demote command, demotes the replied/tagged person """
     # Admin right check
@@ -217,7 +220,7 @@ async def demote(dmod):
         )
 
 
-@register(outgoing=True, pattern=r"^\.ban(?: |$)(.*)")
+@register(outgoing=True, disable_errors=True, pattern=r"^\.ban(?: |$)(.*)")
 async def ban(bon):
     """ For .ban command, bans the replied/tagged person """
     # Here laying the sanity check
@@ -269,7 +272,7 @@ async def ban(bon):
         )
 
 
-@register(outgoing=True, pattern=r"^\.unban(?: |$)(.*)")
+@register(outgoing=True, disable_errors=True, pattern=r"^\.unban(?: |$)(.*)")
 async def nothanos(unbon):
     """ For .unban command, unbans the replied/tagged person """
     # Here laying the sanity check
@@ -365,7 +368,7 @@ async def spider(spdr):
             return await spdr.edit("`Uh oh my mute logic broke!`")
 
 
-@register(outgoing=True, pattern=r"^\.unmute(?: |$)(.*)")
+@register(outgoing=True, disable_errors=True, pattern=r"^\.unmute(?: |$)(.*)")
 async def unmoot(unmot):
     """ For .unmute command, unmute the replied/tagged person """
     # Admin or creator check
@@ -451,7 +454,7 @@ async def muter(moot):
             await moot.delete()
 
 
-@register(outgoing=True, pattern=r"^\.ungmute(?: |$)(.*)")
+@register(outgoing=True, disable_errors=True, pattern=r"^\.ungmute(?: |$)(.*)")
 async def ungmoot(un_gmute):
     """For .ungmute command, ungmutes the target in the userbot"""
     # Admin or creator check
@@ -496,7 +499,7 @@ async def ungmoot(un_gmute):
             )
 
 
-@register(outgoing=True, pattern=r"^\.gmute(?: |$)(.*)")
+@register(outgoing=True, disable_errors=True, pattern=r"^\.gmute(?: |$)(.*)")
 async def gspider(gspdr):
     """For .gmute command, globally mutes the replied/tagged person"""
     # Admin or creator check
@@ -622,7 +625,7 @@ async def rm_deletedacc(show):
         )
 
 
-@register(outgoing=True, pattern=r"^\.admins$")
+@register(outgoing=True, disable_errors=True, pattern=r"^\.admins$")
 async def get_admin(show):
     """ For .admins command, list all of the admins of the chat. """
     info = await show.client.get_entity(show.chat_id)
@@ -642,7 +645,7 @@ async def get_admin(show):
     await show.edit(mentions, parse_mode="html")
 
 
-@register(outgoing=True, pattern=r"^\.pin(?: |$)(.*)")
+@register(outgoing=True, disable_errors=True, pattern=r"^\.pin(?: |$)(.*)")
 async def pin(msg):
     """ For .pin command, pins the replied/tagged message on the top the chat. """
     # Admin or creator check
@@ -685,7 +688,7 @@ async def pin(msg):
         )
 
 
-@register(outgoing=True, pattern=r"^\.kick(?: |$)(.*)")
+@register(outgoing=True, disable_errors=True, pattern=r"^\.kick(?: |$)(.*)")
 async def kick(usr):
     """ For .kick command, kicks the replied/tagged person from the group. """
     # Admin or creator check
@@ -725,7 +728,7 @@ async def kick(usr):
         )
 
 
-@register(outgoing=True, pattern=r"^\.users ?(.*)")
+@register(outgoing=True, disable_errors=True, pattern=r"^\.users ?(.*)")
 async def get_users(show):
     """ For .users command, list all of the users in a chat. """
     info = await show.client.get_entity(show.chat_id)
@@ -815,7 +818,7 @@ async def get_user_from_id(user, event):
     return user_obj
 
 
-@register(outgoing=True, pattern=r"^\.usersdel ?(.*)")
+@register(outgoing=True, disable_errors=True, pattern=r"^\.usersdel ?(.*)")
 async def get_usersdel(show):
     """ For .usersdel command, list all of the deleted users in a chat. """
     info = await show.client.get_entity(show.chat_id)
