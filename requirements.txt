@@ -46,6 +46,7 @@ pytz
 qrcode
 requests
 rarfile
+scipy
 search-engine-parser
 speedtest-cli
 sqlalchemy
@@ -56,3 +57,4 @@ wikipedia
 telegraph
 python-dateutil
 validators
+wordcloud
