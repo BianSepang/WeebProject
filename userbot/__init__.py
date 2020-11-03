@@ -74,7 +74,7 @@ HEROKU_API_KEY = os.environ.get("HEROKU_API_KEY", None)
 # Custom (forked) repo URL for updater.
 UPSTREAM_REPO_URL = os.environ.get(
     "UPSTREAM_REPO_URL",
-    "https://github.com/adekmaulana/ProjectBish.git")
+    "https://github.com/BianSepang/WeebProject.git")
 # UPSTREAM_REPO_URL branch, the default is master
 UPSTREAM_REPO_BRANCH = os.environ.get(
     "UPSTREAM_REPO_BRANCH", "master")
@@ -156,9 +156,6 @@ TERM_ALIAS = os.environ.get("TERM_ALIAS", None)
 
 # Genius Lyrics API
 GENIUS = os.environ.get("GENIUS_ACCESS_TOKEN", None)
-
-# Quote
-QUOTES_API_TOKEN = os.environ.get("QUOTES_API_TOKEN", None)
 
 # Uptobox
 USR_TOKEN = os.environ.get("USR_TOKEN_UPTOBOX", None)
