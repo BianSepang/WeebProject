@@ -5,17 +5,17 @@
 #
 # Port to UserBot by @MoveAngel
 
-import requests
 import base64
 import json
-import telethon
-
-from logging import Logger as logger
-from PIL import Image
 from io import BytesIO
-from userbot import bot, CMD_HELP, QUOTES_API_TOKEN
-from userbot.events import register
+from logging import Logger as logger
 
+import requests
+import telethon
+from PIL import Image
+
+from userbot import CMD_HELP, QUOTES_API_TOKEN, bot
+from userbot.events import register
 
 if 1 == 1:
     strings = {
@@ -36,13 +36,25 @@ if 1 == 1:
         "admin": "admin",
         "creator": "creator",
         "hidden": "hidden",
-        "channel": "Channel"
+        "channel": "Channel",
     }
 
-config = dict({"api_url": "http://api.antiddos.systems",
-               "username_colors": ["#fb6169", "#faa357", "#b48bf2", "#85de85",
-                                   "#62d4e3", "#65bdf3", "#ff5694"],
-               "default_username_color": "#b48bf2"})
+config = dict(
+    {
+        "api_url": "http://api.antiddos.systems",
+        "username_colors": [
+            "#fb6169",
+            "#faa357",
+            "#b48bf2",
+            "#85de85",
+            "#62d4e3",
+            "#65bdf3",
+            "#ff5694",
+        ],
+        "default_username_color": "#b48bf2",
+    }
+)
+
 
 @register(outgoing=True, pattern="^.q(?: |$)(.*)")
 async def quotecmd(message):  # noqa: C901
@@ -67,11 +79,18 @@ async def quotecmd(message):  # noqa: C901
     admintitle = ""
     if isinstance(message.to_id, telethon.tl.types.PeerChannel):
         try:
-            user = await bot(telethon.tl.functions.channels.GetParticipantRequest(message.chat_id,
-                                                                                  reply.from_id))
-            if isinstance(user.participant, telethon.tl.types.ChannelParticipantCreator):
+            user = await bot(
+                telethon.tl.functions.channels.GetParticipantRequest(
+                    message.chat_id, reply.from_id
+                )
+            )
+            if isinstance(
+                user.participant, telethon.tl.types.ChannelParticipantCreator
+            ):
                 admintitle = user.participant.rank or strings["creator"]
-            elif isinstance(user.participant, telethon.tl.types.ChannelParticipantAdmin):
+            elif isinstance(
+                user.participant, telethon.tl.types.ChannelParticipantAdmin
+            ):
                 admintitle = user.participant.rank or strings["admin"]
             user = user.users[0]
         except telethon.errors.rpcerrorlist.UserNotParticipantError:
@@ -79,7 +98,9 @@ async def quotecmd(message):  # noqa: C901
     elif isinstance(message.to_id, telethon.tl.types.PeerChat):
         chat = await bot(telethon.tl.functions.messages.GetFullChatRequest(reply.to_id))
         participants = chat.full_chat.participants.participants
-        participant = next(filter(lambda x: x.user_id == reply.from_id, participants), None)
+        participant = next(
+            filter(lambda x: x.user_id == reply.from_id, participants), None
+        )
         if isinstance(participant, telethon.tl.types.ChatParticipantCreator):
             admintitle = strings["creator"]
         elif isinstance(participant, telethon.tl.types.ChatParticipantAdmin):
@@ -111,16 +132,18 @@ async def quotecmd(message):  # noqa: C901
     else:
         username_color = config["default_username_color"]
 
-    request = json.dumps({
-        "ProfilePhotoURL": profile_photo_url,
-        "usernameColor": username_color,
-        "username": username,
-        "adminTitle": admintitle,
-        "Text": reply.message,
-        "Markdown": await get_markdown(reply),
-        "Template": args[0],
-        "APIKey": QUOTES_API_TOKEN
-    })
+    request = json.dumps(
+        {
+            "ProfilePhotoURL": profile_photo_url,
+            "usernameColor": username_color,
+            "username": username,
+            "adminTitle": admintitle,
+            "Text": reply.message,
+            "Markdown": await get_markdown(reply),
+            "Template": args[0],
+            "APIKey": QUOTES_API_TOKEN,
+        }
+    )
 
     resp = requests.post(config["api_url"] + "/api/v2/quote", data=request)
     resp.raise_for_status()
@@ -140,9 +163,10 @@ async def quotecmd(message):  # noqa: C901
             raise ValueError("Invalid response from server", resp)
     elif resp["status"] == 404:
         if resp["message"] == "ERROR_TEMPLATE_NOT_FOUND":
-            newreq = requests.post(config["api_url"] + "/api/v1/getalltemplates", data={
-                "token": QUOTES_API_TOKEN
-            })
+            newreq = requests.post(
+                config["api_url"] + "/api/v1/getalltemplates",
+                data={"token": QUOTES_API_TOKEN},
+            )
             newreq = newreq.json()
 
             if newreq["status"] == "NOT_ENOUGH_PERMISSIONS":
@@ -183,16 +207,24 @@ async def get_markdown(reply):
         md_item = {
             "Type": None,
             "Start": entity.offset,
-            "End": entity.offset + entity.length - 1
+            "End": entity.offset + entity.length - 1,
         }
         if isinstance(entity, telethon.tl.types.MessageEntityBold):
             md_item["Type"] = "bold"
         elif isinstance(entity, telethon.tl.types.MessageEntityItalic):
             md_item["Type"] = "italic"
-        elif isinstance(entity, (telethon.tl.types.MessageEntityMention, telethon.tl.types.MessageEntityTextUrl,
-                                 telethon.tl.types.MessageEntityMentionName, telethon.tl.types.MessageEntityHashtag,
-                                 telethon.tl.types.MessageEntityCashtag, telethon.tl.types.MessageEntityBotCommand,
-                                 telethon.tl.types.MessageEntityUrl)):
+        elif isinstance(
+            entity,
+            (
+                telethon.tl.types.MessageEntityMention,
+                telethon.tl.types.MessageEntityTextUrl,
+                telethon.tl.types.MessageEntityMentionName,
+                telethon.tl.types.MessageEntityHashtag,
+                telethon.tl.types.MessageEntityCashtag,
+                telethon.tl.types.MessageEntityBotCommand,
+                telethon.tl.types.MessageEntityUrl,
+            ),
+        ):
             md_item["Type"] = "link"
         elif isinstance(entity, telethon.tl.types.MessageEntityCode):
             md_item["Type"] = "code"
@@ -207,8 +239,6 @@ async def get_markdown(reply):
     return markdown
 
 
-CMD_HELP.update({
-    "stickerchat":
-    ">`.q`"
-    "\nUsage: Same as quotly, enhance ur text to sticker."
-})
+CMD_HELP.update(
+    {"stickerchat": ">`.q`" "\nUsage: Same as quotly, enhance ur text to sticker."}
+)

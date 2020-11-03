@@ -64,4 +64,4 @@ def human_to_bytes(size: str) -> int:
     if not re.match(r' ', size):
         size = re.sub(r'([KMGT])', r' \1', size)
     number, unit = [string.strip() for string in size.split()]
-    return int(float(number)*units[unit])
+    return int(float(number) * units[unit])

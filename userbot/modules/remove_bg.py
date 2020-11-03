@@ -8,10 +8,12 @@
 
 import io
 import os
+
 import requests
-from userbot.events import register
 from telethon.tl.types import MessageMediaPhoto
+
 from userbot import CMD_HELP, REM_BG_API_KEY, TEMP_DOWNLOAD_DIRECTORY
+from userbot.events import register
 
 
 @register(outgoing=True, pattern="^.rbg(?: |$)(.*)")
@@ -29,21 +31,22 @@ async def kbg(remob):
         await remob.edit("`Processing..`")
         try:
             if isinstance(
-                    reply_message.media, MessageMediaPhoto
-            ) or "image" in reply_message.media.document.mime_type.split('/'):
+                reply_message.media, MessageMediaPhoto
+            ) or "image" in reply_message.media.document.mime_type.split("/"):
                 downloaded_file_name = await remob.client.download_media(
-                    reply_message, TEMP_DOWNLOAD_DIRECTORY)
+                    reply_message, TEMP_DOWNLOAD_DIRECTORY
+                )
                 await remob.edit("`Removing background from this image..`")
                 output_file_name = await ReTrieveFile(downloaded_file_name)
                 os.remove(downloaded_file_name)
             else:
-                await remob.edit("`How do I remove the background from this ?`"
-                                 )
+                await remob.edit("`How do I remove the background from this ?`")
         except Exception as e:
             return await remob.edit(str(e))
     elif input_str:
         await remob.edit(
-            f"`Removing background from online image hosted at`\n{input_str}")
+            f"`Removing background from online image hosted at`\n{input_str}"
+        )
         output_file_name = await ReTrieveURL(input_str)
     else:
         return await remob.edit("`I need something to remove the background from.`")
@@ -56,11 +59,15 @@ async def kbg(remob):
                 remove_bg_image,
                 caption="Background removed using remove.bg",
                 force_document=True,
-                reply_to=message_id)
+                reply_to=message_id,
+            )
             await remob.delete()
     else:
-        await remob.edit("**Error (Invalid API key, I guess ?)**\n`{}`".format(
-            output_file_name.content.decode("UTF-8")))
+        await remob.edit(
+            "**Error (Invalid API key, I guess ?)**\n`{}`".format(
+                output_file_name.content.decode("UTF-8")
+            )
+        )
 
 
 # this method will call the API, and return in the appropriate format
@@ -72,11 +79,13 @@ async def ReTrieveFile(input_file_name):
     files = {
         "image_file": (input_file_name, open(input_file_name, "rb")),
     }
-    r = requests.post("https://api.remove.bg/v1.0/removebg",
-                      headers=headers,
-                      files=files,
-                      allow_redirects=True,
-                      stream=True)
+    r = requests.post(
+        "https://api.remove.bg/v1.0/removebg",
+        headers=headers,
+        files=files,
+        allow_redirects=True,
+        stream=True,
+    )
     return r
 
 
@@ -85,16 +94,19 @@ async def ReTrieveURL(input_url):
         "X-API-Key": REM_BG_API_KEY,
     }
     data = {"image_url": input_url}
-    r = requests.post("https://api.remove.bg/v1.0/removebg",
-                      headers=headers,
-                      data=data,
-                      allow_redirects=True,
-                      stream=True)
+    r = requests.post(
+        "https://api.remove.bg/v1.0/removebg",
+        headers=headers,
+        data=data,
+        allow_redirects=True,
+        stream=True,
+    )
     return r
 
 
-CMD_HELP.update({
-    "rbg":
-    ">`.rbg <Link to Image> or reply to any image (Warning: does not work on stickers.)`"
-    "\nUsage: Removes the background of images, using remove.bg API"
-})
+CMD_HELP.update(
+    {
+        "rbg": ">`.rbg <Link to Image> or reply to any image (Warning: does not work on stickers.)`"
+        "\nUsage: Removes the background of images, using remove.bg API"
+    }
+)
