@@ -155,11 +155,7 @@
       "description": "For telegraph module",
       "value": "0",
       "required": true
-    },
-    "QUOTES_API_TOKEN": {
-      "description": "API for quotes module get it from http://antiddos.systems",
-      "required": false
-    },
+    },  
     "USR_TOKEN_UPTOBOX": {
       "description": "API for direct link uptobox, https://docs.uptobox.com/#how-to-find-my-api-token",
       "required": false
