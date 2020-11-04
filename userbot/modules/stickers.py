@@ -24,20 +24,25 @@ from userbot import CMD_HELP, bot
 from userbot.events import register
 
 KANGING_STR = [
-    "Using Witchery to kang this sticker...",
-    "Plagiarising hehe...",
-    "Inviting this sticker over to my pack...",
-    "Kanging this sticker...",
-    "Hey that's a nice sticker!\nMind if I kang?!..",
-    "hehe me stel ur stikér\nhehe.",
-    "Ay look over there (☉｡☉)!→\nWhile I kang this...",
-    "Roses are red violets are blue, kanging this sticker so my pacc looks cool",
-    "Imprisoning this sticker...",
-    "Mr.Steal Your Sticker is stealing this sticker... ",
+    "Eh... Koq bagus... aku curry ahhh :3",
+    "Aku curry ya kakak :)",
+    "Curry Sticker dulu yee kan",
+    "ehh, mantep nih.....aku ambil ya kaka",
+    "Bagus eaaaa....\nAmbil ahh....",
+    "Ini Sticker aku ambil yaa\nDUARR!",
+    "leh ugha ni Sticker\nCurry ahh~",
+    "Pim Pim Pom!!!\nni Sticker punya aing sekarang hehe",
+    "Bentar boss, ane curry dulu",
+    "Ihh, bagus nih\nCurry ahh~",
+    "Curry lagi yee kan.....",
+    "CURRY TROSS!!!",
+    "Curry Sticker ahh.....",
+    "Curry dolo boss",
+    "Swiper jangan mencurry",
 ]
 
 
-@register(outgoing=True, pattern="^.kang")
+@register(outgoing=True, pattern="^.curry")
 async def kang(args):
     """ For .kang command, kangs stickers or creates new ones. """
     user = await bot.get_me()
@@ -248,8 +253,7 @@ async def kang(args):
                 await bot.send_read_acknowledge(conv.chat_id)
 
         await args.edit(
-            "`Sticker kanged successfully!`"
-            f"\nPack can be found [here](t.me/addstickers/{packname})",
+            "Curry Success!" f"\n[Klik Disini](t.me/addstickers/{packname})",
             parse_mode="md",
         )
 
@@ -354,10 +358,10 @@ async def sticker_to_png(sticker):
 
 CMD_HELP.update(
     {
-        "stickers": ">`.kang [emoji('s)]?`"
+        "stickers": ">`.curry [emoji('s)]?`"
         "\nUsage: Reply .kang to a sticker or an image to kang it to your userbot pack "
         "\nor specify the emoji you want to."
-        "\n\n>`.kang (emoji['s]]?` [number]?"
+        "\n\n>`.curry (emoji['s]]?` [number]?"
         "\nUsage: Kang's the sticker/image to the specified pack but uses 🤔 as emoji "
         "or choose the emoji you want to."
         "\n\n>`.stkrinfo`"
