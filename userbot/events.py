@@ -3,9 +3,9 @@
 # Licensed under the Raphielscape Public License, Version 1.c (the "License");
 # you may not use this file except in compliance with the License.
 #
-""" Userbot module for managing events.
- One of the main components of the userbot. """
+"""Userbot module for managing events. One of the main components of the userbot."""
 
+import codecs
 import sys
 from asyncio import create_subprocess_shell as asyncsubshell
 from asyncio import subprocess as asyncsub
@@ -13,13 +13,14 @@ from os import remove
 from time import gmtime, strftime
 from traceback import format_exc
 
+import requests
 from telethon import events
 
 from userbot import bot, BOTLOG_CHATID, LOGSPAMMER
 
 
 def register(**args):
-    """ Register a new event. """
+    """Register a new event."""
     pattern = args.get('pattern', None)
     disable_edited = args.get('disable_edited', False)
     ignore_unsafe = args.get('ignore_unsafe', False)
@@ -98,10 +99,7 @@ def register(**args):
                     date = strftime("%Y-%m-%d %H:%M:%S", gmtime())
 
                     text = "**USERBOT ERROR REPORT**\n"
-                    link = "Support chat PM: @adekmaulana"
-                    text += "If you want to, you can report it"
-                    text += f"- just forward this message to {link}.\n"
-                    text += "Nothing is logged except the fact of error and date\n"
+                    text += "Nothing is logged except the fact of error and date\n\n"
 
                     ftext = "========== DISCLAIMER =========="
                     ftext += "\nThis file uploaded ONLY here,"
@@ -135,20 +133,33 @@ def register(**args):
 
                     ftext += result
 
-                    file = open("error.log", "w+")
-                    file.write(ftext)
-                    file.close()
+                    with open("error.txt", "w+") as file:
+                        file.write(ftext)
 
                     if LOGSPAMMER:
-                        await check.client.respond(
-                            "`Sorry, my userbot has crashed."
-                            "\nThe error logs are stored in the userbot's log chat.`"
+                        await check.respond(
+                            "`Sorry, my userbot has crashed.\
+                        \nThe error logs are stored in the userbot's log chat.`"
                         )
 
-                    await check.client.send_file(send_to,
-                                                 "error.log",
-                                                 caption=text)
-                    remove("error.log")
+                        log = codecs.open("error.txt", "r", encoding="utf-8")
+                        data = log.read()
+                        key = (
+                            requests.post(
+                                "https://nekobin.com/api/documents",
+                                json={"content": data},
+                            )
+                            .json()
+                            .get("result")
+                            .get("key")
+                        )
+                        url = f"https://nekobin.com/raw/{key}"
+                        anu = f"{text}Pasted to: [Nekobin]({url})"
+
+                        await check.client.send_file(send_to,
+                                                     "error.txt",
+                                                     caption=anu)
+                        remove("error.txt")
             else:
                 pass
 
