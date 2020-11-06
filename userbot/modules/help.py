@@ -3,7 +3,9 @@
 # Licensed under the Raphielscape Public License, Version 1.c (the "License");
 # you may not use this file except in compliance with the License.
 #
-""" Userbot help command """
+"""Userbot help command"""
+
+import asyncio
 
 from userbot import CMD_HELP
 from userbot.events import register
@@ -11,20 +13,37 @@ from userbot.events import register
 
 @register(outgoing=True, pattern=r"^\.help(?: |$)(.*)")
 async def help(event):
-    """ For .help command,"""
+    """For .help command."""
     args = event.pattern_match.group(1).lower()
     if args:
         if args in CMD_HELP:
-            await event.edit(str(CMD_HELP[args]))
+            msg = await event.edit(str(CMD_HELP[args]))
         else:
-            await event.edit("Please specify a valid module name.")
+            msg = await event.edit("Please specify a valid module name.")
     else:
-        await event.edit(
-            "Please specify which module do you want help for !!"
-            "\nUsage: .help <module name>"
-        )
-        string = "-  "
-        for i in CMD_HELP:
+        head = "**Help for** [WeebProject](https://github.com/BianSepang/WeebProject)"
+        head2 = "Please specify which module do you want help for !!"
+        head3 = "Usage: .help <module name>"
+        head4 = "List for all available command below: "
+        string = ""
+        sep1 = "••••••••••••••••••••••••••••••••••••••••••••••"
+        sep2 = "========================================="
+        for i in sorted(CMD_HELP):
             string += "`" + str(i)
-            string += "`  -  "
-        await event.reply(string)
+            string += "`  |  "
+        await event.edit(
+            f"{head}\
+              \n{sep2}\
+              \n{head2}\
+              \n{head3}\
+              \n{sep2}\
+              \n{head4}\
+              \n\n{string}\
+              \n{sep1}"
+        )
+    await asyncio.sleep(40)
+    await event.delete()
+    try:
+        await msg.delete()
+    except BaseException:
+        return  # just in case if msg deleted first
