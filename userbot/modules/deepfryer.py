@@ -6,7 +6,7 @@ from userbot import CMD_HELP, TEMP_DOWNLOAD_DIRECTORY, bot
 from userbot.events import register
 
 
-@register(outgoing=True, pattern=r"^.df(:? |$)([1-8])?")
+@register(outgoing=True, pattern=r"^\.df(:? |$)([1-8])?")
 async def _(fry):
     await fry.edit("`Sending information...`")
     level = fry.pattern_match.group(2)

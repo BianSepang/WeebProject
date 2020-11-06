@@ -13,7 +13,7 @@ from userbot import CMD_HELP
 from userbot.events import register
 
 
-@register(outgoing=True, pattern="^.purge$")
+@register(outgoing=True, pattern=r"^\.purge$")
 async def fastpurger(purg):
     """ For .purge command, purge all messages starting from the reply. """
     chat = await purg.get_input_chat()
@@ -47,7 +47,7 @@ async def fastpurger(purg):
     await done.delete()
 
 
-@register(outgoing=True, pattern="^.purgeme")
+@register(outgoing=True, pattern=r"^\.purgeme")
 async def purgeme(delme):
     """ For .purgeme, delete x count of your latest message."""
     message = delme.text
@@ -75,7 +75,7 @@ async def purgeme(delme):
     await smsg.delete()
 
 
-@register(outgoing=True, pattern="^.del$")
+@register(outgoing=True, pattern=r"^\.del$")
 async def delete_it(delme):
     """ For .del command, delete the replied message. """
     msg_src = await delme.get_reply_message()
@@ -97,7 +97,7 @@ async def delete_it(delme):
             """
 
 
-@register(outgoing=True, pattern="^.edit")
+@register(outgoing=True, pattern=r"^\.edit")
 async def editer(edit):
     """ For .editme command, edit your last message. """
     message = edit.text
@@ -118,7 +118,7 @@ async def editer(edit):
    """
 
 
-@register(outgoing=True, pattern="^.sd")
+@register(outgoing=True, pattern=r"^\.sd")
 async def selfdestruct(destroy):
     """ For .sd command, make seflf-destructable messages. """
     message = destroy.text

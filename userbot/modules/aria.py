@@ -57,7 +57,7 @@ aria2 = aria2p.API(aria2p.Client(host="http://localhost", port=6800, secret=""))
 aria2.set_global_options({"dir": download_path})
 
 
-@register(outgoing=True, pattern="^.amag(?: |$)(.*)")
+@register(outgoing=True, pattern=r"^\.amag(?: |$)(.*)")
 async def magnet_download(event):
     magnet_uri = event.pattern_match.group(1)
     # Add Magnet URI Into Queue
@@ -73,7 +73,7 @@ async def magnet_download(event):
     await check_progress_for_dl(gid=new_gid, event=event, previous=None)
 
 
-@register(outgoing=True, pattern="^.ator(?: |$)(.*)")
+@register(outgoing=True, pattern=r"^\.ator(?: |$)(.*)")
 async def torrent_download(event):
     torrent_file_path = event.pattern_match.group(1)
     # Add Torrent Into Queue
@@ -87,7 +87,7 @@ async def torrent_download(event):
     await check_progress_for_dl(gid=gid, event=event, previous=None)
 
 
-@register(outgoing=True, pattern="^.aurl(?: |$)(.*)")
+@register(outgoing=True, pattern=r"^\.aurl(?: |$)(.*)")
 async def aurl_download(event):
     uri = [event.pattern_match.group(1)]
     try:  # Add URL Into Queue
@@ -103,7 +103,7 @@ async def aurl_download(event):
         await check_progress_for_dl(gid=new_gid, event=event, previous=None)
 
 
-@register(outgoing=True, pattern="^.aclear(?: |$)(.*)")
+@register(outgoing=True, pattern=r"^\.aclear(?: |$)(.*)")
 async def remove_all(event):
     try:
         removed = aria2.remove_all(force=True)
@@ -118,7 +118,7 @@ async def remove_all(event):
     await sleep(2.5)
 
 
-@register(outgoing=True, pattern="^.apause(?: |$)(.*)")
+@register(outgoing=True, pattern=r"^\.apause(?: |$)(.*)")
 async def pause_all(event):
     # Pause ALL Currently Running Downloads.
     await event.edit("`Pausing downloads...`")
@@ -128,7 +128,7 @@ async def pause_all(event):
     await sleep(2.5)
 
 
-@register(outgoing=True, pattern="^.aresume(?: |$)(.*)")
+@register(outgoing=True, pattern=r"^\.aresume(?: |$)(.*)")
 async def resume_all(event):
     await event.edit("`Resuming downloads...`")
     aria2.resume_all()
@@ -138,7 +138,7 @@ async def resume_all(event):
     await event.delete()
 
 
-@register(outgoing=True, pattern="^.ashow(?: |$)(.*)")
+@register(outgoing=True, pattern=r"^\.ashow(?: |$)(.*)")
 async def show_all(event):
     output = "output.txt"
     downloads = aria2.get_downloads()

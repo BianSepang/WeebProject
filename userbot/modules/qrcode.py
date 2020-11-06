@@ -19,7 +19,7 @@ from userbot import CMD_HELP, LOGS
 from userbot.events import register
 
 
-@register(pattern=r"^.decode$", outgoing=True)
+@register(pattern=r"^\.decode$", outgoing=True)
 async def parseqr(qr_e):
     """ For .decode command, get QR Code/BarCode content from the replied photo. """
     downloaded_file_name = await qr_e.client.download_media(
