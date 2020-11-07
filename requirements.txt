@@ -5,6 +5,7 @@ bs4
 cowpy
 cryptg
 cffi
+covid
 deezloader
 dnspython
 emoji
