@@ -6,6 +6,8 @@
 
 from asyncio import sleep
 
+from telethon import functions
+
 from userbot import BOTLOG, BOTLOG_CHATID, CMD_HELP, bot
 from userbot.events import register
 from userbot.modules.admin import get_user_from_event
@@ -70,6 +72,46 @@ async def log(log_text):
         await log_text.edit("`This feature requires Logging to be enabled!`")
     await sleep(2)
     await log_text.delete()
+
+
+@register(outgoing=True, pattern=r"^\.invite(?: |$)(.*)")
+async def _(event):
+    if event.fwd_from:
+        return
+    to_add_users = event.pattern_match.group(1)
+    if event.is_private:
+        await event.edit("`.invite` users to a chat, not to a Private Message")
+    else:
+        if not event.is_channel and event.is_group:
+            # https://lonamiwebs.github.io/Telethon/methods/messages/add_chat_user.html
+            for user_id in to_add_users.split(" "):
+                try:
+                    await event.client(
+                        functions.messages.AddChatUserRequest(
+                            chat_id=event.chat_id, user_id=user_id, fwd_limit=1000000
+                        )
+                    )
+                except Exception as e:
+                    await event.edit(str(e))
+                    return
+            await event.edit("`Invited Unsuccessfully`")
+            await sleep(3)
+            await event.delete()
+        else:
+            # https://lonamiwebs.github.io/Telethon/methods/channels/invite_to_channel.html
+            for user_id in to_add_users.split(" "):
+                try:
+                    await event.client(
+                        functions.channels.InviteToChannelRequest(
+                            channel=event.chat_id, users=[user_id]
+                        )
+                    )
+                except Exception as e:
+                    await event.edit(str(e))
+                    return
+            await event.edit("`Invited Successfully`")
+            await sleep(3)
+            await event.delete()
 
 
 @register(outgoing=True, pattern=r"^\.kickme$")
@@ -152,6 +194,76 @@ async def sedNinjaToggle(event):
         await event.delete()
 
 
+@register(outgoing=True, pattern=r"^\.create (b|g|c)(?: |$)(.*)")
+async def telegraphs(grop):
+    """For .create command, Creating New Group & Channel"""
+    if grop.text[0].isalpha() or grop.text[0] in ("/", "#", "@", "!"):
+        return
+    if grop.fwd_from:
+        return
+    type_of_group = grop.pattern_match.group(1)
+    group_name = grop.pattern_match.group(2)
+    if type_of_group == "b":
+        try:
+            result = await grop.client(
+                functions.messages.CreateChatRequest(  # pylint:disable=E0602
+                    users=["@RemmuChan_bot"],
+                    # Not enough users (to create a chat, for example)
+                    # Telegram, no longer allows creating a chat with ourselves
+                    title=group_name,
+                )
+            )
+            created_chat_id = result.chats[0].id
+            result = await grop.client(
+                functions.messages.ExportChatInviteRequest(
+                    peer=created_chat_id,
+                )
+            )
+            await grop.edit(
+                "Your {0} Group Created Successfully. Click [{0}]({1}) to join".format(
+                    group_name, result.link
+                )
+            )
+        except Exception as e:  # pylint:disable=C0103,W0703
+            await grop.edit(str(e))
+    elif type_of_group in ("g", "c"):
+        try:
+            r = await grop.client(
+                functions.channels.CreateChannelRequest(  # pylint:disable=E0602
+                    title=group_name,
+                    about="Welcome to this Channel",
+                    megagroup=not bool(type_of_group == "c"),
+                )
+            )
+            created_chat_id = r.chats[0].id
+            result = await grop.client(
+                functions.messages.ExportChatInviteRequest(
+                    peer=created_chat_id,
+                )
+            )
+            await grop.edit(
+                "Your {0} Group/Channel Created Successfully. Click [{0}]({1}) to join".format(
+                    group_name, result.link
+                )
+            )
+        except Exception as e:  # pylint:disable=C0103,W0703
+            await grop.edit(str(e))
+
+
+CMD_HELP.update(
+    {
+        "create": "**Create**"
+        "\nUsage: Create Channel, Group & Group With Bot."
+        "\n\n>`.create g`"
+        "\nUsage: Create a Private Group."
+        "\n\n>`.create b`"
+        "\nUsage: Create a Group with Bot."
+        "\n\n>`.create c`"
+        "\nUsage: Create a Channel."
+    }
+)
+
+
 CMD_HELP.update(
     {
         "chat": ">`.chatid`"
@@ -162,6 +274,8 @@ CMD_HELP.update(
         "\nUsage: Forwards the message you've replied to in your bot logs group."
         "\n\n>`.kickme`"
         "\nUsage: Leave from a targeted group."
+        "\n\n>`.invite` <username>"
+        "\nUsage: Invite user or bots with username"
         "\n\n>`.unmutechat`"
         "\nUsage: Unmutes a muted chat."
         "\n\n>`.mutechat`"
