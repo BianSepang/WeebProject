@@ -25,6 +25,7 @@ httplib2
 humanize
 jikanpy
 lxml
+lyricsgenius
 oauth2client
 pendulum
 Pillow
@@ -49,4 +50,3 @@ urbandict
 wikipedia
 telegraph
 python-dateutil
-git+https://github.com/johnwmillr/LyricsGenius.git
