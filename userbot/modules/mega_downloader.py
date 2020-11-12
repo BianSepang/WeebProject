@@ -32,7 +32,7 @@ from urllib.error import HTTPError
 
 from pySmartDL import SmartDL
 
-from userbot import CMD_HELP, LOGS, TEMP_DOWNLOAD_DIRECTORY
+from userbot import CMD_HELP, LOGS, TEMP_DOWNLOAD_DIRECTORY, bot
 from userbot.events import register
 from userbot.utils import humanbytes, time_formatter
 
@@ -157,10 +157,11 @@ async def mega_downloader(megadl):
             await megadl.edit(f"`{str(e)}`")
             return None
         else:
-            await megadl.edit(
+            await bot.send_message(
+                megadl.chat_id,
                 f"`{file_name}`\n\n"
                 f"Successfully downloaded in: '`{file_path}`'.\n"
-                f"Download took: {time_formatter(download_time)}."
+                f"Download took: {time_formatter(download_time)}.",
             )
             return None
     else:
