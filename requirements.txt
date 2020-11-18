@@ -1,4 +1,4 @@
-aiohttp
+aiohttp[speedups]
 appdirs
 aria2p
 async_generator
