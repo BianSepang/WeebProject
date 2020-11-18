@@ -6,6 +6,7 @@ import re
 
 import requests
 
+from userbot import CMD_HELP
 from userbot.events import register
 
 
@@ -56,3 +57,8 @@ async def _generate_zippylink(url):
             server, id_, val ** 3 + 3, name
         )
     return d_l, name
+
+
+CMD_HELP.update(
+    {"zippy": ">`.zippy` <zippyshare link>" "\nUsage: Direct zippyshare link"}
+)
