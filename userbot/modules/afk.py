@@ -35,37 +35,52 @@ async def mention_afk(mention):
     global afk_end
     not_afk = datetime.now()
     afk_end = not_afk.replace(microsecond=0)
-    if mention.message.mentioned and ISAFK:
+    if ISAFK and mention.message.mentioned:
+        now = datetime.now()
+        afk_since = now - afk_time
+        day = float(afk_since.seconds) // (24 * 3600)
+        time = float(afk_since.seconds) % (24 * 3600)
+        hours = time // 3600
+        time %= 3600
+        minutes = time // 60
+        time %= 60
+        seconds = time
+        if day == 1:
+            afk_str = "Yesterday"
+        elif day > 1:
+            if day > 6:
+                date = now + datetime.timedelta(
+                    days=-day, hours=-hours, minutes=-minutes
+                )
+                afk_str = date.strftime("%A, %Y %B %m, %H:%I")
+            else:
+                wday = now + datetime.timedelta(days=-day)
+                afk_str = wday.strftime("%A")
+        elif hours > 1:
+            afk_str = f"`{int(hours)}h{int(minutes)}m` ago"
+        elif minutes > 0:
+            afk_str = f"`{int(minutes)}m{int(seconds)}s` ago"
+        else:
+            afk_str = f"`{int(seconds)}s` ago"
+
         is_bot = False
         if (sender := await mention.get_sender()) :
             is_bot = sender.bot
-            now = datetime.now()
-            afk_since = now - afk_time
-            day = float(afk_since.seconds) // (24 * 3600)
-            time = float(afk_since.seconds) % (24 * 3600)
-            hours = time // 3600
-            time %= 3600
-            minutes = time // 60
-            time %= 60
-            seconds = time
-            if day == 1:
-                afk_str = "Yesterday"
-            elif day > 1:
-                if day > 6:
-                    date = now + datetime.timedelta(
-                        days=-day, hours=-hours, minutes=-minutes
-                    )
-                    afk_str = date.strftime("%A, %Y %B %m, %H:%I")
-                else:
-                    wday = now + datetime.timedelta(days=-day)
-                    afk_str = wday.strftime("%A")
-            elif hours > 1:
-                afk_str = f"`{int(hours)}h{int(minutes)}m` ago"
-            elif minutes > 0:
-                afk_str = f"`{int(minutes)}m{int(seconds)}s` ago"
+        if not is_bot and mention.sender_id not in USERS:
+            if AFKREASON:
+                await mention.reply(
+                    f"**I'm not available right now.** (Since: {afk_str})"
+                    f"\nReason: `{AFKREASON}`."
+                )
             else:
-                afk_str = f"`{int(seconds)}s` ago"
-            if not is_bot and mention.sender_id not in USERS:
+                await mention.reply(
+                    f"**I'm not available right now.** (Since: {afk_str})"
+                    "\n**Please come back later.**"
+                )
+            USERS.update({mention.sender_id: 1})
+            COUNT_MSG = COUNT_MSG + 1
+        elif not is_bot and sender:
+            if USERS[mention.sender_id] % randint(2, 4) == 0:
                 if AFKREASON:
                     await mention.reply(
                         f"**I'm not available right now.** (Since: {afk_str})"
@@ -76,25 +91,11 @@ async def mention_afk(mention):
                         f"**I'm not available right now.** (Since: {afk_str})"
                         "\n**Please come back later.**"
                     )
-                USERS.update({mention.sender_id: 1})
+                USERS[mention.sender_id] = USERS[mention.sender_id] + 1
                 COUNT_MSG = COUNT_MSG + 1
-            elif mention.sender_id in USERS:
-                if USERS[mention.sender_id] % randint(2, 4) == 0:
-                    if AFKREASON:
-                        await mention.reply(
-                            f"**I'm not available right now.** (Since: {afk_str})"
-                            f"\nReason: `{AFKREASON}`."
-                        )
-                    else:
-                        await mention.reply(
-                            f"**I'm not available right now.** (Since: {afk_str})"
-                            "\n**Please come back later.**"
-                        )
-                    USERS[mention.sender_id] = USERS[mention.sender_id] + 1
-                    COUNT_MSG = COUNT_MSG + 1
-                else:
-                    USERS[mention.sender_id] = USERS[mention.sender_id] + 1
-                    COUNT_MSG = COUNT_MSG + 1
+            else:
+                USERS[mention.sender_id] = USERS[mention.sender_id] + 1
+                COUNT_MSG = COUNT_MSG + 1
 
 
 @register(incoming=True, disable_errors=True)
