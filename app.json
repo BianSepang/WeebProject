@@ -1,11 +1,11 @@
 {
-  "name": "Project Bish UserBot fallback",
-  "description": "[projectbish] A modular Telegram userbot running on Python 3.8, this is a fallback for main userbot.",
+  "name": "WeebProject Userbot Fallback",
+  "description": "A modular Telegram userbot running on Python 3.8, this is a fallback for main userbot.",
   "keywords": [
     "telegram",
     "userbot"
   ],
-  "repository": "https://github.com/adekmaulana/ProjectBish",
+  "repository": "https://github.com/BianSepang/WeebProject",
   "stack": "container",
   "env": {
     "API_KEY": {
