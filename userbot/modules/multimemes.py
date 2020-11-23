@@ -8,17 +8,19 @@
 # Based code + improve from AdekMaulana and aidilaryanto
 
 import asyncio
+import io
 import os
 import random
 import re
 import textwrap
 import time
 from asyncio.exceptions import TimeoutError
+from random import randint, uniform
 
 from glitch_this import ImageGlitcher
 from hachoir.metadata import extractMetadata
 from hachoir.parser import createParser
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps
 from telethon import events, functions, types
 from telethon.errors.rpcerrorlist import YouBlockedUserError
 from telethon.tl.types import DocumentAttributeFilename
@@ -413,7 +415,7 @@ async def hazz(hazmat):
 
 
 @register(outgoing=True, pattern=r"^\.df(:? |$)([1-8])?")
-async def _(fry):
+async def fryerrr(fry):
     await fry.edit("`Sending information...`")
     level = fry.pattern_match.group(2)
     if fry.fwd_from:
@@ -439,7 +441,6 @@ async def _(fry):
                     msg_level = await conv.send_message(m, reply_to=msg.id)
                     r = await conv.get_response()
                 response = await conv.get_response()
-                """don't spam notif"""
                 await bot.send_read_acknowledge(conv.chat_id)
             except YouBlockedUserError:
                 await fry.reply("`Please unblock` @image_deepfrybot`...`")
@@ -456,7 +457,6 @@ async def _(fry):
                     force_document=False,
                     reply_to=message_id_to_reply,
                 )
-                """cleanup chat after completed"""
                 try:
                     msg_level
                 except NameError:
@@ -467,10 +467,106 @@ async def _(fry):
                     await fry.client.delete_messages(
                         conv.chat_id, [msg.id, response.id, r.id, msg_level.id]
                     )
+        await fry.delete()
+        return os.remove(downloaded_file_name)
     except TimeoutError:
-        return await fry.edit("**Error:** @image_deepfrybot **is not responding.**")
-    await fry.delete()
-    return os.remove(downloaded_file_name)
+        await fry.edit("`@image_deepfrybot isnt responding..`")
+        await fry.client.delete_messages(conv.chat_id, [msg.id])
+
+
+@register(pattern=r"^\.deepfry(?: |$)(.*)", outgoing=True)
+async def deepfryer(event):
+    try:
+        frycount = int(event.pattern_match.group(1))
+        if frycount < 1:
+            raise ValueError
+    except ValueError:
+        frycount = 1
+    reply_message = await event.get_reply_message()
+    image = io.BytesIO()
+    await event.edit("`Downloading media..`")
+    if reply_message.photo:
+        image = await bot.download_media(
+            reply_message,
+            "df.png",
+        )
+    elif (
+        DocumentAttributeFilename(file_name="AnimatedSticker.tgs")
+        in reply_message.media.document.attributes
+    ):
+        await bot.download_media(
+            reply_message,
+            "df.tgs",
+        )
+        os.system("lottie_convert.py df.tgs df.png")
+        image = "df.png"
+    elif reply_message.video:
+        video = await bot.download_media(
+            reply_message,
+            "df.mp4",
+        )
+        extractMetadata(createParser(video))
+        os.system("ffmpeg -i df.mp4 -vframes 1 -an -s 480x360 -ss 1 df.png")
+        image = "df.png"
+    else:
+        image = await bot.download_media(
+            reply_message,
+            "df.png",
+        )
+    image = Image.open(image)
+
+    # fry the image
+    await event.edit("`Deep frying media…`")
+    for _ in range(frycount):
+        image = await deepfry(image)
+
+    fried_io = io.BytesIO()
+    fried_io.name = "image.jpeg"
+    image.save(fried_io, "JPEG")
+    fried_io.seek(0)
+
+    await event.reply(file=fried_io)
+    os.system("rm *.mp4 *.tgs *.png")
+
+
+async def deepfry(img: Image) -> Image:
+    colours = (
+        (randint(50, 200), randint(40, 170), randint(40, 190)),
+        (randint(190, 255), randint(170, 240), randint(180, 250)),
+    )
+
+    img = img.copy().convert("RGB")
+
+    # Crush image to hell and back
+    img = img.convert("RGB")
+    width, height = img.width, img.height
+    img = img.resize(
+        (int(width ** uniform(0.8, 0.9)), int(height ** uniform(0.8, 0.9))),
+        resample=Image.LANCZOS,
+    )
+    img = img.resize(
+        (int(width ** uniform(0.85, 0.95)), int(height ** uniform(0.85, 0.95))),
+        resample=Image.BILINEAR,
+    )
+    img = img.resize(
+        (int(width ** uniform(0.89, 0.98)), int(height ** uniform(0.89, 0.98))),
+        resample=Image.BICUBIC,
+    )
+    img = img.resize((width, height), resample=Image.BICUBIC)
+    img = ImageOps.posterize(img, randint(3, 7))
+
+    # Generate colour overlay
+    overlay = img.split()[0]
+    overlay = ImageEnhance.Contrast(overlay).enhance(uniform(1.0, 2.0))
+    overlay = ImageEnhance.Brightness(overlay).enhance(uniform(1.0, 2.0))
+
+    overlay = ImageOps.colorize(overlay, colours[0], colours[1])
+
+    # Overlay red and yellow onto main image and sharpen the hell out of it
+    img = Image.blend(img, overlay, uniform(0.5, 0.9))
+    img = ImageEnhance.Sharpness(img).enhance(randint(5, 300))
+
+    return img
 
 
 @register(outgoing=True, pattern=r"^\.sg(?: |$)(.*)")
@@ -580,9 +676,11 @@ CMD_HELP.update(
 
 CMD_HELP.update(
     {
-        "deepfry": ".df or .df [level(1-8)]"
+        "deepfry": ">`.df or .df [level(1-8)]`"
         "\nUsage: deepfry image/sticker from the reply."
         "\n@image_deepfrybot"
+        "\n\n>`.deepfry`"
+        "\nUsage: krispi image"
     }
 )
 
