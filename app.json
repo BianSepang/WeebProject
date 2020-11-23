@@ -137,11 +137,6 @@
       "description": "Set the default city for the userbot's weather module.",
       "required": false
     },
-    "TELEGRAPH_SHORT_NAME": {
-      "description": "For telegraph module",
-      "value": "0",
-      "required": true
-    },  
     "USR_TOKEN_UPTOBOX": {
       "description": "API for direct link uptobox, https://docs.uptobox.com/#how-to-find-my-api-token",
       "required": false
