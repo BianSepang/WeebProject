@@ -157,6 +157,7 @@ async def mega_downloader(megadl):
             await megadl.edit(f"`{str(e)}`")
             return None
         else:
+            await megadl.delete()
             await bot.send_message(
                 megadl.chat_id,
                 f"`{file_name}`\n\n"
