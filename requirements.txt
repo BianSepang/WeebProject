@@ -14,7 +14,7 @@ glitch_this
 google-api-python-client
 google-auth-httplib2
 google-auth-oauthlib
-googletrans
+google_trans_new
 google_images_download
 gTTS
 gTTS-token
