@@ -366,6 +366,8 @@ async def spider(spdr):
                 )
         except UserIdInvalidError:
             return await spdr.edit("`Uh oh my mute logic broke!`")
+        except UserAdminInvalidError:
+            pass
 
 
 @register(outgoing=True, disable_errors=True, pattern=r"^\.unmute(?: |$)(.*)")
@@ -404,6 +406,8 @@ async def unmoot(unmot):
             await unmot.edit("```Unmuted Successfully```")
         except UserIdInvalidError:
             return await unmot.edit("`Uh oh my unmute logic broke!`")
+        except UserAdminInvalidError:
+            pass
 
         if BOTLOG:
             await unmot.client.send_message(
