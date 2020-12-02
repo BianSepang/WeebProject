@@ -24,25 +24,25 @@ from userbot import CMD_HELP, bot
 from userbot.events import register
 
 KANGING_STR = [
-    "Eh... Koq bagus... aku curry ahhh :3",
-    "Aku curry ya kakak :)",
-    "Curry Sticker dulu yee kan",
-    "ehh, mantep nih.....aku ambil ya kaka",
-    "Bagus eaaaa....\nAmbil ahh....",
-    "Ini Sticker aku ambil yaa\nDUARR!",
-    "leh ugha ni Sticker\nCurry ahh~",
-    "Pim Pim Pom!!!\nni Sticker punya aing sekarang hehe",
-    "Bentar boss, ane curry dulu",
-    "Ihh, bagus nih\nCurry ahh~",
-    "Curry lagi yee kan.....",
-    "CURRY TROSS!!!",
-    "Curry Sticker ahh.....",
-    "Curry dolo boss",
-    "Swiper jangan mencurry",
+    "Eh... Kok bagus... aku curi ahhh :3",
+    "Aku curi ya kakak :)",
+    "Curi Stiker dulu yee kan",
+    "Mantep nih... Aku ambil ya kakak",
+    "Bagus eaaa...\nAmbil ahh...",
+    "Ini Stiker aku ambil yaa\n**DUARR!**",
+    "Boleh juga ni Stiker\n**Curi ahh...**",
+    "**Pim Pim Pom!!!**\nini Stiker punya aing sekarang hehe",
+    "Bentar boss, ane curi dulu",
+    "Ihh, bagus nih\n**Curi ahh...**",
+    "Curi lagi yee kan...",
+    "**CURI TEROSS!!!**",
+    "Curi Stiker ahh...",
+    "Curi dulu boss",
+    "Swiper jangan mencuri!!!",
 ]
 
 
-@register(outgoing=True, pattern=r"^\.curry")
+@register(outgoing=True, pattern=r"^\.curi")
 async def kang(args):
     """ For .kang command, kangs stickers or creates new ones. """
     user = await bot.get_me()
@@ -83,9 +83,9 @@ async def kang(args):
             is_anim = True
             photo = 1
         else:
-            return await args.edit("`Unsupported File!`")
+            return await args.edit("`File tidak didukung!`")
     else:
-        return await args.edit("`I can't kang that...`")
+        return await args.edit("`Saya tidak bisa mencuri...`")
 
     if photo:
         splat = args.text.split()
@@ -253,7 +253,7 @@ async def kang(args):
                 await bot.send_read_acknowledge(conv.chat_id)
 
         await args.edit(
-            "Curry Success!" f"\n[Klik Disini](t.me/addstickers/{packname})",
+            "__Sukses Mencuri Stiker!__" f"\n**[Klik Disini]**(t.me/addstickers/{packname})",
             parse_mode="md",
         )
 
@@ -358,10 +358,10 @@ async def sticker_to_png(sticker):
 
 CMD_HELP.update(
     {
-        "stickers": ">`.curry [emoji('s)]?`"
+        "stickers": ">`.curi [emoji('s)]?`"
         "\nUsage: Reply .kang to a sticker or an image to kang it to your userbot pack "
         "\nor specify the emoji you want to."
-        "\n\n>`.curry (emoji['s]]?` [number]?"
+        "\n\n>`.curi (emoji['s]]?` [number]?"
         "\nUsage: Kang's the sticker/image to the specified pack but uses 🤔 as emoji "
         "or choose the emoji you want to."
         "\n\n>`.stkrinfo`"
