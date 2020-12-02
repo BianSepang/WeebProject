@@ -46,7 +46,7 @@ async def mention_afk(mention):
         time %= 60
         seconds = time
         if day == 1:
-            afk_str = "Yesterday"
+            afk_str = "Kemarin"
         elif day > 1:
             if day > 6:
                 date = now + datetime.timedelta(
@@ -57,11 +57,11 @@ async def mention_afk(mention):
                 wday = now + datetime.timedelta(days=-day)
                 afk_str = wday.strftime("%A")
         elif hours > 1:
-            afk_str = f"`{int(hours)}h{int(minutes)}m` ago"
+            afk_str = f"`{int(hours)}jam{int(minutes)}menit` yg lalu"
         elif minutes > 0:
-            afk_str = f"`{int(minutes)}m{int(seconds)}s` ago"
+            afk_str = f"`{int(minutes)}menit{int(seconds)}detik` yg lalu"
         else:
-            afk_str = f"`{int(seconds)}s` ago"
+            afk_str = f"`{int(seconds)}detik` yg lalu"
 
         is_bot = False
         if (sender := await mention.get_sender()) :
@@ -69,13 +69,13 @@ async def mention_afk(mention):
         if not is_bot and mention.sender_id not in USERS:
             if AFKREASON:
                 await mention.reply(
-                    f"**I'm not available right now.** (Since: {afk_str})"
-                    f"\nReason: `{AFKREASON}`."
+                    f"**Saya sedang offline.** (Sejak: {afk_str})"
+                    f"\n**Alasan:** `{AFKREASON}`."
                 )
             else:
                 await mention.reply(
-                    f"**I'm not available right now.** (Since: {afk_str})"
-                    "\n**Please come back later.**"
+                    f"**Saya sedang offline.** (Sejak: {afk_str})"
+                    "\n**Harap bersabar, hubungi saya nanti.**"
                 )
             USERS.update({mention.sender_id: 1})
             COUNT_MSG = COUNT_MSG + 1
@@ -83,13 +83,13 @@ async def mention_afk(mention):
             if USERS[mention.sender_id] % randint(2, 4) == 0:
                 if AFKREASON:
                     await mention.reply(
-                        f"**I'm not available right now.** (Since: {afk_str})"
-                        f"\nReason: `{AFKREASON}`."
+                        f"**Saya sedang offline.** (Sejak: {afk_str})"
+                        f"\n**Alasan:** `{AFKREASON}`."
                     )
                 else:
                     await mention.reply(
-                        f"**I'm not available right now.** (Since: {afk_str})"
-                        "\n**Please come back later.**"
+                        f"**Saya sedang offline.** (Sejak: {afk_str})"
+                        "\n**Harap bersabar, hubungi saya nanti.**"
                     )
                 USERS[mention.sender_id] = USERS[mention.sender_id] + 1
                 COUNT_MSG = COUNT_MSG + 1
@@ -109,7 +109,7 @@ async def afk_on_pm(sender):
     global afk_end
     not_afk = datetime.now()
     afk_end = not_afk.replace(microsecond=0)
-    afk_str = "a while ago"
+    afk_str = "beberapa waktu lalu"
     if (
         sender.is_private
         and sender.sender_id != 777000
@@ -135,7 +135,7 @@ async def afk_on_pm(sender):
             time %= 60
             seconds = time
             if day == 1:
-                afk_str = "Yesterday"
+                afk_str = "Kemarin"
             elif day > 1:
                 if day > 6:
                     date = now + datetime.timedelta(
@@ -146,21 +146,21 @@ async def afk_on_pm(sender):
                     wday = now + datetime.timedelta(days=-day)
                     afk_str = wday.strftime("%A")
             elif hours > 1:
-                afk_str = f"`{int(hours)}h{int(minutes)}m` ago"
+                afk_str = f"`{int(hours)}jam{int(minutes)}menit` yg lalu"
             elif minutes > 0:
-                afk_str = f"`{int(minutes)}m{int(seconds)}s` ago"
+                afk_str = f"`{int(minutes)}menit{int(seconds)}detik` yg lalu"
             else:
-                afk_str = f"`{int(seconds)}s` ago"
+                afk_str = f"`{int(seconds)}detik` yg lalu"
             if sender.sender_id not in USERS:
                 if AFKREASON:
                     await sender.reply(
-                        f"**I'm not available right now.** (Since: {afk_str})"
-                        f"\nReason: `{AFKREASON}`."
+                        f"**Saya sedang offline.** (Sejak: {afk_str})"
+                        f"\n**Alasan:** `{AFKREASON}`."
                     )
                 else:
                     await sender.reply(
-                        f"**I'm not available right now.** (Since: {afk_str})"
-                        "\n**Please come back later.**"
+                        f"**Saya sedang offline.** (Sejak: {afk_str})"
+                        "\n**Harap bersabar, hubungi saya nanti.**"
                     )
                 USERS.update({sender.sender_id: 1})
                 COUNT_MSG = COUNT_MSG + 1
@@ -168,13 +168,13 @@ async def afk_on_pm(sender):
                 if USERS[sender.sender_id] % randint(2, 4) == 0:
                     if AFKREASON:
                         await sender.reply(
-                            "**I'm not available right now.** (Since: {afk_str})"
-                            f"\nReason: `{AFKREASON}`."
+                            "**Saya sedang offline.** (Sejak: {afk_str})"
+                            f"\n**Alasan:** `{AFKREASON}`."
                         )
                     else:
                         await sender.reply(
-                            "**I'm not available right now.** (Since: {afk_str})"
-                            "\n**Please come back later.**"
+                            "**Saya sedang offline.** (Sejak: {afk_str})"
+                            "\n**Harap bersabar, hubungi saya nanti.**"
                         )
                     USERS[sender.sender_id] = USERS[sender.sender_id] + 1
                     COUNT_MSG = COUNT_MSG + 1
@@ -199,11 +199,11 @@ async def set_afk(afk_e):
     afk_start = start1.replace(microsecond=0)
     if string:
         AFKREASON = string
-        await afk_e.edit("**Into The Void!**" f"\nReason: `{string}`")
+        await afk_e.edit("**Offline**" f"\n**Alasan:** `{string}`")
     else:
-        await afk_e.edit("**Into The Void!**")
+        await afk_e.edit("**Offline**")
     if BOTLOG:
-        await afk_e.client.send_message(BOTLOG_CHATID, "#AFK\nYou went AFK!")
+        await afk_e.client.send_message(BOTLOG_CHATID, "#AFK\nAnda Offline!")
     ISAFK = True
     afk_time = datetime.now()
     raise StopPropagation
@@ -223,7 +223,7 @@ async def type_afk_is_not_true(notafk):
     afk_end = not_afk.replace(microsecond=0)
     if ISAFK:
         ISAFK = False
-        msg = await notafk.edit("**I'm back BISH!**")
+        msg = await notafk.edit("**OK - Saya Online.**")
         await asyncio.sleep(3)
         await msg.delete()
         if BOTLOG:
