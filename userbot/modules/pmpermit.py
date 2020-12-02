@@ -14,13 +14,16 @@ from userbot.events import register
 
 # ========================= CONSTANTS ============================
 DEF_UNAPPROVED_MSG = (
-    "I haven't approved you to PM yet.\n"
-    "wait for me to approve your PM.\n"
-    "Until then, don't spam My PM or you'll get blocked...\n"
-    "CAPICHE?\n\n"
-    "-Userbot"
+    "Hai... Ini adalah pesan balasan otomatis.\n"
+    "===============================================================\n"
+    "Maaf, Saya belum menyetujui Anda untuk kirim pesan.\n"
+    "Mohon tunggu sampai saya menyetujui pesan Anda.\n"
+    "Sampai saat itu, tolong jangan spam pesan ke Saya.\n"
+    "Jika Anda tetap melakukannya, Anda akan dilaporkan dan diblokir.\n"
+    "===============================================================\n"
+    "Terima kasih.\n"
 )
-# =================================================================
+# ================================================================
 
 
 @register(incoming=True, disable_edited=True, disable_errors=True)
