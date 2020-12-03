@@ -26,16 +26,14 @@ async def help(event):
         head3 = "Gunakan: .help <nama modul>"
         head4 = "Daftar untuk semua perintah tersedia di bawah ini: "
         string = ""
-        sep2 = "`=======================================`"
+        sep1 = "`=======================================`"
         for i in sorted(CMD_HELP):
             string += "`" + str(i)
             string += "`  |  "
         await event.edit(
             f"{head}\
-              \n{sep2}\
               \n{head2}\
               \n{head3}\
-              \n{sep2}\
               \n{head4}\
               \n\n{string}\
               \n{sep1}"
