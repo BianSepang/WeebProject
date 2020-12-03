@@ -42,7 +42,7 @@ async def gen_chlog(repo, diff):
 
 async def print_changelogs(event, ac_br, changelog):
     changelog_str = (
-        f"**PEMBARUAN baru tersedia untuk [{ac_br}]:\n\nPERUBAHAN:**\n`{changelog}`"
+        f"**Pembaruan** baru tersedia untuk [**{ac_br}**]:\n\n**Perubahan:**\n`{changelog}`"
     )
     if len(changelog_str) > 4096:
         await event.edit("`Perubahan terlalu besar, lihat berkas untuk melihatnya.`")
@@ -88,7 +88,7 @@ async def deploy(event, repo, ups_rem, ac_br, txt):
         if HEROKU_APP_NAME is None:
             await event.edit(
                 "`Harap siapkan variabel HEROKU_APP_NAME"
-                " untuk dapat menggunakan __userbot__ Anda...`"
+                " untuk dapat menggunakan userbot Anda...`"
             )
             repo.__del__()
             return
@@ -169,7 +169,7 @@ async def upstream(event):
                 f"`Sayangnya, direktori {error} tersebut "
                 "tampaknya bukan repositori git.\n"
                 "Tapi kita bisa memperbaikinya dengan memperbarui "
-                "paksa __userbot__ menggunakan .update now.`"
+                "paksa userbot menggunakan .update now.`"
             )
         repo = Repo.init()
         origin = repo.create_remote("upstream", off_repo)
@@ -206,7 +206,7 @@ async def upstream(event):
 
     if changelog == "" and force_update is False:
         await event.edit(
-            "\n`USERBOT Anda sudah`  **terbaru**  `dengan`  "
+            "\n**{app.name}** `sudah`  **terbaru**  `dengan`  "
             f"**{UPSTREAM_REPO_BRANCH}**\n"
         )
         return repo.__del__()
