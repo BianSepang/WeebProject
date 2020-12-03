@@ -136,7 +136,7 @@ async def generate_credentials(gdrive):
             await gdrive.edit(
                 "`[OTENTIKASI - KESALAHAN]`\n\n"
                 "`Status` : **BURUK**\n"
-                "`Alasan` : Silahkan ambil **G_DRIVE_DATA** anda "
+                "`Alasan` : Silahkan ambil **G_DRIVE_DATA** Anda "
                 "[disini](https://telegra.ph/How-To-Setup-Google-Drive-04-03)"
             )
             return False
@@ -259,7 +259,7 @@ async def download(gdrive, service, uri=None):
                         t,
                         gdrive,
                         current_time,
-                        "[FILE - UNDUH]",
+                        "[BERKAS - UNDUH]",
                         is_cancelled=is_cancelled,
                     )
                 ),
@@ -272,7 +272,7 @@ async def download(gdrive, service, uri=None):
             newest = max(names, key=getctime)
             os.remove(newest)
             reply += (
-                "`[FILE - DIBATALKAN]`\n\n"
+                "`[BERKAS - DIBATALKAN]`\n\n"
                 "`Status` : **OK** - dibatalkan."
             )
             return reply
@@ -285,7 +285,7 @@ async def download(gdrive, service, uri=None):
         return reply
     mimeType = await get_mimeType(required_file_name)
     try:
-        status = "[FILE - UNGGAH]"
+        status = "[BERKAS - UNGGAH]"
         if isfile(required_file_name):
             try:
                 result = await upload(
@@ -293,7 +293,7 @@ async def download(gdrive, service, uri=None):
                 )
             except CancelProcess:
                 reply += (
-                    "`[FILE - DIBATALKAN]`\n\n"
+                    "`[BERKAS - DIBATALKAN]`\n\n"
                     "`Status` : **OK** - dibatalkan."
                 )
                 return reply
@@ -307,7 +307,7 @@ async def download(gdrive, service, uri=None):
                 )
                 return reply
         else:
-            status = status.replace("[FILE", "[FOLDER")
+            status = status.replace("[BERKAS", "[FOLDER")
             global parent_Id
             folder = await create_dir(service, file_name)
             parent_Id = folder.get("id")
@@ -393,13 +393,13 @@ async def download_gdrive(gdrive, service, uri):
                         )
                     except Exception:
                         reply += (
-                            "`[FILE - KESALAHAN]`\n\n"
+                            "`[BERKAS - KESALAHAN]`\n\n"
                             "`Status` : **BURUK** - gagal mengunduh.\n"
                             "`Alasan` : Kesalahan tidak diketahui."
                         )
                     else:
                         reply += (
-                            "`[FILE - KESALAHAN]`\n\n"
+                            "`[BERKAS - KESALAHAN]`\n\n"
                             "`Status` : **BURUK** - gagal mengunduh.\n"
                             f"`Alasan` : {error}"
                         )
@@ -439,13 +439,13 @@ async def download_gdrive(gdrive, service, uri):
                     percentage = downloaded / file_size * 100
                     speed = round(downloaded / diff, 2)
                     eta = round((file_size - downloaded) / speed)
-                    prog_str = "`Mengunduh` | [{0}{1}] `{2}%`".format(
+                    prog_str = "**Mengunduh** | [{0}{1}] `{2}%`".format(
                         "".join(["●" for i in range(math.floor(percentage / 10))]),
                         "".join(["○" for i in range(10 - math.floor(percentage / 10))]),
                         round(percentage, 2),
                     )
                     current_message = (
-                        "`[FILE - UNDUH]`\n\n"
+                        "`[BERKAS - UNDUH]`\n\n"
                         f"`{file_name}`\n"
                         f"`Status`\n{prog_str}\n"
                         f"`{humanbytes(downloaded)} dari {humanbytes(file_size)}"
@@ -486,13 +486,13 @@ async def download_gdrive(gdrive, service, uri):
                     percentage = downloaded / file_size * 100
                     speed = round(downloaded / diff, 2)
                     eta = round((file_size - downloaded) / speed)
-                    prog_str = "`Mengunduh` | [{0}{1}] `{2}%`".format(
+                    prog_str = "**Mengunduh** | [{0}{1}] `{2}%`".format(
                         "".join(["●" for i in range(math.floor(percentage / 10))]),
                         "".join(["○" for i in range(10 - math.floor(percentage / 10))]),
                         round(percentage, 2),
                     )
                     current_message = (
-                        "`[FILE - UNDUH]`\n\n"
+                        "`[BERKAS - UNDUH]`\n\n"
                         f"`{file_name}`\n"
                         f"`Status`\n{prog_str}\n"
                         f"`{humanbytes(downloaded)} dari {humanbytes(file_size)}"
@@ -507,7 +507,7 @@ async def download_gdrive(gdrive, service, uri):
                         await gdrive.edit(current_message)
                         display_message = current_message
     await gdrive.edit(
-        "`[FILE - UNDUH]`\n\n"
+        "`[BERKAS - UNDUH]`\n\n"
         f"`Nama   :` `{file_name}`\n"
         f"`Ukuran :` `{humanbytes(file_size)}`\n"
         f"`Lokasi :` `{file_path}`\n"
@@ -533,12 +533,12 @@ async def download_gdrive(gdrive, service, uri):
             result = await upload(gdrive, service, file_path, file_name, mimeType)
         except CancelProcess:
             reply += (
-                "`[FILE - DIBATALKAN]`\n\n"
+                "`[BERKAS - DIBATALKAN]`\n\n"
                 "`Status` : **OK** - dibatalkan."
             )
         else:
             reply += (
-                "`[FILE - UNGGAH]`\n\n"
+                "`[BERKAS - UNGGAH]`\n\n"
                 f"`Nama   :` `{file_name}`\n"
                 f"`Ukuran :` `{humanbytes(result[0])}`\n"
                 f"`Tautan :` [{file_name}]({result[1]})\n"
@@ -652,13 +652,13 @@ async def upload(gdrive, service, file_path, file_name, mimeType):
             percentage = uploaded / file_size * 100
             speed = round(uploaded / diff, 2)
             eta = round((file_size - uploaded) / speed)
-            prog_str = "`Mengunggah` | [{0}{1}] `{2}%`".format(
+            prog_str = "**Mengunggah** | [{0}{1}] `{2}%`".format(
                 "".join(["●" for i in range(math.floor(percentage / 10))]),
                 "".join(["○" for i in range(10 - math.floor(percentage / 10))]),
                 round(percentage, 2),
             )
             current_message = (
-                "`[FILE - UNGGAH]`\n\n"
+                "`[BERKAS - UNGGAH]`\n\n"
                 f"`{file_name}`\n"
                 f"`Status`\n{prog_str}\n"
                 f"`{humanbytes(uploaded)} dari {humanbytes(file_size)} "
@@ -728,7 +728,7 @@ async def lists(gdrive):
             await gdrive.edit(
                 "`[GDRIVE - DAFTAR]`\n\n"
                 "`Status` : **BURUK**\n"
-                "`Alasan` : tidak bisa mendapatkan daftar batas lebih dari 1000."
+                "`Alasan` : tidak bisa mendapatkan batas daftar lebih dari 1000."
             )
             return
     else:
@@ -740,17 +740,17 @@ async def lists(gdrive):
             try:
                 name = checker.split(None, 2)[2]
             except IndexError:
-                query = f"'{parents}' in parents and (name contains '*')"
+                query = f"'{parents}' in parents and (terkait nama '*')"
             else:
-                query = f"'{parents}' in parents and (name contains '{name}')"
+                query = f"'{parents}' in parents and (terkait nama '{name}')"
         else:
             if re.search("-p (.*)", checker):
                 parents = re.search("-p (.*)", checker).group(1)
                 name = checker.split("-p")[0].strip()
-                query = f"'{parents}' in parents and (name contains '{name}')"
+                query = f"'{parents}' in parents and (terkait nama '{name}')"
             else:
                 name = checker
-                query = f"name contains '{name}'"
+                query = f"terkait nama '{name}'"
     else:
         query = ""
     service = await create_app(gdrive)
@@ -803,17 +803,17 @@ async def lists(gdrive):
 
     del result
     if query == "":
-        query = "Not specified"
+        query = "Tidak ditentukan"
     if len(message) > 4096:
         await gdrive.edit("`Hasilnya terlalu besar, mengirimkan sebagai file...`")
         with open("result.txt", "w") as r:
-            r.write(f"Kueri Google Drive:\n{query}\n\nHasil\n\n{message}")
+            r.write(f"**Kueri Google Drive:**\n{query}\n\n**Hasil**\n\n{message}")
         await gdrive.client.send_file(
             gdrive.chat_id, "result.txt", caption="Daftar Kueri Google Drive."
         )
     else:
         await gdrive.edit(
-            "**Kueri Google Drive**:\n" f"`{query}`\n\n**Hasil**\n\n{message}"
+            "**Kueri Google Drive:**\n" f"`{query}`\n\n**Hasil**\n\n{message}"
         )
     return
 
@@ -895,7 +895,7 @@ async def google_drive_managers(gdrive):
                     f = await get_information(service, f_id)
                 except Exception as e:
                     reply += (
-                        f"`[FILE/FOLDER - KESALAHAN]`\n\n"
+                        f"`[BERKAS/FOLDER - KESALAHAN]`\n\n"
                         "`Status` : **BURUK**"
                         f"`Alasan` : `{str(e)}`\n\n"
                     )
@@ -905,7 +905,7 @@ async def google_drive_managers(gdrive):
             if mimeType == "application/vnd.google-apps.folder":
                 status = "[FOLDER - HAPUS]"
             else:
-                status = "[FILE - HAPUS]"
+                status = "[BERKAS - HAPUS]"
             try:
                 service.files().delete(fileId=f_id, supportsAllDrives=True).execute()
             except HttpError as e:
@@ -927,7 +927,7 @@ async def google_drive_managers(gdrive):
                     f = await get_information(service, f_id)
                 except Exception as e:
                     reply += (
-                        "`[FILE/FOLDER - KESALAHAN]`\n\n"
+                        "`[BERKAS/FOLDER - KESALAHAN]`\n\n"
                         "`Status` : **BURUK**\n"
                         f"`Alasan` : `{str(e)}`\n\n"
                     )
@@ -943,7 +943,7 @@ async def google_drive_managers(gdrive):
             if mimeType == "application/vnd.google-apps.folder":
                 status = "[FOLDER - ADA]"
             else:
-                status = "[FILE - ADA]"
+                status = "[BERKAS - ADA]"
             msg = (
                 f"`{status}`\n\n" f"`Nama  :` `{name_or_id}`\n" f"`ID    :` `{f_id}`\n"
             )
@@ -1048,13 +1048,13 @@ async def google_drive(gdrive):
                     reply += await download_gdrive(gdrive, service, uri)
                 except CancelProcess:
                     reply += (
-                        "`[FILE - DIBATALKAN]`\n\n"
+                        "`[BERKAS - DIBATALKAN]`\n\n"
                         "`Status` : **OK** - dibatalkan."
                     )
                     break
                 except Exception as e:
                     reply += (
-                        "`[FILE - KESALAHAN]`\n\n"
+                        "`[BERKAS - KESALAHAN]`\n\n"
                         "`Status` : **BURUK**\n"
                         f"`Alasan` : {str(e)}\n\n"
                     )
@@ -1082,13 +1082,13 @@ async def google_drive(gdrive):
                         reply += await download_gdrive(gdrive, service, fileId)
                     except CancelProcess:
                         reply += (
-                            "`[FILE - DIBATALKAN]`\n\n"
+                            "`[BERKAS - DIBATALKAN]`\n\n"
                             "`Status` : **OK** - dibatalkan."
                         )
                         break
                     except Exception as e:
                         reply += (
-                            "`[FILE - KESALAHAN]`\n\n"
+                            "`[BERKAS - KESALAHAN]`\n\n"
                             "`Status` : **BURUK**\n"
                             f"`Alasan` : {str(e)}\n\n"
                         )
@@ -1103,7 +1103,7 @@ async def google_drive(gdrive):
             await gdrive.edit(
                 "`[NILAI - KESALAHAN]`\n\n"
                 "`Status` : **BURUK**\n"
-                "`Alasan` : nilai yang diberikan bukanlah URL atau jalur file / folder. "
+                "`Alasan` : Nilai yang diberikan bukanlah URL atau jalur file/folder. "
                 "Jika menurut Anda ini salah, mungkin Anda menggunakan .gd dengan beberapa "
                 "nilai dari file/folder, cth: `.gd <namafile1> <namafile2>` "
                 "untuk mengunggah dari file/folder itu tidak didukung."
@@ -1116,7 +1116,7 @@ async def google_drive(gdrive):
             except Exception as e:
                 if " not found" in str(e) or "'file'" in str(e):
                     reply += (
-                        "`[FILE - DIBATALKAN]`\n\n"
+                        "`[BERKAS - DIBATALKAN]`\n\n"
                         "`Status` : **OK** - dibatalkan."
                     )
                     await asyncio.sleep(2.5)
@@ -1138,11 +1138,11 @@ async def google_drive(gdrive):
         result = await upload(gdrive, service, file_path, file_name, mimeType)
     except CancelProcess:
         gdrive.respond(
-            "`[FILE - DIBATALKAN]`\n\n" "`Status` : **OK** - dibatalkan."
+            "`[BERKAS - DIBATALKAN]`\n\n" "`Status` : **OK** - dibatalkan."
         )
     if result:
         await gdrive.respond(
-            "`[FILE - UNGGAH]`\n\n"
+            "`[BERKAS - UNGGAH]`\n\n"
             f"`Nama   :` `{file_name}`\n"
             f"`Ukuran :` `{humanbytes(result[0])}`\n"
             f"`Tautan :` [{file_name}]({result[1]})\n"
@@ -1259,7 +1259,7 @@ async def check_progress_for_dl(gdrive, gid, previous):
             if not complete and not file.error_message:
                 percentage = int(file.progress)
                 downloaded = percentage * int(file.total_length) / 100
-                prog_str = "`Mengunduh` | [{0}{1}] `{2}`".format(
+                prog_str = "**Mengunduh** | [{0}{1}] `{2}`".format(
                     "".join(["●" for i in range(math.floor(percentage / 10))]),
                     "".join(["○" for i in range(10 - math.floor(percentage / 10))]),
                     file.progress_string(),
@@ -1284,7 +1284,7 @@ async def check_progress_for_dl(gdrive, gid, previous):
             file = aria2.get_download(gid)
             complete = file.is_complete
             if complete:
-                await gdrive.edit(f"`{file.name}`\n\n" "Successfully downloaded...")
+                await gdrive.edit(f"`{file.name}`\n\n" "Berhasil diunduh...")
                 return True
         except Exception as e:
             if " depth exceeded" in str(e):
