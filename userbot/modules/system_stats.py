@@ -41,7 +41,7 @@ async def sysdetails(sysd):
 
             await sysd.edit("`" + result + "`")
         except FileNotFoundError:
-            await sysd.edit("`Install neofetch first !!`")
+            await sysd.edit("`Instal neofetch terlebih dahulu!`")
 
 
 @register(outgoing=True, pattern=r"^\.botver$")
@@ -72,11 +72,11 @@ async def bot_ver(event):
             revout = str(stdout.decode().strip()) + str(stderr.decode().strip())
 
             await event.edit(
-                "`Userbot Version: " f"{verout}" "` \n" "`Revision: " f"{revout}" "`"
+                "`Versi Userbot: " f"{verout}" "` \n" "`Revisi: " f"{revout}" "`"
             )
         else:
             await event.edit(
-                "Shame that you don't have git, you're running - 'v1.beta.4' anyway!"
+                "Sayang sekali Anda tidak memiliki git, Anda tetap menjalankan 'v1.beta.4'!"
             )
 
 
@@ -86,7 +86,7 @@ async def pipcheck(pip):
     if not pip.text[0].isalpha() and pip.text[0] not in ("/", "#", "@", "!"):
         pipmodule = pip.pattern_match.group(1)
         if pipmodule:
-            await pip.edit("`Searching . . .`")
+            await pip.edit("`Mencari...`")
             pipc = await asyncrunapp(
                 "pip3",
                 "search",
@@ -100,7 +100,7 @@ async def pipcheck(pip):
 
             if pipout:
                 if len(pipout) > 4096:
-                    await pip.edit("`Output too large, sending as file`")
+                    await pip.edit("`Output terlalu besar, dikirim sebagai file`")
                     file = open("output.txt", "w+")
                     file.write(pipout)
                     file.close()
@@ -112,20 +112,20 @@ async def pipcheck(pip):
                     remove("output.txt")
                     return
                 await pip.edit(
-                    "**Query: **\n`"
+                    "**Kueri: **\n`"
                     f"pip3 search {pipmodule}"
-                    "`\n**Result: **\n`"
+                    "`\n**Hasil: **\n`"
                     f"{pipout}"
                     "`"
                 )
             else:
                 await pip.edit(
-                    "**Query: **\n`"
+                    "**Kueri: **\n`"
                     f"pip3 search {pipmodule}"
-                    "`\n**Result: **\n`No Result Returned/False`"
+                    "`\n**Hasil: **\n`Tidak ada hasil yang dikembalikan/salah`"
                 )
         else:
-            await pip.edit("`Use .help pip to see an example`")
+            await pip.edit("`Gunakan .help pip untuk melihat contoh`")
 
 
 @register(outgoing=True, pattern=r"^\.(alive|on)$")
@@ -133,12 +133,13 @@ async def amireallyalive(alive):
     """For .alive command, check if the bot is running."""
     logo = ALIVE_LOGO
     output = (
-        f"**WeebProject** aktif, berjalan pada __{repo.active_branch.name}__\n"
-        f"`=================================`\n"
-        f"`• Python         :  v{python_version()}`\n"
-        f"`• Telethon       :  v{version.__version__}`\n"
-        f"`• User           :  {DEFAULTUSER}`\n"
-        f"`=================================`\n"
+        f"`WeebProject aktif, siap melayani Anda`\n"
+        f"`=====================================`\n"
+        f"`• Python         :   v{python_version()}`\n"
+        f"`• Telethon       :   v{version.__version__}`\n"
+        f"`• Pengguna       :   {DEFAULTUSER}`\n"
+        f"`=====================================`\n"
+        f"`======== berjalan di {repo.active_branch.name} =========`\n"
     )
     if ALIVE_LOGO:
         try:
@@ -147,8 +148,8 @@ async def amireallyalive(alive):
             await alive.delete()
         except MediaEmptyError:
             await alive.edit(
-                output + "\n\n *`The provided logo is invalid."
-                "\nMake sure the link is directed to the logo picture`"
+                output + "\n\n`Logo yang diberikan tidak valid."
+                "\nPastikan link diarahkan ke gambar logo`."
             )
     else:
         await alive.edit(output)
@@ -158,12 +159,12 @@ async def amireallyalive(alive):
 async def amireallyaliveuser(username):
     """ For .aliveu command, change the username in the .alive command. """
     message = username.text
-    output = ".aliveu [new user without brackets] nor can it be empty"
+    output = ".aliveu [pengguna baru tanpa tanda kurung] juga tidak bisa kosong"
     if not (message == ".aliveu" or message[7:8] != " "):
         newuser = message[8:]
         global DEFAULTUSER
         DEFAULTUSER = newuser
-        output = "Successfully changed user to " + newuser + "!"
+        output = "Berhasil mengubah pengguna menjadi " + newuser + "!"
     await username.edit("`" f"{output}" "`")
 
 
@@ -172,19 +173,19 @@ async def amireallyalivereset(ureset):
     """ For .resetalive command, reset the username in the .alive command. """
     global DEFAULTUSER
     DEFAULTUSER = str(ALIVE_NAME) if ALIVE_NAME else uname().node
-    await ureset.edit("`" "Successfully reset user for alive!" "`")
+    await ureset.edit("`" "Berhasil menyetel ulang pengguna untuk alive!" "`")
 
 
 CMD_HELP.update(
     {
-        "sysd": ">`.sysd`" "\nUsage: Shows system information using neofetch.",
-        "botver": ">`.botver`" "\nUsage: Shows the userbot version.",
-        "pip": ">`.pip <module(s)>`" "\nUsage: Does a search of pip modules(s).",
+        "sysd": ">`.sysd`" "\nUntuk: Menampilkan informasi sistem menggunakan neofetch.",
+        "botver": ">`.botver`" "\nUntuk: Menampilkan versi userbot.",
+        "pip": ">`.pip <module(s)>`" "\nUntuk: Melakukan pencarian modul pip.",
         "alive": ">`.alive`"
-        "\nUsage: Type .alive to see wether your bot is working or not."
-        "\n\n>`.aliveu <text>`"
-        "\nUsage: Changes the 'user' in alive to the text you want."
+        "\nUntuk: Ketik .alive untuk melihat apakah bot Anda berfungsi atau tidak."
+        "\n\n>`.aliveu <teks>`"
+        "\nUntuk: Mengubah "pengguna" di .alive menjadi teks yang Anda inginkan."
         "\n\n>`.resetalive`"
-        "\nUsage: Resets the user to default.",
+        "\nUntuk: Menyetel ulang pengguna ke default.",
     }
 )
