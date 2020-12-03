@@ -42,7 +42,7 @@ async def gen_chlog(repo, diff):
 
 async def print_changelogs(event, ac_br, changelog):
     changelog_str = (
-        f"**Pembaruan** baru tersedia untuk [**{ac_br}**]:\n\n**Perubahan:**\n`{changelog}`"
+        f"**Pembaruan** baru tersedia untuk **[{ac_br}]**:\n\n**Perubahan:**\n`{changelog}`"
     )
     if len(changelog_str) > 4096:
         await event.edit("`Perubahan terlalu besar, lihat berkas untuk melihatnya.`")
