@@ -184,7 +184,7 @@ CMD_HELP.update(
         "alive": ">`.alive`"
         "\nUntuk: Ketik .alive untuk melihat apakah bot Anda berfungsi atau tidak."
         "\n\n>`.aliveu <teks>`"
-        "\nUntuk: Mengubah "pengguna" di .alive menjadi teks yang Anda inginkan."
+        "\nUntuk: Mengubah 'pengguna' di .alive menjadi teks yang Anda inginkan."
         "\n\n>`.resetalive`"
         "\nUntuk: Menyetel ulang pengguna ke default.",
     }
