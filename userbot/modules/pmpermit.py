@@ -80,8 +80,7 @@ async def permitpm(event):
             if COUNT_PM[event.chat_id] > 4:
                 await event.respond(
                     "`Anda melakukan spam pesan ke saya, yang tidak saya sukai.`\n"
-                    "`Saya tidak akan mengizinkan Anda kirim pesan ke saya lagi,`\n"
-                    "`sampai pemberitahuan lebih lanjut.`\n"
+                    "`Saya tidak akan mengizinkan Anda kirim pesan ke saya lagi, sampai pemberitahuan lebih lanjut.`\n"
                     "`Mohon maaf dan terima kasih.`"
                 )
 
@@ -305,7 +304,7 @@ async def unblockpm(unblock):
 async def add_pmsg(cust_msg):
     """Set your own Unapproved message"""
     if not PM_AUTO_BAN:
-        return await cust_msg.edit("Anda harus merubah `PM_AUTO_BAN` ke `True`")
+        return await cust_msg.edit("Anda harus merubah `PM_AUTO_BAN` menjadi `True`")
     try:
         import userbot.modules.sql_helper.globals as sql
     except AttributeError:
@@ -364,25 +363,25 @@ async def add_pmsg(cust_msg):
 CMD_HELP.update(
     {
         "pmpermit": ">`.approve`"
-        "\nUsage: Approves the mentioned/replied person to PM."
+        "\nUntuk: Menyetujui orang yang disebutkan/menjawab pesan."
         "\n\n>`.disapprove`"
-        "\nUsage: Disapproves the mentioned/replied person to PM."
+        "\nUntuk: Menolak orang yang disebutkan/membalas pesan."
         "\n\n>`.block`"
-        "\nUsage: Blocks the person."
+        "\nUntuk: Blokir orang tersebut."
         "\n\n>`.unblock`"
-        "\nUsage: Unblocks the person so they can PM you."
+        "\nUntuk: Batalkan pemblokiran orang tersebut agar mereka dapat kirim pesan kepada Anda."
         "\n\n>`.notifoff`"
-        "\nUsage: Clears/Disables any notifications of unapproved PMs."
+        "\nUntuk: Menghapus/Menonaktifkan pemberitahuan apa pun dari PM yang belum disetujui."
         "\n\n>`.notifon`"
-        "\nUsage: Allows notifications for unapproved PMs."
-        "\n\n>`.set pm_msg` <reply to msg>"
-        "\nUsage: Set your own Unapproved message"
+        "\nUntuk: Mengizinkan pemberitahuan untuk PM yang belum disetujui."
+        "\n\n>`.set pm_msg` <balas pesan>"
+        "\nUntuk: Setel pesan Anda yang belum disetujui."
         "\n\n>`.get pm_msg`"
-        "\nUsage: Get your current Unapproved message"
+        "\nUntuk: Dapatkan pesan Anda yang belum disetujui saat ini."
         "\n\n>`.reset pm_msg`"
-        "\nUsage: Get your remove your Unapproved message"
-        "\n\n*Custom unapproved message currently not able to set"
-        "\nformated text like bold, underline, link, etc."
-        "\nMessage will send in monoscape only"
+        "\nUntuk: Menyetel ulang pesan yang belum Anda setujui."
+        "\n\nPesan kustom yang belum disetujui saat ini tidak dapat disetel"
+        "\nteks yang diformat seperti cetak tebal, garis bawah, tautan, dll."
+        "\nPesan hanya akan dikirim dalam monospace."
     }
 )
