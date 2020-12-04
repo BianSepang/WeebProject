@@ -18,7 +18,7 @@ from urllib.parse import quote_plus
 
 from bs4 import BeautifulSoup
 from emoji import get_emoji_regexp
-from google_trans_new import LANGUAGES, google_translator
+from googletrans import LANGUAGES, Translator
 from gtts import gTTS
 from gtts.lang import tts_langs
 from requests import get
@@ -53,13 +53,13 @@ TRT_LANG = "id"
 async def setlang(prog):
     global CARBONLANG
     CARBONLANG = prog.pattern_match.group(1)
-    await prog.edit(f"Language for carbon.now.sh set to {CARBONLANG}")
+    await prog.edit(f"Bahasa untuk carbon.now.sh diatur ke {CARBONLANG}")
 
 
 @register(outgoing=True, pattern=r"^\.carbon")
 async def carbon_api(e):
     """ A Wrapper for carbon.now.sh """
-    await e.edit("`Processing...`")
+    await e.edit("`Memproses...`")
     CARBON = "https://carbon.now.sh/?l={lang}&code={code}"
     global CARBONLANG
     textx = await e.get_reply_message()
@@ -69,29 +69,29 @@ async def carbon_api(e):
     elif textx:
         pcode = str(textx.message)  # Importing message to module
     code = quote_plus(pcode)  # Converting to urlencoded
-    await e.edit("`Processing...\n25%`")
+    await e.edit("`Memproses...\n25%`")
     file_path = TEMP_DOWNLOAD_DIRECTORY + "carbon.png"
     if os.path.isfile(file_path):
         os.remove(file_path)
     url = CARBON.format(code=code, lang=CARBONLANG)
     driver = await chrome()
     driver.get(url)
-    await e.edit("`Processing...\n50%`")
+    await e.edit("`Memproses...\n50%`")
     driver.find_element_by_xpath("//button[@id='export-menu']").click()
     driver.find_element_by_xpath("//button[contains(text(),'4x')]").click()
     driver.find_element_by_xpath("//button[contains(text(),'PNG')]").click()
-    await e.edit("`Processing...\n75%`")
+    await e.edit("`Memproses...\n75%`")
     # Waiting for downloading
     while not os.path.isfile(file_path):
         await sleep(0.5)
-    await e.edit("`Processing...\n100%`")
-    await e.edit("`Uploading...`")
+    await e.edit("`Memproses...\n100%`")
+    await e.edit("`Mengunggah...`")
     await e.client.send_file(
         e.chat_id,
         file_path,
         caption=(
-            "Made using [Carbon](https://carbon.now.sh/about/),"
-            "\na project by [Dawn Labs](https://dawnlabs.io/)"
+            "Dibuat menggunakan [Carbon](https://carbon.now.sh/about/),"
+            "\nsebuah proyek oleh [Dawn Labs](https://dawnlabs.io/)"
         ),
         force_document=True,
         reply_to=e.message.reply_to_msg_id,
@@ -106,7 +106,7 @@ async def carbon_api(e):
 @register(outgoing=True, pattern=r"^\.img (.*)")
 async def img_sampler(event):
     """ For .img command, search and return images matching the query. """
-    await event.edit("`Processing...`")
+    await event.edit("`Memproses...`")
     query = event.pattern_match.group(1)
     lim = findall(r"lim=\d+", query)
     try:
@@ -156,12 +156,12 @@ async def moni(event):
                 )
             else:
                 await event.edit(
-                    "`This seems to be some alien currency, which I can't convert right now.`"
+                    "`Ini sepertinya mata uang asing, yang tidak dapat saya konversi sekarang.`"
                 )
         except Exception as e:
             await event.edit(str(e))
     else:
-        return await event.edit("`Invalid syntax.`")
+        return await event.edit("`Sintaks tidak valid.`")
 
 
 @register(outgoing=True, pattern=r"^\.google (.*)")
@@ -188,7 +188,7 @@ async def gsearch(q_event):
         except IndexError:
             break
     await q_event.edit(
-        "**Search Query:**\n`" + match + "`\n\n**Results:**\n" + msg, link_preview=False
+        "**Kueri Pencarian:**\n`" + match + "`\n\n**Hasil:**\n" + msg, link_preview=False
     )
 
     if BOTLOG:
@@ -205,9 +205,9 @@ async def wiki(wiki_q):
     try:
         summary(match)
     except DisambiguationError as error:
-        return await wiki_q.edit(f"Disambiguated page found.\n\n{error}")
+        return await wiki_q.edit(f"Ditemukan halaman yang tidak ambigu.\n\n{error}")
     except PageError as pageerror:
-        return await wiki_q.edit(f"Page not found.\n\n{pageerror}")
+        return await wiki_q.edit(f"halaman tidak ditemukan.\n\n{pageerror}")
     result = summary(match)
     if len(result) >= 4096:
         file = open("output.txt", "w+")
@@ -217,11 +217,11 @@ async def wiki(wiki_q):
             wiki_q.chat_id,
             "output.txt",
             reply_to=wiki_q.id,
-            caption="`Output too large, sending as file`",
+            caption="`Output terlalu besar, dikirim sebagai file.`",
         )
         if os.path.exists("output.txt"):
             return os.remove("output.txt")
-    await wiki_q.edit("**Search:**\n`" + match + "`\n\n**Result:**\n" + result)
+    await wiki_q.edit("**Pencarian:**\n`" + match + "`\n\n**Hasil:**\n" + result)
     if BOTLOG:
         await wiki_q.client.send_message(
             BOTLOG_CHATID, f"Wiki query `{match}` was executed successfully"
@@ -231,19 +231,19 @@ async def wiki(wiki_q):
 @register(outgoing=True, pattern=r"^\.ud (.*)")
 async def urban_dict(ud_e):
     """ For .ud command, fetch content from Urban Dictionary. """
-    await ud_e.edit("Processing...")
+    await ud_e.edit("Memproses...")
     query = ud_e.pattern_match.group(1)
     try:
         define(query)
     except HTTPError:
-        return await ud_e.edit(f"Sorry, couldn't find any results for: {query}")
+        return await ud_e.edit(f"Maaf, tidak dapat menemukan hasil apa pun untuk: {query}")
     mean = define(query)
     deflen = sum(len(i) for i in mean[0]["def"])
     exalen = sum(len(i) for i in mean[0]["example"])
     meanlen = deflen + exalen
     if int(meanlen) >= 0:
         if int(meanlen) >= 4096:
-            await ud_e.edit("`Output too large, sending as file.`")
+            await ud_e.edit("`Output terlalu besar, dikirim sebagai file.`")
             file = open("output.txt", "w+")
             file.write(
                 "Text: "
@@ -258,7 +258,7 @@ async def urban_dict(ud_e):
             await ud_e.client.send_file(
                 ud_e.chat_id,
                 "output.txt",
-                caption="`Output was too large, sent it as a file.`",
+                caption="`Output terlalu besar, dikirim sebagai file.`",
             )
             if os.path.exists("output.txt"):
                 os.remove("output.txt")
@@ -278,7 +278,7 @@ async def urban_dict(ud_e):
                 BOTLOG_CHATID, "ud query `" + query + "` executed successfully."
             )
     else:
-        await ud_e.edit("No result found for **" + query + "**")
+        await ud_e.edit("Tidak ada hasil untuk **" + query + "**")
 
 
 @register(outgoing=True, pattern=r"^\.tts(?: |$)([\s\S]*)")
@@ -292,20 +292,20 @@ async def text_to_speech(query):
         message = textx.text
     else:
         return await query.edit(
-            "`Give a text or reply to a message for Text-to-Speech!`"
+            "`Berikan teks atau balas pesan untuk Text-to-Speech!`"
         )
 
     try:
         gTTS(message, lang=TTS_LANG)
     except AssertionError:
         return await query.edit(
-            "The text is empty.\n"
-            "Nothing left to speak after pre-precessing, tokenizing and cleaning."
+            "Teksnya kosong.\n"
+            "Tidak ada yang tersisa untuk dibicarakan setelah pra-pemrosesan, tokenisasi, dan pembersihan."
         )
     except ValueError:
-        return await query.edit("Language is not supported.")
+        return await query.edit("Bahasa tidak didukung.")
     except RuntimeError:
-        return await query.edit("Error loading the languages dictionary.")
+        return await query.edit("Terjadi kesalahan saat memuat kamus bahasa.")
     tts = gTTS(message, lang=TTS_LANG)
     tts.save("k.mp3")
     with open("k.mp3", "rb") as audio:
@@ -352,8 +352,8 @@ async def imdb(e):
         credits = soup.findAll("div", "credit_summary_item")
         if len(credits) == 1:
             director = credits[0].a.text
-            writer = "Not available"
-            stars = "Not available"
+            writer = "Tidak diketahui"
+            stars = "Tidak diketahui"
         elif len(credits) > 2:
             director = credits[0].a.text
             writer = credits[1].a.text
@@ -364,7 +364,7 @@ async def imdb(e):
             stars = actors[0] + "," + actors[1] + "," + actors[2]
         else:
             director = credits[0].a.text
-            writer = "Not available"
+            writer = "Tidak diketahui"
             actors = []
             for x in credits[1].findAll("a"):
                 actors.append(x.text)
@@ -373,7 +373,7 @@ async def imdb(e):
         if soup.find("div", "inline canwrap"):
             story_line = soup.find("div", "inline canwrap").findAll("p")[0].text
         else:
-            story_line = "Not available"
+            story_line = "Tidak tersedia"
         info = soup.findAll("div", "txt-block")
         if info:
             mov_country = []
@@ -389,40 +389,40 @@ async def imdb(e):
             for r in soup.findAll("div", "ratingValue"):
                 mov_rating = r.strong["title"]
         else:
-            mov_rating = "Not available"
+            mov_rating = "Tidak tersedia"
         await e.edit(
             "<a href=" + poster + ">&#8203;</a>"
-            "<b>Title : </b><code>"
+            "<b>Judul : </b><code>"
             + mov_title
             + "</code>\n<code>"
             + mov_details
-            + "</code>\n<b>Rating : </b><code>"
+            + "</code>\n<b>Peringkat : </b><code>"
             + mov_rating
-            + "</code>\n<b>Country : </b><code>"
+            + "</code>\n<b>Negara : </b><code>"
             + mov_country[0]
-            + "</code>\n<b>Language : </b><code>"
+            + "</code>\n<b>Bahasa : </b><code>"
             + mov_language[0]
-            + "</code>\n<b>Director : </b><code>"
+            + "</code>\n<b>Direktur : </b><code>"
             + director
-            + "</code>\n<b>Writer : </b><code>"
+            + "</code>\n<b>Penulis : </b><code>"
             + writer
-            + "</code>\n<b>Stars : </b><code>"
+            + "</code>\n<b>Bintang : </b><code>"
             + stars
-            + "</code>\n<b>IMDB Url : </b>"
+            + "</code>\n<b>Url IMDB : </b>"
             + mov_link
-            + "\n<b>Story Line : </b>"
+            + "\n<b>Alur Cerita : </b>"
             + story_line,
             link_preview=True,
             parse_mode="HTML",
         )
     except IndexError:
-        await e.edit("Plox enter **Valid movie name** kthx")
+        await e.edit("Plox masukkan **Nama film yang valid**")
 
 
 @register(outgoing=True, pattern=r"^\.trt(?: |$)([\s\S]*)")
 async def translateme(trans):
     """ For .trt command, translate the given text using Google Translate. """
-    translator = google_translator()
+    translator = Translator()
     textx = await trans.get_reply_message()
     message = trans.pattern_match.group(1)
     if message:
@@ -430,25 +430,22 @@ async def translateme(trans):
     elif textx:
         message = textx.text
     else:
-        return await trans.edit("`Give a text or reply to a message to translate!`")
+        return await trans.edit("`Berikan teks atau balas pesan untuk diterjemahkan!`")
 
     try:
-        reply_text = translator.translate(deEmojify(message), lang_tgt=TRT_LANG)
+        reply_text = translator.translate(deEmojify(message), dest=TRT_LANG)
     except ValueError:
-        return await trans.edit("Invalid destination language.")
+        return await trans.edit("Bahasa tujuan tidak valid.")
 
-    try:
-        source_lan = translator.detect(deEmojify(message))[1].title()
-    except BaseException:
-        source_lan = "(Google didn't provide this info)"
-
-    reply_text = f"From: **{source_lan}**\nTo: **{LANGUAGES.get(TRT_LANG).title()}**\n\n{reply_text}"
+    source_lan = LANGUAGES[f"{reply_text.src.lower()}"]
+    transl_lan = LANGUAGES[f"{reply_text.dest.lower()}"]
+    reply_text = f"Dari **{source_lan.title()}**\nKe **{transl_lan.title()}:**\n\n{reply_text.text}"
 
     await trans.edit(reply_text)
     if BOTLOG:
         await trans.client.send_message(
             BOTLOG_CHATID,
-            f"Translated some {source_lan} stuff to {LANGUAGES.get(TRT_LANG).title()} just now.",
+            f"Translated some {source_lan.title()} stuff to {transl_lan.title()} just now.",
         )
 
 
@@ -465,7 +462,7 @@ async def lang(value):
             LANG = LANGUAGES[arg]
         else:
             return await value.edit(
-                f"`Invalid Language code !!`\n`Available language codes for TRT`:\n\n`{LANGUAGES}`"
+                f"`Kode Bahasa tidak valid !!`\n`Kode bahasa yang tersedia untuk TRT`:\n\n`{LANGUAGES}`"
             )
     elif util == "tts":
         scraper = "Text to Speech"
@@ -476,9 +473,9 @@ async def lang(value):
             LANG = tts_langs()[arg]
         else:
             return await value.edit(
-                f"`Invalid Language code !!`\n`Available language codes for TTS`:\n\n`{tts_langs()}`"
+                f"`Kode Bahasa tidak valid !!`\n`Kode bahasa yang tersedia untuk TTS`:\n\n`{tts_langs()}`"
             )
-    await value.edit(f"`Language for {scraper} changed to {LANG.title()}.`")
+    await value.edit(f"`Bahasa untuk {scraper} diubah menjadi {LANG.title()}.`")
     if BOTLOG:
         await value.client.send_message(
             BOTLOG_CHATID, f"`Language for {scraper} changed to {LANG.title()}.`"
@@ -501,17 +498,17 @@ async def yt_search(event):
     query = event.pattern_match.group(2)
 
     if not query:
-        return await event.edit("`Enter a query to search.`")
-    await event.edit("`Processing...`")
+        return await event.edit("`Masukkan kueri untuk dicari.`")
+    await event.edit("`Memproses...`")
 
     try:
         results = json.loads(YoutubeSearch(query, max_results=counter).to_json())
     except KeyError:
         return await event.edit(
-            "`Youtube Search gone retard.\nCan't search this query!`"
+            "`Pencarian Youtube menjadi lambat.\n Tidak dapat menelusuri kueri ini!`"
         )
 
-    output = f"**Search Query:**\n`{query}`\n\n**Results:**\n"
+    output = f"**Kueri Pencarian:**\n`{query}`\n\n**Hasil:**\n"
 
     for i in results["videos"]:
         try:
@@ -520,7 +517,7 @@ async def yt_search(event):
             channel = i["channel"]
             duration = i["duration"]
             views = i["views"]
-            output += f"[{title}]({link})\nChannel: `{channel}`\nDuration: {duration} | {views}\n\n"
+            output += f"[{title}]({link})\n Saluran: `{channel}`\n Durasi: {duration} | {views}\n\n"
         except IndexError:
             break
 
@@ -533,7 +530,7 @@ async def download_video(v_url):
     url = v_url.pattern_match.group(2)
     type = v_url.pattern_match.group(1).lower()
 
-    await v_url.edit("`Preparing to download...`")
+    await v_url.edit("`Bersiap untuk mengunduh...`")
 
     if type == "audio":
         opts = {
@@ -577,35 +574,35 @@ async def download_video(v_url):
         video = True
 
     try:
-        await v_url.edit("`Fetching data, please wait..`")
+        await v_url.edit("`Mengambil data, harap tunggu..`")
         with YoutubeDL(opts) as rip:
             rip_data = rip.extract_info(url)
     except DownloadError as DE:
         return await v_url.edit(f"`{str(DE)}`")
     except ContentTooShortError:
-        return await v_url.edit("`The download content was too short.`")
+        return await v_url.edit("`Konten unduhan terlalu pendek.`")
     except GeoRestrictedError:
         return await v_url.edit(
-            "`Video is not available from your geographic location "
-            "due to geographic restrictions imposed by a website.`"
+            "`Video tidak tersedia dari lokasi geografis Anda "
+            "karena batasan geografis yang diberlakukan oleh situs web.`"
         )
     except MaxDownloadsReached:
-        return await v_url.edit("`Max-downloads limit has been reached.`")
+        return await v_url.edit("`Batas unduhan maksimal telah tercapai.`")
     except PostProcessingError:
-        return await v_url.edit("`There was an error during post processing.`")
+        return await v_url.edit("`Ada kesalahan selama pemrosesan posting.`")
     except UnavailableVideoError:
-        return await v_url.edit("`Media is not available in the requested format.`")
+        return await v_url.edit("`Media tidak tersedia dalam format yang diminta.`")
     except XAttrMetadataError as XAME:
         return await v_url.edit(f"`{XAME.code}: {XAME.msg}\n{XAME.reason}`")
     except ExtractorError:
-        return await v_url.edit("`There was an error during info extraction.`")
+        return await v_url.edit("`Terjadi kesalahan selama mengekstraks info.`")
     except Exception as e:
         return await v_url.edit(f"{str(type(e)): {str(e)}}")
     c_time = time.time()
     if song:
         await v_url.edit(
-            f"`Preparing to upload song:`\n**{rip_data['title']}**"
-            "\nby *{rip_data['uploader']}*"
+            f"`Bersiap mengupload lagu:`\n**{rip_data['title']}**"
+            "\noleh *{rip_data['uploader']}*"
         )
         await v_url.client.send_file(
             v_url.chat_id,
@@ -619,15 +616,15 @@ async def download_video(v_url):
                 )
             ],
             progress_callback=lambda d, t: asyncio.get_event_loop().create_task(
-                progress(d, t, v_url, c_time, "Uploading..", f"{rip_data['title']}.mp3")
+                progress(d, t, v_url, c_time, "Mengupload..", f"{rip_data['title']}.mp3")
             ),
         )
         os.remove(f"{rip_data['id']}.mp3")
         await v_url.delete()
     elif video:
         await v_url.edit(
-            f"`Preparing to upload video:`\n**{rip_data['title']}**"
-            "\nby *{rip_data['uploader']}*"
+            f"`Bersiap mengupload video:`\n**{rip_data['title']}**"
+            "\noleh *{rip_data['uploader']}*"
         )
         await v_url.client.send_file(
             v_url.chat_id,
@@ -635,7 +632,7 @@ async def download_video(v_url):
             supports_streaming=True,
             caption=rip_data["title"],
             progress_callback=lambda d, t: asyncio.get_event_loop().create_task(
-                progress(d, t, v_url, c_time, "Uploading..", f"{rip_data['title']}.mp4")
+                progress(d, t, v_url, c_time, "Mengupload..", f"{rip_data['title']}.mp4")
             ),
         )
         os.remove(f"{rip_data['id']}.mp4")
@@ -649,26 +646,26 @@ def deEmojify(inputString):
 
 CMD_HELP.update(
     {
-        "img": ">`.img <search_query>`"
-        "\nUsage: Does an image search on Google and shows 5 images.",
-        "currency": ">`.currency <amount> <from> <to>`"
-        "\nUsage: Converts various currencies for you.",
-        "carbon": ">`.carbon <text> [or reply]`"
-        "\nUsage: Beautify your code using carbon.now.sh\n"
-        "Use .crblang <text> to set language for your code.",
-        "google": ">`.google <query>`" "\nUsage: Does a search on Google.",
-        "wiki": ">`.wiki <query>`" "\nUsage: Does a search on Wikipedia.",
-        "ud": ">`.ud <query>`" "\nUsage: Does a search on Urban Dictionary.",
-        "tts": ">`.tts <text> [or reply]`"
-        "\nUsage: Translates text to speech for the language which is set."
-        "\nUse >`.lang tts <language code>` to set language for tts. (Default is English.)",
-        "trt": ">`.trt <text> [or reply]`"
-        "\nUsage: Translates text to the language which is set."
-        "\nUse >`.lang trt <language code>` to set language for trt. (Default is English)",
-        "yt": ">`.yt <text>`" "\nUsage: Does a YouTube search.",
-        "imdb": ">`.imdb <movie-name>`" "\nUsage: Shows movie info and other stuff.",
-        "rip": ">`.ripaudio <url> or ripvideo <url>`"
-        "\nUsage: Download videos and songs from YouTube "
-        "(and [many other sites](https://ytdl-org.github.io/youtube-dl/supportedsites.html)).",
+        "img": ">`.img <permintaan pencarian>`"
+        "\nUntuk: Melakukan pencarian gambar di Google dan menampilkan 5 gambar.",
+        "currency": ">`.currency <jumlah> <dari> <untuk>`"
+        "\nUntuk: Mengonversi berbagai mata uang untuk Anda.",
+        "carbon": ">`.carbon <teks> [atau balas]`"
+        "\nUntuk: Percantik kode Anda menggunakan carbon.now.sh\n"
+        "Gunakan .crblang <teks> untuk mengatur bahasa untuk kode Anda.",
+        "google": ">`.google <pertanyaan>`" "\nUntuk: Melakukan pencarian di Google.",
+        "wiki": ">`.wiki <pertanyaan>`" "\nUntuk: Melakukan pencarian di Wikipedia.",
+        "ud": ">`.ud <pertanyaan>`" "\nUsage: Melakukan pencarian di Kamus Urban.",
+        "tts": ">`.tts <teks> [atau balas]`"
+        "\nUntuk: Menerjemahkan teks ucapan untuk bahasa yang diatur."
+        "\nGunakan >`.lang tts <kode bahasa>` untuk mengatur bahasa untuk tts. (Default-nya bahasa Inggris.)",
+        "trt": ">`.trt <teks> [atau balas]`"
+        "\nUntuk: Menerjemahkan teks ke bahasa yang diatur."
+        "\nGunakan >`.lang trt <kode bahasa>` untuk mengatur bahasa untuk trt. (Default-nya bahasa Inggris.)",
+        "yt": ">`.yt <teks>`" "\nUntuk: Melakukan pencarian Youtube.",
+        "imdb": ">`.imdb <nama film>`" "\nUntuk: Menampilkan info film dan hal lainnya.",
+        "rip": ">`.ripaudio <url> / ripvideo <url>`"
+        "\nUntuk: Unduh video dan lagu dari Youtube "
+        "(dan [banyak situs lainnya](https://ytdl-org.github.io/youtube-dl/supportedsites.html)).",
     }
 )
