@@ -37,7 +37,7 @@ async def help(event):
               \n{head4}\
               \n{sep1}\
               \n\n{string}\
-              \n{sep1}"
+              \n\n{sep1}"
         )
     await asyncio.sleep(60)
     await event.delete()

@@ -7,9 +7,18 @@
 
 from sqlalchemy.exc import IntegrityError
 from telethon.tl.functions.contacts import BlockRequest, UnblockRequest
+from telethon.tl.functions.messages import ReportSpamRequest
 from telethon.tl.types import User
 
-from userbot import BOTLOG, BOTLOG_CHATID, CMD_HELP, COUNT_PM, LASTMSG, PM_AUTO_BAN
+from userbot import ( 
+    BOTLOG,
+    BOTLOG_CHATID,
+    CMD_HELP,
+    COUNT_PM,
+    LASTMSG,
+    LOGS,
+    PM_AUTO_BAN,
+)
 from userbot.events import register
 
 # ========================= CONSTANTS ============================
@@ -28,7 +37,8 @@ DEF_UNAPPROVED_MSG = (
 
 @register(incoming=True, disable_edited=True, disable_errors=True)
 async def permitpm(event):
-    """Prohibits people from PMing you without approval. Will block retarded nibbas automatically."""
+    """ Prohibits people from PMing you without approval. \
+        Will block retarded nibbas automatically."""
     if not PM_AUTO_BAN:
         return
     self_user = await event.client.get_me()
@@ -89,17 +99,28 @@ async def permitpm(event):
                     del LASTMSG[event.chat_id]
                 except KeyError:
                     if BOTLOG:
-                        name = await event.client.get_entity(event.chat_id)
-                        name0 = str(name.first_name)
-                        await event.client.send_message(
+                    	await event.clinet.send_messages(
                             BOTLOG_CHATID,
-                            "["
-                            + name0
-                            + "](tg://user?id="
-                            + str(event.chat_id)
-                            + ")"
-                            + " was just another retarded nibba",
+                            "Count PM is seemingly going retard, plis restart bot!",
                         )
+                    LOGS.info("CountPM wen't rerted boi")
+                    return
+
+                await event.client(BlockRequest(event.chat_id))
+                await event.client(ReportSpamRequest(peer=event.chat_id))
+                
+                if BOTLOG:
+                    name = await event.client.get_entity(event.chat_id)
+                    name0 = str(name.first_name)
+                    await event.client.send_message(
+                        BOTLOG_CHATID,
+                        "["
+                        + name0
+                        + "](tg://user?id="
+                        + str(event.chat_id)
+                        + ")"
+                        + " was just another retarded nibba",
+                    )
 
 
 @register(disable_edited=True, outgoing=True, disable_errors=True)
@@ -152,36 +173,39 @@ async def auto_accept(event):
                     )
 
 
-@register(outgoing=True, pattern=r"^\.notifoff$")
+@register(outgoing=True, pattern=r"^.notifoff$")
 async def notifoff(noff_event):
     """ For .notifoff command, stop getting notifications from unapproved PMs. """
     try:
         from userbot.modules.sql_helper.globals import addgvar
     except AttributeError:
-        return await noff_event.edit("`Running on Non-SQL mode!`")
+        await noff_event.edit("`Running on Non-SQL mode!`")
+        return
     addgvar("NOTIF_OFF", True)
     await noff_event.edit("`Pemberitahuan dari pesan yang belum diizinakn dibisukan!`")
 
 
-@register(outgoing=True, pattern=r"^\.notifon$")
+@register(outgoing=True, pattern=r"^.notifon$")
 async def notifon(non_event):
     """ For .notifoff command, get notifications from unapproved PMs. """
     try:
         from userbot.modules.sql_helper.globals import delgvar
     except AttributeError:
-        return await non_event.edit("`Running on Non-SQL mode!`")
+        await non_event.edit("`Running on Non-SQL mode!`")
+        return
     delgvar("NOTIF_OFF")
     await non_event.edit("`Pemberitahuan dari pesan yang belum diizinkan dibunyikan!`")
 
 
-@register(outgoing=True, pattern=r"^\.approve$")
+@register(outgoing=True, pattern=r"^.approve$")
 async def approvepm(apprvpm):
     """ For .approve command, give someone the permissions to PM you. """
     try:
         from userbot.modules.sql_helper.globals import gvarstatus
         from userbot.modules.sql_helper.pm_permit_sql import approve
     except AttributeError:
-        return await apprvpm.edit("`Running on Non-SQL mode!`")
+        await apprvpm.edit("`Running on Non-SQL mode!`")
+        return
 
     if apprvpm.reply_to_msg_id:
         reply = await apprvpm.get_reply_message()
@@ -210,7 +234,8 @@ async def approvepm(apprvpm):
     try:
         approve(uid)
     except IntegrityError:
-        return await apprvpm.edit(f"[{name0}](tg://user?id={uid}) `mungkin sudah diizinkan.`")
+        await apprvpm.edit(f"[{name0}](tg://user?id={uid}) `mungkin sudah diizinkan.`")
+        return
 
     await apprvpm.edit(f"[{name0}](tg://user?id={uid}) `diizinkan kirim pesan!`")
 
@@ -221,12 +246,13 @@ async def approvepm(apprvpm):
         )
 
 
-@register(outgoing=True, pattern=r"^\.disapprove$")
+@register(outgoing=True, pattern=r"^.disapprove$")
 async def disapprovepm(disapprvpm):
     try:
         from userbot.modules.sql_helper.pm_permit_sql import dissprove
     except BaseException:
-        return await disapprvpm.edit("`Running on Non-SQL mode!`")
+        await disapprvpm.edit("`Running on Non-SQL mode!`")
+        return
 
     if disapprvpm.reply_to_msg_id:
         reply = await disapprvpm.get_reply_message()
@@ -251,7 +277,7 @@ async def disapprovepm(disapprvpm):
         )
 
 
-@register(outgoing=True, pattern=r"^\.block$")
+@register(outgoing=True, pattern=r"^.block$")
 async def blockpm(block):
     """ For .block command, block people from PMing you! """
     if block.reply_to_msg_id:
@@ -283,7 +309,7 @@ async def blockpm(block):
         )
 
 
-@register(outgoing=True, pattern=r"^\.unblock$")
+@register(outgoing=True, pattern=r"^.unblock$")
 async def unblockpm(unblock):
     """ For .unblock command, let people PMing you again! """
     if unblock.reply_to_msg_id:
@@ -300,7 +326,7 @@ async def unblockpm(unblock):
         )
 
 
-@register(outgoing=True, pattern=r"^\.(set|get|reset) pm_msg(?: |$)(\w*)")
+@register(outgoing=True, pattern=r"^.(set|get|reset) pm_msg(?: |$)(\w*)")
 async def add_pmsg(cust_msg):
     """Set your own Unapproved message"""
     if not PM_AUTO_BAN:

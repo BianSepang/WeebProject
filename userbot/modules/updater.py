@@ -101,7 +101,7 @@ async def deploy(event, repo, ups_rem, ac_br, txt):
                 f"{txt}\n" "`Kredensial Heroku tidak valid untuk men-deploy dyno userbot.`"
             )
             return repo.__del__()
-        await event.edit("`dyno Userbot dalam proses, tunggu sebentar...`")
+        await event.edit("`Dyno userbot dalam proses, tunggu sebentar...`")
         ups_rem.fetch(ac_br)
         repo.git.reset("--hard", "FETCH_HEAD")
         heroku_git_url = heroku_app.git_url.replace(
@@ -206,7 +206,7 @@ async def upstream(event):
 
     if changelog == "" and force_update is False:
         await event.edit(
-            "\n**{HEROKU_APP_NAME}** `sudah`  **terbaru**  `dengan`  "
+            f"\n**{app.name}** `sudah`  **terbaru**  `dengan`  "
             f"**{UPSTREAM_REPO_BRANCH}**\n"
         )
         return repo.__del__()
@@ -229,13 +229,13 @@ async def upstream(event):
 CMD_HELP.update(
     {
         "update": ">`.update`"
-        "\nUsage: Checks if the main userbot repository has any updates "
-        "and shows a changelog if so."
+        "\nUntuk: Memeriksa apakah repositori userbot utama memiliki pembaruan "
+        "dan juga menampilkan perubahan jika ada."
         "\n\n>`.update now`"
-        "\nUsage: Update your userbot, "
-        "if there are any updates in your userbot repository."
+        "\nUntuk: Perbarui userbot Anda, "
+        "jika ada pembaruan di repositori userbot Anda."
         "\n\n>`.update deploy`"
-        "\nUsage: Deploy your userbot"
-        "\nThis will triggered deploy always, even no updates."
+        "\nUntuk: Terapkan userbot Anda."
+        "\nIni akan selalu memicu penerapan, bahkan jika tidak ada pembaruan."
     }
 )

@@ -259,7 +259,7 @@ async def download(gdrive, service, uri=None):
                         t,
                         gdrive,
                         current_time,
-                        "[BERKAS - UNDUH]",
+                        "[FILE - DOWNLOAD]",
                         is_cancelled=is_cancelled,
                     )
                 ),
@@ -285,7 +285,7 @@ async def download(gdrive, service, uri=None):
         return reply
     mimeType = await get_mimeType(required_file_name)
     try:
-        status = "[BERKAS - UNGGAH]"
+        status = "[FILE - UPLOAD]"
         if isfile(required_file_name):
             try:
                 result = await upload(
@@ -303,11 +303,11 @@ async def download(gdrive, service, uri=None):
                     f"`Nama   :` `{file_name}`\n"
                     f"`Ukuran :` `{humanbytes(result[0])}`\n"
                     f"`Tautan :` [{file_name}]({result[1]})\n"
-                    f"`Status :` **OK** - Berhasil diunggah.\n\n"
+                    "`Status :` **OK** - Berhasil diunggah.\n\n"
                 )
                 return reply
         else:
-            status = status.replace("[BERKAS", "[FOLDER")
+            status = status.replace("[FILE", "[FOLDER")
             global parent_Id
             folder = await create_dir(service, file_name)
             parent_Id = folder.get("id")
@@ -327,14 +327,14 @@ async def download(gdrive, service, uri=None):
                 reply += (
                     f"`{status}`\n\n"
                     f"[{file_name}]({webViewURL})\n"
-                    f"`Status` : **OK** - Berhasil diunggah.\n\n"
+                    "`Status` : **OK** - Berhasil diunggah.\n\n"
                 )
                 await reset_parentId()
                 return reply
     except Exception as e:
-        status = status.replace("UNDUH]", "KESALAHAN]")
+        status = status.replace("DOWNLOAD]", "ERROR]")
         reply += (
-            f"`{status}`\n\n" "`Status` : **gagal**\n" f"`Alasan` : `{str(e)}`\n\n"
+            f"`{status}`\n\n" "`Status` : **Gagal**\n" f"`Alasan` : `{str(e)}`\n\n"
         )
         return reply
     return
@@ -511,7 +511,7 @@ async def download_gdrive(gdrive, service, uri):
         f"`Nama   :` `{file_name}`\n"
         f"`Ukuran :` `{humanbytes(file_size)}`\n"
         f"`Lokasi :` `{file_path}`\n"
-        f"`Status :` **OK** - Berhasil diunduh."
+        "`Status :` **OK** - Berhasil diunduh."
     )
     msg = await gdrive.respond("`Jawab pertanyaan di grup BOTLOG Anda`")
     async with gdrive.client.conversation(BOTLOG_CHATID) as conv:
@@ -542,7 +542,7 @@ async def download_gdrive(gdrive, service, uri):
                 f"`Nama   :` `{file_name}`\n"
                 f"`Ukuran :` `{humanbytes(result[0])}`\n"
                 f"`Tautan :` [{file_name}]({result[1]})\n"
-                f"`Status :` **OK**\n\n"
+                "`Status :` **OK**\n\n"
             )
         return reply
     else:
@@ -728,7 +728,7 @@ async def lists(gdrive):
             await gdrive.edit(
                 "`[GDRIVE - DAFTAR]`\n\n"
                 "`Status` : **BURUK**\n"
-                "`Alasan` : tidak bisa mendapatkan batas daftar lebih dari 1000."
+                "`Alasan` : Tidak bisa mendapatkan batas daftar lebih dari 1000."
             )
             return
     else:
@@ -805,15 +805,15 @@ async def lists(gdrive):
     if query == "":
         query = "Tidak ditentukan"
     if len(message) > 4096:
-        await gdrive.edit("`Hasilnya terlalu besar, mengirimkan sebagai file...`")
+        await gdrive.edit("`Hasil terlalu besar, mengirim sebagai file...`")
         with open("result.txt", "w") as r:
-            r.write(f"**Kueri Google Drive:**\n{query}\n\n**Hasil**\n\n{message}")
+            r.write(f"**Kueri Google Drive:**\n{query}\n\n**Hasil:**\n\n{message}")
         await gdrive.client.send_file(
             gdrive.chat_id, "result.txt", caption="Daftar Kueri Google Drive."
         )
     else:
         await gdrive.edit(
-            "**Kueri Google Drive:**\n" f"`{query}`\n\n**Hasil**\n\n{message}"
+            "**Kueri Google Drive:**\n" f"`{query}`\n\n**Hasil:**\n\n{message}"
         )
     return
 
@@ -988,7 +988,7 @@ async def google_drive(gdrive):
     elif value and gdrive.reply_to_msg_id:
         await gdrive.edit(
             "`[TIDAK DIKETAHUI - KESALAHAN]`\n\n"
-            "`Status` : **gagal**\n"
+            "`Status` : **Gagal**\n"
             "`Alasan` : Bingung mengunggah file atau pesan/media yang dibalas."
         )
         return None
@@ -1021,7 +1021,7 @@ async def google_drive(gdrive):
             await gdrive.edit(
                 "`[FOLDER - UNGGAH]`\n\n"
                 f"`{folder_name}`\n"
-                "`Status` : **BURUK**\n"
+                "`Status` : **BAD**\n"
                 f"`Alasan` : {str(e)}"
             )
             await reset_parentId()
@@ -1101,11 +1101,11 @@ async def google_drive(gdrive):
                 return None
         if not uri and not gdrive.reply_to_msg_id:
             await gdrive.edit(
-                "`[NILAI - KESALAHAN]`\n\n"
+                "`[VALUE - KESALAHAN]`\n\n"
                 "`Status` : **BURUK**\n"
-                "`Alasan` : Nilai yang diberikan bukanlah URL atau jalur file/folder. "
+                "`Alasan` : Value yang diberikan bukanlah URL atau jalur file/folder. "
                 "Jika menurut Anda ini salah, mungkin Anda menggunakan .gd dengan beberapa "
-                "nilai dari file/folder, cth: `.gd <namafile1> <namafile2>` "
+                "value dari file/folder, cth: `.gd <namafile1> <namafile2>` "
                 "untuk mengunggah dari file/folder itu tidak didukung."
             )
             return False
@@ -1146,7 +1146,7 @@ async def google_drive(gdrive):
             f"`Nama   :` `{file_name}`\n"
             f"`Ukuran :` `{humanbytes(result[0])}`\n"
             f"`Tautan :` [{file_name}]({result[1]})\n"
-            f"`Status :` **OK** - Berhasil diunggah.\n",
+            "`Status :` **OK** - Berhasil diunggah.\n",
             link_preview=False,
         )
     await gdrive.delete()
@@ -1164,7 +1164,7 @@ async def set_upload_folder(gdrive):
             parent_Id = G_DRIVE_FOLDER_ID
             await gdrive.edit(
                 "`[FOLDER - SET]`\n\n"
-                "`Status` : **OK** - gunakan `G_DRIVE_FOLDER_ID` sekarang."
+                "`Status` : **OK** - sekarang menggunakan `G_DRIVE_FOLDER_ID`."
             )
             return None
         else:
@@ -1172,7 +1172,7 @@ async def set_upload_folder(gdrive):
                 del parent_Id
             except NameError:
                 await gdrive.edit(
-                    "`[FOLDER - SET]`\n\n" "`Status` : **BURUK** - Tidak ada parent_Id yg diatur."
+                    "`[FOLDER - SET]`\n\n" "`Status` : **BURUK** - Tidak ada parent_Id yang diatur."
                 )
                 return False
             else:
@@ -1269,7 +1269,7 @@ async def check_progress_for_dl(gdrive, gid, previous):
                     f"`{file.name}`\n"
                     f"`Status` -> **{file.status.capitalize()}**\n"
                     f"{prog_str}\n"
-                    f"`{humanbytes(downloaded)} of"
+                    f"`{humanbytes(downloaded)} dari"
                     f" {file.total_length_string()}"
                     f" @ {file.download_speed_string()}`\n"
                     f"`ETA` -> {file.eta_string()}\n"
@@ -1293,7 +1293,7 @@ async def check_progress_for_dl(gdrive, gid, previous):
                     await gdrive.edit(
                         "`[URI - UNDUH]`\n\n"
                         f"`{file.name}`\n"
-                        "`Status` : **gagal**\n"
+                        "`Status` : **Gagal**\n"
                         "`Alasan` : Unduh otomatis dibatalkan, URI/Torrent mati."
                     )
                 except Exception:
@@ -1303,34 +1303,34 @@ async def check_progress_for_dl(gdrive, gid, previous):
 CMD_HELP.update(
     {
         "gdrive": ">`.gdauth`"
-        "\nUsage: generate token to enable all cmd google drive service."
-        "\nThis only need to run once in life time."
+        "\nUntuk: Buat token untuk mengaktifkan semua layanan cmd google drive."
+        "\nIni hanya perlu dijalankan sekali seumur hidup."
         "\n\n>`.gdreset`"
-        "\nUsage: reset your token if something bad happened or change drive acc."
+        "\nUntuk: Setel ulang token Anda jika terjadi sesuatu yang buruk atau ubah akun drive."
         "\n\n>`.gd`"
-        "\nUsage: Upload file from local or uri/url/drivelink into google drive."
-        "\nfor drivelink it's upload only if you want to."
+        "\nUntuk: Unggah file dari lokal atau uri/url/drivelink ke google drive."
+        "\nuntuk drivelink, unggah hanya jika Anda mau."
         "\n\n>`.gdabort`"
-        "\nUsage: Abort process uploading or downloading."
+        "\nUntuk: Batalkan proses mengunggah atau mengunduh."
         "\n\n>`.gdlist`"
-        "\nUsage: Get list of folders and files with default size 50."
-        "\nUse flags `-l range[1-1000]` for limit output."
-        "\nUse flags `-p parents-folder_id` for lists given folder in gdrive."
+        "\nUntuk: Dapatkan daftar folder dan file dengan ukuran default 50."
+        "\nGunakan flags `-l jarak [1-1000]` untuk batas keluaran."
+        "\nGunakan flags `-p parents-folder_id` untuk daftar folder yang diberikan di gdrive."
         "\n\n>`.gdf mkdir`"
-        "\nUsage: Create gdrive folder."
+        "\nUntuk: Membuat folder gdrive."
         "\n\n>`.gdf chck`"
-        "\nUsage: Check file/folder in gdrive."
+        "\nUntuk: Periksa file/folder di gdrive."
         "\n\n>`.gdf rm`"
-        "\nUsage: Delete files/folders in gdrive."
-        "\nCan't be undone, this method skipping file trash, so be caution..."
+        "\nUntuk: Hapus file/folder di gdrive."
+        "\nTidak bisa dibatalkan, metode ini melewatkan file sampah, jadi hati-hati..."
         "\n\n>`.gdfset put`"
-        "\nUsage: Change upload directory in gdrive."
+        "\nUntuk: Ubah direktori unggah di gdrive."
         "\n\n>`.gdfset rm`"
-        "\nUsage: remove set parentId from cmd\n>`.gdfset put` "
-        "into **G_DRIVE_FOLDER_ID** and if empty upload will go to root."
-        "\n\nNOTE:"
-        "\nfor >`.gdlist` you can combine -l and -p flags with or without name "
-        "at the same time, it must be `-l` flags first before use `-p` flags.\n"
-        "And by default it lists from latest 'modifiedTime' and then folders."
+        "\nUntuk: hapus set parentId dari cmd\n>`.gdfset put` "
+        "ke **G_DRIVE_FOLDER_ID** dan jika upload kosong akan masuk ke root."
+        "\n\nCATATAN:"
+        "\nuntuk >`.gdlist` Anda bisa menggabungkan -l dan -p flags dengan atau tanpa nama "
+        "pada waktu bersamaan, `-l` flags itu pasti lebih dahulu sebelum `-p` flags.\n"
+        "dan secara default daftar dari 'modifiedTime' terbaru dan kemudian folder."
     }
 )
