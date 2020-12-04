@@ -740,17 +740,17 @@ async def lists(gdrive):
             try:
                 name = checker.split(None, 2)[2]
             except IndexError:
-                query = f"'{parents}' in parents and (terkait nama '*')"
+                query = f"'{parents}' in parents and (contains name '*')"
             else:
-                query = f"'{parents}' in parents and (terkait nama '{name}')"
+                query = f"'{parents}' in parents and (contains name '{name}')"
         else:
             if re.search("-p (.*)", checker):
                 parents = re.search("-p (.*)", checker).group(1)
                 name = checker.split("-p")[0].strip()
-                query = f"'{parents}' in parents and (terkait nama '{name}')"
+                query = f"'{parents}' in parents and (contains name '{name}')"
             else:
                 name = checker
-                query = f"terkait nama '{name}'"
+                query = f"contains name '{name}'"
     else:
         query = ""
     service = await create_app(gdrive)
@@ -807,13 +807,13 @@ async def lists(gdrive):
     if len(message) > 4096:
         await gdrive.edit("`Hasil terlalu besar, mengirim sebagai file...`")
         with open("result.txt", "w") as r:
-            r.write(f"**Kueri Google Drive:**\n{query}\n\n**Hasil:**\n\n{message}")
+            r.write(f"**Kueri Google Drive :**\n{query}\n\n**Hasil :**\n\n{message}")
         await gdrive.client.send_file(
             gdrive.chat_id, "result.txt", caption="Daftar Kueri Google Drive."
         )
     else:
         await gdrive.edit(
-            "**Kueri Google Drive:**\n" f"`{query}`\n\n**Hasil:**\n\n{message}"
+            "**Kueri Google Drive :**\n" f"`{query}`\n\n**Hasil :**\n\n{message}"
         )
     return
 
@@ -1329,7 +1329,7 @@ CMD_HELP.update(
         "\nUntuk: hapus set parentId dari cmd\n>`.gdfset put` "
         "ke **G_DRIVE_FOLDER_ID** dan jika upload kosong akan masuk ke root."
         "\n\nCATATAN:"
-        "\nuntuk >`.gdlist` Anda bisa menggabungkan -l dan -p flags dengan atau tanpa nama "
+        "\nUntuk >`.gdlist` Anda bisa menggabungkan -l dan -p flags dengan atau tanpa nama "
         "pada waktu bersamaan, `-l` flags itu pasti lebih dahulu sebelum `-p` flags.\n"
         "dan secara default daftar dari 'modifiedTime' terbaru dan kemudian folder."
     }

@@ -57,11 +57,11 @@ async def mention_afk(mention):
                 wday = now + datetime.timedelta(days=-day)
                 afk_str = wday.strftime("%A")
         elif hours > 1:
-            afk_str = f"`{int(hours)}jam {int(minutes)}menit`"
+            afk_str = f"{int(hours)}jam {int(minutes)}menit"
         elif minutes > 0:
-            afk_str = f"`{int(minutes)}menit {int(seconds)}detik`"
+            afk_str = f"{int(minutes)}menit {int(seconds)}detik"
         else:
-            afk_str = f"`{int(seconds)}detik`"
+            afk_str = f"{int(seconds)}detik"
 
         is_bot = False
         if (sender := await mention.get_sender()) :
@@ -69,15 +69,15 @@ async def mention_afk(mention):
         if not is_bot and mention.sender_id not in USERS:
             if AFKREASON:
                 await mention.reply(
-                    f"**!!! OFFLINE !!!**"
-                    f"\n`Sejak :` `{afk_str}`"
-                    f"\n`Alasan:` `{AFKREASON}`"
+                    f"**!!! OFFLINE !!!**\n"
+                    f"`Sejak : {afk_str}`\n"
+                    f"`Alasan: {AFKREASON}`\n"
                 )
             else:
                 await mention.reply(
-                    f"**!!! OFFLINE !!!**"
-                    f"\n`Sejak :` `{afk_str}`"
-                    "\n`Saya off dulu BOS`"
+                    f"**!!! OFFLINE !!!**\n"
+                    f"`Sejak : {afk_str}`\n"
+                    "`Saya off dulu BOS.`\n"
                 )
             USERS.update({mention.sender_id: 1})
             COUNT_MSG = COUNT_MSG + 1
@@ -85,15 +85,15 @@ async def mention_afk(mention):
             if USERS[mention.sender_id] % randint(2, 4) == 0:
                 if AFKREASON:
                     await mention.reply(
-                        f"**!!! OFFLINE !!!**"
-                        f"\n`Sejak :` `{afk_str}`"
-                        f"\n`Alasan:` `{AFKREASON}`"
+                        f"**!!! OFFLINE !!!**\n"
+                        f"`Sejak : {afk_str}`\n"
+                        f"`Alasan: {AFKREASON}`\n"
                     )
                 else:
                     await mention.reply(
-                        f"**!!! OFFLINE !!!**"
-                        f"\n`Sejak :` `{afk_str}`"
-                        "\n`Saya off dulu BOS`"
+                        f"**!!! OFFLINE !!!**\n"
+                        f"`Sejak : {afk_str}`\n"
+                        "`Saya off dulu BOS.`\n"
                     )
                 USERS[mention.sender_id] = USERS[mention.sender_id] + 1
                 COUNT_MSG = COUNT_MSG + 1
@@ -150,23 +150,23 @@ async def afk_on_pm(sender):
                     wday = now + datetime.timedelta(days=-day)
                     afk_str = wday.strftime("%A")
             elif hours > 1:
-                afk_str = f"`{int(hours)}jam {int(minutes)}menit`"
+                afk_str = f"{int(hours)}jam {int(minutes)}menit"
             elif minutes > 0:
-                afk_str = f"`{int(minutes)}menit {int(seconds)}detik`"
+                afk_str = f"{int(minutes)}menit {int(seconds)}detik"
             else:
-                afk_str = f"`{int(seconds)}detik`"
+                afk_str = f"{int(seconds)}detik"
             if sender.sender_id not in USERS:
                 if AFKREASON:
                     await sender.reply(
-                        f"**!!! OFFLINE !!!**"
-                        f"\n`Sejak :` `{afk_str}`"
-                        f"\n`Alasan:` `{AFKREASON}`"
+                        f"**!!! OFFLINE !!!**\n"
+                        f"`Sejak : {afk_str}`\n"
+                        f"`Alasan: {AFKREASON}`\n"
                     )
                 else:
                     await sender.reply(
-                        f"**!!! OFFLINE !!!**"
-                        f"\n`Sejak :` `{afk_str}`"
-                        "\n`Saya off dulu BOS`"
+                        f"**!!! OFFLINE !!!**\n"
+                        f"`Sejak : {afk_str}`\n"
+                        "`Saya off dulu BOS.`\n"
                     )
                 USERS.update({sender.sender_id: 1})
                 COUNT_MSG = COUNT_MSG + 1
@@ -174,15 +174,15 @@ async def afk_on_pm(sender):
                 if USERS[sender.sender_id] % randint(2, 4) == 0:
                     if AFKREASON:
                         await sender.reply(
-                            f"**!!! OFFLINE !!!**"
-                            f"\n`Sejak :` `{afk_str}`"
-                            f"\n`Alasan:` `{AFKREASON}`"
+                            f"**!!! OFFLINE !!!**\n"
+                            f"`Sejak : {afk_str}`\n"
+                            f"`Alasan: {AFKREASON}`\n"
                         )
                     else:
                         await sender.reply(
-                            f"**!!! OFFLINE !!!**"
-                            f"\n`Sejak :` `{afk_str}`"
-                            "\n`Saya off dulu BOS`"
+                            f"**!!! OFFLINE !!!**\n"
+                            f"`Sejak : {afk_str}`\n"
+                            "`Saya off dulu BOS.`\n"
                         )
                     USERS[sender.sender_id] = USERS[sender.sender_id] + 1
                     COUNT_MSG = COUNT_MSG + 1
@@ -269,6 +269,6 @@ CMD_HELP.update(
         "\nUntuk: Jadikan Anda offline.\nBalasan untuk siapa saja yang memberi tag/pesan."
         "Anda memberi tahu mereka bahwa Anda AFK(alasan)."
         "\n\n>`.unoff`"
-        "\nUntuk: Mematikan Anda dari mode AFK/Offline."
+        "\nUntuk: Menjadikan Anda online dari mode AFK/Offline."
     }
 )
