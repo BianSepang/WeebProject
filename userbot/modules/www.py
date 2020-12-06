@@ -31,7 +31,7 @@ async def speedtst(spd):
         "`"
         "Dimulai pada : "
         f"{result['timestamp']} \n\n"
-        "Unduhb: "
+        "Unduh : "
         f"{speed_convert(result['download'])} \n"
         "Unggah : "
         f"{speed_convert(result['upload'])} \n"
