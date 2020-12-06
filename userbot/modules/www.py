@@ -29,15 +29,15 @@ async def speedtst(spd):
 
     await spd.edit(
         "`"
-        "Dimulai pada: "
+        "Dimulai pada : "
         f"{result['timestamp']} \n\n"
-        "Unduh: "
+        "Unduhb: "
         f"{speed_convert(result['download'])} \n"
-        "Unggah: "
+        "Unggah : "
         f"{speed_convert(result['upload'])} \n"
-        "Ping: "
+        "Ping : "
         f"{result['ping']} \n"
-        "ISP: "
+        "ISP : "
         f"{result['client']['isp']}"
         "`"
     )

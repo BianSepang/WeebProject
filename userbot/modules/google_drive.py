@@ -153,10 +153,10 @@ async def generate_credentials(gdrive):
         configs, SCOPES, redirect_uri=REDIRECT_URI
     )
     auth_url, _ = flow.authorization_url(access_type="offline", prompt="consent")
-    msg = await gdrive.respond("`Go to your BOTLOG group to authenticate token...`")
+    msg = await gdrive.respond("`Buka grup BOTLOG Anda untuk mengautentikasi token...`")
     async with gdrive.client.conversation(BOTLOG_CHATID) as conv:
         url_msg = await conv.send_message(
-            "Please go to this URL:\n" f"{auth_url}\nauthorize then reply the code"
+            "Silakan buka URL ini :\n" f"{auth_url}\n otorisasi lalu balas kodenya."
         )
         r = conv.wait_event(events.NewMessage(outgoing=True, chats=BOTLOG_CHATID))
         r = await r
@@ -273,7 +273,7 @@ async def download(gdrive, service, uri=None):
             os.remove(newest)
             reply += (
                 "`[FILE - CANCELLED]`\n\n"
-                "`Status` : **OK** - received signal cancelled."
+                "`Status` : **OK** - sinyal yang diterima dibatalkan."
             )
             return reply
         else:
@@ -281,7 +281,7 @@ async def download(gdrive, service, uri=None):
     try:
         file_name = await get_raw_name(required_file_name)
     except AttributeError:
-        reply += "`[ENTRY - ERROR]`\n\n" "`Status` : **BAD**\n"
+        reply += "`[ENTRY - ERROR]`\n\n" "`Status` : **BURUK**\n"
         return reply
     mimeType = await get_mimeType(required_file_name)
     try:
@@ -294,7 +294,7 @@ async def download(gdrive, service, uri=None):
             except CancelProcess:
                 reply += (
                     "`[FILE - CANCELLED]`\n\n"
-                    "`Status` : **OK** - received signal cancelled."
+                    "`Status` : **OK** - sinyal yang diterima dibatalkan."
                 )
                 return reply
             else:
@@ -303,7 +303,7 @@ async def download(gdrive, service, uri=None):
                     f"`Nama   :` `{file_name}`\n"
                     f"`Ukuran :` `{humanbytes(result[0])}`\n"
                     f"`Tautan :` [{file_name}]({result[1]})\n"
-                    "`Status :` **OK** - Successfully uploaded.\n\n"
+                    "`Status :` **OK** - Berhasil diunggah.\n\n"
                 )
                 return reply
         else:
@@ -317,7 +317,7 @@ async def download(gdrive, service, uri=None):
             except CancelProcess:
                 reply += (
                     "`[FOLDER - CANCELLED]`\n\n"
-                    "`Status` : **OK** - received signal cancelled."
+                    "`Status` : **OK** - sinyal yang diterima dibatalkan."
                 )
                 await reset_parentId()
                 return reply
@@ -327,14 +327,14 @@ async def download(gdrive, service, uri=None):
                 reply += (
                     f"`{status}`\n\n"
                     f"[{file_name}]({webViewURL})\n"
-                    "`Status` : **OK** - Successfully uploaded.\n\n"
+                    "`Status` : **OK** - Berhasil diunggah.\n\n"
                 )
                 await reset_parentId()
                 return reply
     except Exception as e:
         status = status.replace("DOWNLOAD]", "ERROR]")
         reply += (
-            f"`{status}`\n\n" "`Status` : **failed**\n" f"`Reason` : `{str(e)}`\n\n"
+            f"`{status}`\n\n" "`Status` : **Gagal**\n" f"`Alasan` : `{str(e)}`\n\n"
         )
         return reply
     return
@@ -394,14 +394,14 @@ async def download_gdrive(gdrive, service, uri):
                     except Exception:
                         reply += (
                             "`[FILE - ERROR]`\n\n"
-                            "`Status` : **BAD** - failed to download.\n"
-                            "`Reason` : uncaught err."
+                            "`Status` : **BURUK** - gagal untuk mengunduh.\n"
+                            "`Alasan` : uncaught err."
                         )
                     else:
                         reply += (
                             "`[FILE - ERROR]`\n\n"
-                            "`Status` : **BAD** - failed to download.\n"
-                            f"`Reason` : {error}"
+                            "`Status` : **BURUK** - gagal untuk mengunduh.\n"
+                            f"`Alasan` : {error}"
                         )
                     return reply
                 download = session.get(export, stream=True)
@@ -513,9 +513,9 @@ async def download_gdrive(gdrive, service, uri):
         f"`Lokasi :` `{file_path}`\n"
         "`Status :` **OK** - Berhasil diunduh."
     )
-    msg = await gdrive.respond("`Answer the question in your BOTLOG group`")
+    msg = await gdrive.respond("`Jawab pertanyaan di grup BOTLOG Anda`")
     async with gdrive.client.conversation(BOTLOG_CHATID) as conv:
-        ask = await conv.send_message("`Proceed with mirroring? [y/N]`")
+        ask = await conv.send_message("`Lanjutkan proses? [y/N]`")
         try:
             r = conv.wait_event(events.NewMessage(outgoing=True, chats=BOTLOG_CHATID))
             r = await r
@@ -534,7 +534,7 @@ async def download_gdrive(gdrive, service, uri):
         except CancelProcess:
             reply += (
                 "`[FILE - CANCELLED]`\n\n"
-                "`Status` : **OK** - received signal cancelled."
+                "`Status` : **OK** - sinyal yang diterima dibatalkan."
             )
         else:
             reply += (
@@ -547,7 +547,7 @@ async def download_gdrive(gdrive, service, uri):
         return reply
     else:
         await gdrive.client.send_message(
-            BOTLOG_CHATID, "`Invalid answer type [Y/N] only...`"
+            BOTLOG_CHATID, "`Jenis jawaban tidak valid [Y/N] saja`"
         )
         return reply
 
@@ -614,7 +614,7 @@ async def upload(gdrive, service, file_path, file_name, mimeType):
         pass
     body = {
         "name": file_name,
-        "description": "Uploaded from Telegram using ProjectBish userbot.",
+        "description": "Diunggah dari Telegram menggunakan ProjectBish userbot.",
         "mimeType": mimeType,
     }
     try:
@@ -720,7 +720,7 @@ async def reset_parentId():
 
 @register(pattern=r"^\.gdlist(?: |$)(-l \d+)?(?: |$)?(.*)?(?: |$)", outgoing=True)
 async def lists(gdrive):
-    await gdrive.edit("`Getting information...`")
+    await gdrive.edit("`Mendapatkan informasi...`")
     checker = gdrive.pattern_match.group(1)
     if checker is not None:
         page_size = int(gdrive.pattern_match.group(1).strip("-l "))
@@ -805,7 +805,7 @@ async def lists(gdrive):
     if query == "":
         query = "Tidak ditentukan"
     if len(message) > 4096:
-        await gdrive.edit("`Hasilnya terlalu besar, mengirimnya sebagai file...`")
+        await gdrive.edit("`Hasilnya terlalu besar, dikirim sebagai file...`")
         with open("result.txt", "w") as r:
             r.write(f"**Kueri Google Drive :**\n{query}\n\n**Hasil :**\n\n{message}")
         await gdrive.client.send_file(
@@ -945,15 +945,15 @@ async def google_drive_managers(gdrive):
             else:
                 status = "[FILE - EXIST]"
             msg = (
-                f"`{status}`\n\n" f"`Nama    :` `{name_or_id}`\n" f"`ID     :` `{f_id}`\n"
+                f"`{status}`\n\n" f"`Nama   :` `{name_or_id}`\n" f"`ID    :` `{f_id}`\n"
             )
             if mimeType != "application/vnd.google-apps.folder":
-                msg += f"`Ukuran  :` `{humanbytes(f_size)}`\n"
-                msg += f"`Tautan  :` [{name_or_id}]({downloadURL})\n\n"
+                msg += f"`Ukuran :` `{humanbytes(f_size)}`\n"
+                msg += f"`Tautan :` [{name_or_id}]({downloadURL})\n\n"
             else:
-                msg += f"`URL     :` [Open]({webViewLink})\n\n"
+                msg += f"`URL    :` [Open]({webViewLink})\n\n"
             if description:
-                msg += f"`Tentang :`\n`{description}`\n\n"
+                msg += f"`Tentang:`\n`{description}`\n\n"
             reply += msg
         page_token = result.get("nextPageToken", None)
     await gdrive.edit(reply)
@@ -1012,7 +1012,7 @@ async def google_drive(gdrive):
         except CancelProcess:
             await gdrive.respond(
                 "`[FOLDER - CANCELLED]`\n\n"
-                "`Status` : **OK** - received signal cancelled."
+                "`Status` : **OK** - sinyal yang diterima dibatalkan."
             )
             await reset_parentId()
             await gdrive.delete()
@@ -1049,7 +1049,7 @@ async def google_drive(gdrive):
                 except CancelProcess:
                     reply += (
                         "`[FILE - CANCELLED]`\n\n"
-                        "`Status` : **OK** - received signal cancelled."
+                        "`Status` : **OK** - sinyal yang diterima dibatalkan."
                     )
                     break
                 except Exception as e:
@@ -1083,7 +1083,7 @@ async def google_drive(gdrive):
                     except CancelProcess:
                         reply += (
                             "`[FILE - CANCELLED]`\n\n"
-                            "`Status` : **OK** - received signal cancelled."
+                            "`Status` : **OK** - sinyal yang diterima dibatalkan."
                         )
                         break
                     except Exception as e:
@@ -1103,10 +1103,10 @@ async def google_drive(gdrive):
             await gdrive.edit(
                 "`[VALUE - ERROR]`\n\n"
                 "`Status` : **BURUK**\n"
-                "`Alasan` : given value is not URL nor file/folder path. "
-                "If you think this is wrong, maybe you use .gd with multiple "
-                "value of files/folders, e.g `.gd <filename1> <filename2>` "
-                "for upload from files/folders path this doesn't support it."
+                "`Alasan` : nilai yang diberikan bukanlah URL atau jalur file/folder. "
+                "Jika menurut Anda ini salah, mungkin Anda menggunakan .gd dengan beberapa "
+                "nilai file/folder, cth: `.gd <namafile1> <namafile2>` "
+                "untuk mengunggah dari jalur file/folder itu tidak didukung."
             )
             return False
     if uri and not gdrive.reply_to_msg_id:
@@ -1117,7 +1117,7 @@ async def google_drive(gdrive):
                 if " not found" in str(e) or "'file'" in str(e):
                     reply += (
                         "`[FILE - CANCELLED]`\n\n"
-                        "`Status` : **OK** - received signal cancelled."
+                        "`Status` : **OK** - sinyal yang diterima dibatalkan."
                     )
                     await asyncio.sleep(2.5)
                     break
@@ -1138,7 +1138,7 @@ async def google_drive(gdrive):
         result = await upload(gdrive, service, file_path, file_name, mimeType)
     except CancelProcess:
         gdrive.respond(
-            "`[FILE - CANCELLED]`\n\n" "`Status` : **OK** - received signal cancelled."
+            "`[FILE - CANCELLED]`\n\n" "`Status` : **OK** - sinyal yang diterima dibatalkan."
         )
     if result:
         await gdrive.respond(
@@ -1146,7 +1146,7 @@ async def google_drive(gdrive):
             f"`Nama   :` `{file_name}`\n"
             f"`Ukuran :` `{humanbytes(result[0])}`\n"
             f"`Tautan :` [{file_name}]({result[1]})\n"
-            "`Status :` **OK** - Successfully uploaded.\n",
+            "`Status :` **OK** - Berhasil diunggah.\n",
             link_preview=False,
         )
     await gdrive.delete()
@@ -1156,7 +1156,7 @@ async def google_drive(gdrive):
 @register(pattern=r"^\.gdfset (put|rm)(?: |$)(.*)", outgoing=True)
 async def set_upload_folder(gdrive):
     """ - Set parents dir for upload/check/makedir/remove - """
-    await gdrive.edit("`Sending information...`")
+    await gdrive.edit("`Mengirim informasi...`")
     global parent_Id
     exe = gdrive.pattern_match.group(1)
     if exe == "rm":
@@ -1164,7 +1164,7 @@ async def set_upload_folder(gdrive):
             parent_Id = G_DRIVE_FOLDER_ID
             await gdrive.edit(
                 "`[FOLDER - SET]`\n\n"
-                "`Status` : **OK** - using `G_DRIVE_FOLDER_ID` now."
+                "`Status` : **OK** - sekarang menggunakan `G_DRIVE_FOLDER_ID`."
             )
             return None
         else:
@@ -1172,14 +1172,14 @@ async def set_upload_folder(gdrive):
                 del parent_Id
             except NameError:
                 await gdrive.edit(
-                    "`[FOLDER - SET]`\n\n" "`Status` : **BAD** - No parent_Id is set."
+                    "`[FOLDER - SET]`\n\n" "`Status` : **BURUK** - Tidak ada parent_Id yang disetel."
                 )
                 return False
             else:
                 await gdrive.edit(
                     "`[FOLDER - SET]`\n\n"
                     "`Status` : **OK**"
-                    " - `G_DRIVE_FOLDER_ID` empty, will use root."
+                    " - `G_DRIVE_FOLDER_ID` kosong, akan menggunakan root."
                 )
                 return None
     inp = gdrive.pattern_match.group(2)
@@ -1202,18 +1202,18 @@ async def set_upload_folder(gdrive):
         if True in [c1 or c2]:
             parent_Id = inp
             await gdrive.edit(
-                "`[PARENT - FOLDER]`\n\n" "`Status` : **OK** - Successfully changed."
+                "`[PARENT - FOLDER]`\n\n" "`Status` : **OK** - Berhasil diubah."
             )
             return None
         else:
             await gdrive.edit(
-                "`[PARENT - FOLDER]`\n\n" "`Status` : **WARNING** - forcing use..."
+                "`[PARENT - FOLDER]`\n\n" "`Status` : **PERINGATAN** - penggunaan paksa..."
             )
             parent_Id = inp
     else:
         if "uc?id=" in ext_id:
             await gdrive.edit(
-                "`[URL - ERROR]`\n\n" "`Status` : **BAD** - Not a valid folderURL."
+                "`[URL - ERROR]`\n\n" "`Status` : **BURUK** - folderURL tidak valid."
             )
             return None
         try:
@@ -1231,11 +1231,11 @@ async def set_upload_folder(gdrive):
                     except IndexError:
                         await gdrive.edit(
                             "`[URL - ERROR]`\n\n"
-                            "`Status` : **BAD** - Not a valid folderURL."
+                            "`Status` : **BURUK** - folderURL tidak valid."
                         )
                         return None
         await gdrive.edit(
-            "`[PARENT - FOLDER]`\n\n" "`Status` : **OK** - Successfully changed."
+            "`[PARENT - FOLDER]`\n\n" "`Status` : **OK** - Berhasil diubah."
         )
     return
 
@@ -1284,7 +1284,7 @@ async def check_progress_for_dl(gdrive, gid, previous):
             file = aria2.get_download(gid)
             complete = file.is_complete
             if complete:
-                await gdrive.edit(f"`{file.name}`\n\n" "Successfully downloaded...")
+                await gdrive.edit(f"`{file.name}`\n\n" "Berhasil diunduh...")
                 return True
         except Exception as e:
             if " depth exceeded" in str(e):
@@ -1294,7 +1294,7 @@ async def check_progress_for_dl(gdrive, gid, previous):
                         "`[URI - DOWNLOAD]`\n\n"
                         f"`{file.name}`\n"
                         "`Status` : **Gagal**\n"
-                        "`Alasan` : Auto cancelled download, URI/Torrent dead."
+                        "`Alasan` : Unduhan otomatis dibatalkan, URI/Torrent mati."
                     )
                 except Exception:
                     pass
