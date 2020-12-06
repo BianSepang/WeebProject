@@ -53,7 +53,7 @@ TRT_LANG = "id"
 async def setlang(prog):
     global CARBONLANG
     CARBONLANG = prog.pattern_match.group(1)
-    await prog.edit(f"Bahasa untuk carbon.now.sh diatur ke {CARBONLANG}")
+    await prog.edit(f"Bahasa untuk **carbon.now.sh** diatur ke {CARBONLANG}")
 
 
 @register(outgoing=True, pattern=r"^\.carbon")
@@ -179,7 +179,7 @@ async def gsearch(q_event):
     gsearch = GoogleSearch()
     gresults = await gsearch.async_search(*search_args)
     msg = ""
-    for i in range(10):
+    for i in range(7):
         try:
             title = gresults["titles"][i]
             link = gresults["links"][i]
@@ -188,7 +188,7 @@ async def gsearch(q_event):
         except IndexError:
             break
     await q_event.edit(
-        "**Kueri Pencarian:**\n`" + match + "`\n\n**Hasil:**\n" + msg, link_preview=False
+        "**Kueri Pencarian :**\n`" + match + "`\n\n**Hasil :**\n" + msg, link_preview=False
     )
 
     if BOTLOG:
@@ -207,7 +207,7 @@ async def wiki(wiki_q):
     except DisambiguationError as error:
         return await wiki_q.edit(f"Ditemukan halaman yang tidak ambigu.\n\n{error}")
     except PageError as pageerror:
-        return await wiki_q.edit(f"halaman tidak ditemukan.\n\n{pageerror}")
+        return await wiki_q.edit(f"Halaman tidak ditemukan.\n\n{pageerror}")
     result = summary(match)
     if len(result) >= 4096:
         file = open("output.txt", "w+")
@@ -221,7 +221,7 @@ async def wiki(wiki_q):
         )
         if os.path.exists("output.txt"):
             return os.remove("output.txt")
-    await wiki_q.edit("**Pencarian:**\n`" + match + "`\n\n**Hasil:**\n" + result)
+    await wiki_q.edit("**Pencarian :**\n`" + match + "`\n\n**Hasil :**\n" + result)
     if BOTLOG:
         await wiki_q.client.send_message(
             BOTLOG_CHATID, f"Wiki query `{match}` was executed successfully"
@@ -236,7 +236,7 @@ async def urban_dict(ud_e):
     try:
         define(query)
     except HTTPError:
-        return await ud_e.edit(f"Maaf, tidak dapat menemukan hasil apa pun untuk: {query}")
+        return await ud_e.edit(f"Maaf, tidak dapat menemukan hasil apa pun untuk : {query}")
     mean = define(query)
     deflen = sum(len(i) for i in mean[0]["def"])
     exalen = sum(len(i) for i in mean[0]["example"])
@@ -462,7 +462,7 @@ async def lang(value):
             LANG = LANGUAGES[arg]
         else:
             return await value.edit(
-                f"`Kode Bahasa tidak valid !!`\n`Kode bahasa yang tersedia untuk TRT`:\n\n`{LANGUAGES}`"
+                f"`Kode Bahasa tidak valid !!`\n`Kode bahasa yang tersedia untuk TRT :`\n\n`{LANGUAGES}`"
             )
     elif util == "tts":
         scraper = "Text to Speech"
@@ -473,7 +473,7 @@ async def lang(value):
             LANG = tts_langs()[arg]
         else:
             return await value.edit(
-                f"`Kode Bahasa tidak valid !!`\n`Kode bahasa yang tersedia untuk TTS`:\n\n`{tts_langs()}`"
+                f"`Kode Bahasa tidak valid !!`\n`Kode bahasa yang tersedia untuk TTS :`\n\n`{tts_langs()}`"
             )
     await value.edit(f"`Bahasa untuk {scraper} diubah menjadi {LANG.title()}.`")
     if BOTLOG:
@@ -508,7 +508,7 @@ async def yt_search(event):
             "`Pencarian Youtube menjadi lambat.\n Tidak dapat menelusuri kueri ini!`"
         )
 
-    output = f"**Kueri Pencarian:**\n`{query}`\n\n**Hasil:**\n"
+    output = f"**Kueri Pencarian :**\n`{query}`\n\n**Hasil :**\n"
 
     for i in results["videos"]:
         try:
@@ -517,7 +517,7 @@ async def yt_search(event):
             channel = i["channel"]
             duration = i["duration"]
             views = i["views"]
-            output += f"[{title}]({link})\n Saluran: `{channel}`\n Durasi: {duration} | {views}\n\n"
+            output += f"[{title}]({link})\n Saluran : `{channel}`\n Durasi : {duration} | {views}\n\n"
         except IndexError:
             break
 
@@ -601,7 +601,7 @@ async def download_video(v_url):
     c_time = time.time()
     if song:
         await v_url.edit(
-            f"`Bersiap mengupload lagu:`\n**{rip_data['title']}**"
+            f"`Bersiap mengunggah lagu:`\n**{rip_data['title']}**"
             "\noleh *{rip_data['uploader']}*"
         )
         await v_url.client.send_file(
@@ -616,14 +616,14 @@ async def download_video(v_url):
                 )
             ],
             progress_callback=lambda d, t: asyncio.get_event_loop().create_task(
-                progress(d, t, v_url, c_time, "Mengupload..", f"{rip_data['title']}.mp3")
+                progress(d, t, v_url, c_time, "Mengunggah...", f"{rip_data['title']}.mp3")
             ),
         )
         os.remove(f"{rip_data['id']}.mp3")
         await v_url.delete()
     elif video:
         await v_url.edit(
-            f"`Bersiap mengupload video:`\n**{rip_data['title']}**"
+            f"`Bersiap mengunggah video:`\n**{rip_data['title']}**"
             "\noleh *{rip_data['uploader']}*"
         )
         await v_url.client.send_file(
@@ -632,7 +632,7 @@ async def download_video(v_url):
             supports_streaming=True,
             caption=rip_data["title"],
             progress_callback=lambda d, t: asyncio.get_event_loop().create_task(
-                progress(d, t, v_url, c_time, "Mengupload..", f"{rip_data['title']}.mp4")
+                progress(d, t, v_url, c_time, "Mengunggah...", f"{rip_data['title']}.mp4")
             ),
         )
         os.remove(f"{rip_data['id']}.mp4")

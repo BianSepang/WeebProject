@@ -57,7 +57,7 @@ async def mention_afk(mention):
                 wday = now + datetime.timedelta(days=-day)
                 afk_str = wday.strftime("%A")
         elif hours > 1:
-            afk_str = f"`{int(hours)}jam{int(minutes)}menit yang lalu.`"
+            afk_str = f"`{int(hours)}jam{int(minutes)}menit{int(seconds)}detik yang lalu.`"
         elif minutes > 0:
             afk_str = f"`{int(minutes)}menit{int(seconds)}detik yang lalu.`"
         else:
@@ -75,7 +75,7 @@ async def mention_afk(mention):
             else:
                 await mention.reply(
                     f"**Saya Offline.** `Sejak :` {afk_str}"
-                    "\n**Sedang offline, cobalah beberapa saat lagi.**"
+                    "\n`Tolong jangan spam pesan ke Saya.`"
                 )
             USERS.update({mention.sender_id: 1})
             COUNT_MSG = COUNT_MSG + 1
@@ -89,7 +89,7 @@ async def mention_afk(mention):
                 else:
                     await mention.reply(
                         f"**Saya Offline.** `Sejak :` {afk_str}"
-                        "\n**Masih offline, harap hubungi lagi nanti."
+                        "\n`Tunggu sampai Saya membuka pesan Anda.`"
                     )
                 USERS[mention.sender_id] = USERS[mention.sender_id] + 1
                 COUNT_MSG = COUNT_MSG + 1
@@ -146,7 +146,7 @@ async def afk_on_pm(sender):
                     wday = now + datetime.timedelta(days=-day)
                     afk_str = wday.strftime("%A")
             elif hours > 1:
-                afk_str = f"`{int(hours)}jam {int(minutes)}menit yang lalu.`"
+                afk_str = f"`{int(hours)}jam {int(minutes)}menit{int(seconds)}detik yang lalu.`"
             elif minutes > 0:
                 afk_str = f"`{int(minutes)}menit {int(seconds)}detik yang lalu.`"
             else:
@@ -160,7 +160,7 @@ async def afk_on_pm(sender):
                 else:
                     await sender.reply(
                         f"**Saya Offline.** `Sejak :` {afk_str}"
-                        "\n**Sedang offline, cobalah beberapa saat lagi.**"
+                        "\n`Tolong jangan spam pesan ke Saya.`"
                     )
                 USERS.update({sender.sender_id: 1})
                 COUNT_MSG = COUNT_MSG + 1
@@ -174,7 +174,7 @@ async def afk_on_pm(sender):
                     else:
                         await sender.reply(
                             f"**Saya Offline.** `Sejak :` {afk_str}"
-                            "\n**Masih offline, harap hubungi lagi nanti.**"
+                            "\n`Tunggu sampai Saya membuka pesan Anda.`"
                         )
                     USERS[sender.sender_id] = USERS[sender.sender_id] + 1
                     COUNT_MSG = COUNT_MSG + 1

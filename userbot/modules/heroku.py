@@ -30,10 +30,10 @@ else:
 async def variable(var):
     exe = var.pattern_match.group(1)
     if app is None:
-        await var.edit("`Please setup your`  **HEROKU_APP_NAME**.")
+        await var.edit("`Harap siapkan` **HEROKU_APP_NAME** `Anda.`")
         return False
     if exe == "get":
-        await var.edit("`Getting information...`")
+        await var.edit("`Mendapatkan informasi...`")
         variable = var.pattern_match.group(2)
         if variable != "":
             if variable in heroku_var:
@@ -44,13 +44,13 @@ async def variable(var):
                         "**ConfigVar**:\n"
                         f"`{variable}` = `{heroku_var[variable]}`\n",
                     )
-                    await var.edit("`Received to BOTLOG_CHATID...`")
+                    await var.edit("`Diterima ke BOTLOG_CHATID...`")
                     return True
                 else:
-                    await var.edit("`Please set BOTLOG to True...`")
+                    await var.edit("`Harap setel BOTLOG ke True...`")
                     return False
             else:
-                await var.edit("`Information don't exists...`")
+                await var.edit("`Informasi tidak ada...`")
                 return True
         else:
             configvars = heroku_var.to_dict()
@@ -61,16 +61,16 @@ async def variable(var):
                 await var.client.send_message(
                     BOTLOG_CHATID, "#CONFIGVARS\n\n" "**ConfigVars**:\n" f"{msg}"
                 )
-                await var.edit("`Received to BOTLOG_CHATID...`")
+                await var.edit("`Diterima ke BOTLOG_CHATID...`")
                 return True
             else:
-                await var.edit("`Please set BOTLOG to True...`")
+                await var.edit("`Harap setel BOTLOG ke True...`")
                 return False
     elif exe == "del":
-        await var.edit("`Deleting information...`")
+        await var.edit("`Menghapus informasi...`")
         variable = var.pattern_match.group(2)
         if variable == "":
-            await var.edit("`Specify ConfigVars you want to del...`")
+            await var.edit("`Tentukan ConvigVar yang ingin Anda hapus...`")
             return False
         if variable in heroku_var:
             if BOTLOG:
@@ -78,16 +78,16 @@ async def variable(var):
                     BOTLOG_CHATID,
                     "#DELCONFIGVAR\n\n" "**Delete ConfigVar**:\n" f"`{variable}`",
                 )
-            await var.edit("`Information deleted...`")
+            await var.edit("`Informasi dihapus...`")
             del heroku_var[variable]
         else:
-            await var.edit("`Information don't exists...`")
+            await var.edit("`Informasi tidak ada...`")
             return True
 
 
 @register(outgoing=True, pattern=r"^\.set var (\w*) ([\s\S]*)")
 async def set_var(var):
-    await var.edit("`Setting information...`")
+    await var.edit("`Mengatur informasi...`")
     variable = var.pattern_match.group(1)
     value = var.pattern_match.group(2)
     if variable in heroku_var:
@@ -98,14 +98,14 @@ async def set_var(var):
                 "**Change ConfigVar**:\n"
                 f"`{variable}` = `{value}`",
             )
-        await var.edit("`Information sets...`")
+        await var.edit("`Informasi diatur...`")
     else:
         if BOTLOG:
             await var.client.send_message(
                 BOTLOG_CHATID,
                 "#ADDCONFIGVAR\n\n" "**Add ConfigVar**:\n" f"`{variable}` = `{value}`",
             )
-        await var.edit("`Information added...`")
+        await var.edit("`Informasi ditambah...`")
     heroku_var[variable] = value
 
 
@@ -119,7 +119,7 @@ async def dyno_usage(dyno):
     """
     Get your account Dyno Usage
     """
-    await dyno.edit("`Getting Information...`")
+    await dyno.edit("`Mendapatkan informasi...`")
     useragent = (
         "Mozilla/5.0 (Linux; Android 10; SM-G975F) "
         "AppleWebKit/537.36 (KHTML, like Gecko) "
@@ -138,7 +138,7 @@ async def dyno_usage(dyno):
                 await dyno.client.send_message(
                     dyno.chat_id, f"`{r.reason}`", reply_to=dyno.id
                 )
-                await dyno.edit("`Can't get information...`")
+                await dyno.edit("`Tidak dapat memperoleh informasi...`")
                 return False
             result = await r.json()
             quota = result["account_quota"]
@@ -166,13 +166,13 @@ async def dyno_usage(dyno):
             AppMinutes = math.floor(AppQuotaUsed % 60)
 
             await dyno.edit(
-                "**Dyno Usage**:\n\n"
-                f"-> `Dyno usage for`  **{app.name}**:\n"
-                f"     •  **{AppHours} hour(s), "
-                f"{AppMinutes} minute(s)  -  {AppPercentage}%**"
+                "**Penggunaan Dyno**:\n\n"
+                f"-> `Penggunaan Dyno untuk`  **{app.name}**:\n"
+                f"     •  **{AppHours} jam, "
+                f"{AppMinutes} menit  -  {AppPercentage}%**"
                 "\n\n"
-                "-> `Dyno hours quota remaining this month`:\n"
-                f"     •  **{hours} hour(s), {minutes} minute(s)  "
+                "-> `Sisa kuota jam Dyno bulan ini`:\n"
+                f"     •  **{hours} jam, {minutes} menit  "
                 f"-  {percentage}%**"
             )
             return True
@@ -181,15 +181,15 @@ async def dyno_usage(dyno):
 CMD_HELP.update(
     {
         "heroku": ">.`usage`"
-        "\nUsage: Check your heroku dyno hours remaining"
+        "\nUntuk: Periksa jam heroku dyno Anda yang tersisa."
         "\n\n>`.set var <NEW VAR> <VALUE>`"
-        "\nUsage: add new variable or update existing value variable"
-        "\n!!! WARNING !!!, after setting a variable the bot will restarted"
+        "\nUntuk: Tambahkan variabel baru atau perbarui variabel yang ada."
+        "\n!!! PERINGATAN !!!, setelah mengatur variabel, bot akan mulai ulang."
         "\n\n>`.get var or .get var <VAR>`"
-        "\nUsage: get your existing varibles, use it only on your private group!"
-        "\nThis returns all of your private information, please be caution..."
+        "\nUntuk: Dapatkan variabel Anda yang ada, gunakan hanya di grup pribadi Anda!"
+        "\nIni mengembalikan semua informasi pribadi Anda, harap berhati-hati..."
         "\n\n>`.del var <VAR>`"
-        "\nUsage: delete existing variable"
-        "\n!!! WARNING !!!, after deleting variable the bot will restarted"
+        "\nUntuk: Hapus variabel yang ada."
+        "\n!!! PERINGATAN !!!, setelah menghapus variabel, bot akan mulai ulang."
     }
 )

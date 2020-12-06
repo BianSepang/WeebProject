@@ -18,7 +18,7 @@ from userbot.events import register
 @register(outgoing=True, pattern=r"^\.speed$")
 async def speedtst(spd):
     """ For .speed command, use SpeedTest to check server speeds. """
-    await spd.edit("`Running speed test . . .`")
+    await spd.edit("`Tes kecepatan. . .`")
     test = Speedtest()
 
     test.get_best_server()
@@ -29,15 +29,15 @@ async def speedtst(spd):
 
     await spd.edit(
         "`"
-        "Started at "
+        "Dimulai pada: "
         f"{result['timestamp']} \n\n"
-        "Download "
+        "Unduh: "
         f"{speed_convert(result['download'])} \n"
-        "Upload "
+        "Unggah: "
         f"{speed_convert(result['upload'])} \n"
-        "Ping "
+        "Ping: "
         f"{result['ping']} \n"
-        "ISP "
+        "ISP: "
         f"{result['client']['isp']}"
         "`"
     )
@@ -61,9 +61,9 @@ async def neardc(event):
     """ For .dc command, get the nearest datacenter information. """
     result = await event.client(functions.help.GetNearestDcRequest())
     await event.edit(
-        f"Country : `{result.country}`\n"
-        f"Nearest Datacenter : `{result.nearest_dc}`\n"
-        f"This Datacenter : `{result.this_dc}`"
+        f"Negara : `{result.country}`\n"
+        f"Pusat Data Terdekat : `{result.nearest_dc}`\n"
+        f"Pusat Data ini : `{result.this_dc}`"
     )
 
 
@@ -79,8 +79,8 @@ async def pingme(pong):
 
 CMD_HELP.update(
     {
-        "speed": ">`.speed`" "\nUsage: Does a speedtest and shows the results.",
-        "dc": ">`.dc`" "\nUsage: Finds the nearest datacenter from your server.",
-        "ping": ">`.ping`" "\nUsage: Shows how long it takes to ping your bot.",
+        "speed": ">`.speed`" "\nUntuk: Melakukan tes kecepatan dan menunjukkan hasilnya.",
+        "dc": ">`.dc`" "\nUntuk: Menemukan pusat data terdekat dari server Anda.",
+        "ping": ">`.ping`" "\nUntuk: Menunjukkan berapa lama waktu yang dibutuhkan untuk melakukan ping bot Anda.",
     }
 )
