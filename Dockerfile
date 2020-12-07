@@ -6,5 +6,8 @@ RUN git clone -b master https://github.com/BianSepang/WeebProject /home/weebproj
 RUN mkdir /home/weebproject/bin/
 WORKDIR /home/weebproject/
 
+# Make open port TCP
+EXPOSE 80 443
+
 # Finalization
 CMD ["python3","-m","userbot"]
