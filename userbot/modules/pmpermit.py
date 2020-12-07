@@ -284,8 +284,7 @@ async def blockpm(block):
         await block.edit("`Anda telah diblokir!`")
         uid = replied_user.id
     elif block.is_group and not block.reply_to_msg_id:
-    	await block.edit("`Harap balas pengguna yang ingin Anda blokir`")
-        return
+    	return await block.edit("`Harap balas pengguna yang ingin Anda blokir`")
     else:
         await block.client(BlockRequest(block.chat_id))
         aname = await block.client.get_entity(block.chat_id)
@@ -323,8 +322,7 @@ async def unblockpm(unblock):
                 f"#UNBLOCKED\n" + "User: " + f"[{name0}](tg://user?id={uid})",
             )
     elif unblock.is_group and not unblock.reply_to_msg_id:
-    	await unblock.edit("`Harap balas pengguna yang ingin Anda buka blokirnya`")
-        return
+    	return await unblock.edit("`Harap balas pengguna yang ingin Anda buka blokirnya`")
     else:
     	await unblock.edit(f"[{name0}](tg://user?id={uid}) `sudah tidak diblokir`")
 
