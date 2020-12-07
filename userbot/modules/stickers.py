@@ -25,8 +25,8 @@ from userbot.events import register
 
 KANGING_STR = [
     "Curi Stiker dulu yee kan",
-    "Ini Stiker aku ambil yaa\n**DUARR!**",
-    "Boleh juga nih Stiker\n**Curi ahh...**",
+    "Ini Stiker aku ambil yaa\nDUARR!",
+    "Boleh juga nih Stiker\nCuri ahh...",
     "Bentar boss, ane curi dulu",
     "Curi lagi yee kan...",
     "Curi Stiker ahh...",
@@ -82,7 +82,7 @@ async def kang(args):
     if photo:
         splat = args.text.split()
         if not emojibypass:
-            emoji = "  "
+            emoji = " 🤔 "
         pack = 1
         if len(splat) == 3:
             pack = splat[2]  # User sent both
