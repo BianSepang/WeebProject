@@ -69,13 +69,13 @@ async def mention_afk(mention):
         if not is_bot and mention.sender_id not in USERS:
             if AFKREASON:
                 await mention.reply(
-                    f"**Saya Offline.** `Sejak :` {afk_str}"
-                    f"\n`Alasan: {AFKREASON}`"
+                    f"**AFK •>** `Sejak -` {afk_str}"
+                    f"\n**Alasan •>** `{AFKREASON}`"
                 )
             else:
                 await mention.reply(
-                    f"**Saya Offline.** `Sejak :` {afk_str}"
-                    "\n`Tolong jangan spam pesan ke Saya.`"
+                    f"**Masih AFK •>** `Sejak -` {afk_str}"
+                    "\n**•>** __Sedang Offline__"
                 )
             USERS.update({mention.sender_id: 1})
             COUNT_MSG = COUNT_MSG + 1
@@ -83,13 +83,13 @@ async def mention_afk(mention):
             if USERS[mention.sender_id] % randint(2, 4) == 0:
                 if AFKREASON:
                     await mention.reply(
-                        f"**Saya Offline.** `Sejak :` {afk_str}"
-                        f"\n`Alasan: {AFKREASON}`"
+                        f"**AFK •>** `Sejak -` {afk_str}"
+                        f"\n**Alasan •>** `{AFKREASON}`"
                     )
                 else:
                     await mention.reply(
-                        f"**Saya Offline.** `Sejak :` {afk_str}"
-                        "\n`Tunggu sampai Saya membuka pesan Anda.`"
+                        f"**Masih AFK •>** `Sejak -` {afk_str}"
+                        "\n**•>** __Belum Online__"
                     )
                 USERS[mention.sender_id] = USERS[mention.sender_id] + 1
                 COUNT_MSG = COUNT_MSG + 1
@@ -154,13 +154,13 @@ async def afk_on_pm(sender):
             if sender.sender_id not in USERS:
                 if AFKREASON:
                     await sender.reply(
-                        f"**Saya Offline.** `Sejak :` {afk_str}"
-                        f"\n`Alasan: {AFKREASON}`"
+                        f"**AFK •>** `Sejak -` {afk_str}"
+                        f"\n**Alasan •>** `{AFKREASON}`"
                     )
                 else:
                     await sender.reply(
-                        f"**Saya Offline.** `Sejak :` {afk_str}"
-                        "\n`Tolong jangan spam pesan ke Saya.`"
+                        f"**Masih AFK •>** `Sejak -` {afk_str}"
+                        "\n**•>** __Sedang Offline__"
                     )
                 USERS.update({sender.sender_id: 1})
                 COUNT_MSG = COUNT_MSG + 1
@@ -168,13 +168,13 @@ async def afk_on_pm(sender):
                 if USERS[sender.sender_id] % randint(2, 4) == 0:
                     if AFKREASON:
                         await sender.reply(
-                            f"**Saya Offline.** `Sejak :` {afk_str}"
-                            f"\n`Alasan: {AFKREASON}`"
+                            f"**AFK •>** `Sejak -` {afk_str}"
+                            f"\n**Alasan •>** `{AFKREASON}`"
                         )
                     else:
                         await sender.reply(
-                            f"**Saya Offline.** `Sejak :` {afk_str}"
-                            "\n`Tunggu sampai Saya membuka pesan Anda.`"
+                            f"**Masih AFK •>** `Sejak -` {afk_str}"
+                            "\n**•>** __Belum Online__"
                         )
                     USERS[sender.sender_id] = USERS[sender.sender_id] + 1
                     COUNT_MSG = COUNT_MSG + 1
@@ -199,11 +199,11 @@ async def set_afk(afk_e):
     afk_start = start1.replace(microsecond=0)
     if string:
         AFKREASON = string
-        await afk_e.edit("**Offline.**" f"\n`Alasan:` `{string}`")
+        await afk_e.edit("**Pergi AFK!**" f"\n**Alasan •>** `{string}`")
     else:
-        await afk_e.edit("**Offline.**")
+        await afk_e.edit("**Pergi AFK!**")
     if BOTLOG:
-        await afk_e.client.send_message(BOTLOG_CHATID, "#AFK\nAnda Offline!")
+        await afk_e.client.send_message(BOTLOG_CHATID, "#AFK\nYou went AFK!")
     ISAFK = True
     afk_time = datetime.now()
     raise StopPropagation
@@ -223,7 +223,7 @@ async def type_afk_is_not_true(notafk):
     afk_end = not_afk.replace(microsecond=0)
     if ISAFK:
         ISAFK = False
-        msg = await notafk.edit("**OK - Saya Online.**")
+        msg = await notafk.edit("**OK - Saya Online**")
         await asyncio.sleep(3)
         await msg.delete()
         if BOTLOG:
