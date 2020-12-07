@@ -284,8 +284,7 @@ async def blockpm(block):
         await block.edit("`Anda telah diblokir!`")
         uid = replied_user.id
     elif block.is_group and not block.reply_to_msg_id:
-    	await block.edit("`Harap balas pengguna yang ingin Anda blokir`")
-        return
+    	return await block.edit("`Harap balas pengguna yang ingin Anda blokir`")
     else:
         await block.client(BlockRequest(block.chat_id))
         aname = await block.client.get_entity(block.chat_id)
