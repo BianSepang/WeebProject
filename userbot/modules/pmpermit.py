@@ -73,7 +73,7 @@ async def permitpm(event):
                     if event.text != prevmsg:
                         async for message in event.client.iter_messages(
                             event.chat_id, from_user="me", search=UNAPPROVED_MSG
-                    ):
+                        ):
                             await message.delete()
                         await event.reply(f"`{UNAPPROVED_MSG}`")
                     LASTMSG.update({event.chat_id: event.text})
@@ -90,9 +90,9 @@ async def permitpm(event):
 
                 if COUNT_PM[event.chat_id] > 4:
                     await event.respond(
-                        "`Anda melakukan spam pesan ke saya, yang tidak saya sukai.`\n"
-                        "`Saya tidak akan mengizinkan Anda kirim pesan ke saya lagi, sampai pemberitahuan lebih lanjut.`\n"
-                        "`Mohon maaf dan terima kasih.`"
+                        "**Anda mengirim spam pesan ke saya.**\n"
+                        "**Anda telah diblokir dan dilaporkan sebagai spam.**\n"
+                        "**Selamat tinggal.**"
                     )
 
                     try:
@@ -284,7 +284,8 @@ async def blockpm(block):
         await block.edit("`Anda telah diblokir!`")
         uid = replied_user.id
     elif block.is_group and not block.reply_to_msg_id:
-    	return await block.edit("`Harap balas pengguna yang ingin Anda blokir`")
+    	await block.edit("`Harap balas pengguna yang ingin Anda blokir`")
+        return
     else:
         await block.client(BlockRequest(block.chat_id))
         aname = await block.client.get_entity(block.chat_id)
