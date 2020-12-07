@@ -354,7 +354,7 @@ CMD_HELP.update(
         "\nUntuk: Balas `.curi` ke stiker atau gambar untuk dimasukkan ke paket userbot Anda "
         "\natau tentukan emoji yang Anda inginkan."
         "\n\n>`.curi [emoji('s)]? [nomor]?`"
-        "\nUntuk: Curi stiker/gambar untuk paket tertentu tetapi menggunakan  sebagai emoji "
+        "\nUntuk: Curi stiker/gambar untuk paket tertentu tetapi menggunakan 🤔 sebagai emoji "
         "atau pilih emoji yang Anda inginkan."
         "\n\n>`.stkrinfo`"
         "\nUntuk: Mendapatkan info tentang paket stiker."
