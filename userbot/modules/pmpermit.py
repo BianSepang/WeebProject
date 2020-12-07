@@ -190,7 +190,7 @@ async def notifon(non_event):
     try:
         from userbot.modules.sql_helper.globals import delgvar
     except AttributeError:
-        retrun await non_event.edit("`Running on Non-SQL mode!`")
+        return await non_event.edit("`Running on Non-SQL mode!`")
     delgvar("NOTIF_OFF")
     await non_event.edit("`Pemberitahuan dari pesan yang belum diizinkan dibunyikan!`")
 
