@@ -41,12 +41,14 @@ async def _(event):
                     response.media, TEMP_DOWNLOAD_DIRECTORY + "spot.webp"
                 )
                 link = response.reply_markup.rows[0].buttons[0].url
-                await event.client.send_file(
+                spot = await event.client.send_file(
                     event.chat_id,
                     downloaded_file_name,
                     force_document=False,
                 )
-                await event.reply(f"[Play on Spotify]({link})", link_preview=False)
+                await event.respond(
+                    f"[Play on Spotify]({link})", link_preview=False, reply_to=spot
+                )
                 """cleanup chat after completed"""
                 await event.client.delete_messages(conv.chat_id, [msg.id, response.id])
         await event.delete()
