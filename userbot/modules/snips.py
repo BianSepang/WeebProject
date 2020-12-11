@@ -4,6 +4,8 @@
 # you may not use this file except in compliance with the License.
 """ Userbot module containing commands for keeping global notes. """
 
+from sqlalchemy.orm.exc import UnmappedInstanceError
+
 from userbot import BOTLOG_CHATID, CMD_HELP
 from userbot.events import register
 
@@ -63,11 +65,14 @@ async def on_snip_save(event):
     elif event.reply_to_msg_id and not string:
         rep_msg = await event.get_reply_message()
         string = rep_msg.text
-    success = "`Snip {} successfully. Use` **${}** `anywhere to get it`"
-    if add_snip(keyword, string, msg_id) is False:
-        await event.edit(success.format("updated", keyword))
-    else:
-        await event.edit(success.format("saved", keyword))
+    success = "`Snip {} successfully. Use` `${}` `anywhere to get it`"
+    try:
+        if add_snip(keyword, string, msg_id) is False:
+            await event.edit(success.format("updated", keyword))
+        else:
+            await event.edit(success.format("saved", keyword))
+    except UnmappedInstanceError:
+        return await event.edit(f"`Snip` `{keyword}` `already exists.`")
 
 
 @register(outgoing=True, pattern=r"^\.snips$")
