@@ -4,7 +4,6 @@
 # you may not use this file except in compliance with the License.
 """ Userbot module for having some fun with people. """
 
-import time
 from asyncio import sleep
 from collections import deque
 from random import choice, getrandbits, randint
@@ -257,6 +256,32 @@ UWUS = [
     "(♥_♥)",
     "*(^O^)*",
     "((+_+))",
+]
+
+IWIS = [
+    "┐(´д｀)┌",
+    "┐(´～｀)┌",
+    "┐(´ー｀)┌",
+    "┐(￣ヘ￣)┌",
+    "╮(╯∀╰)╭",
+    "╮(╯_╰)╭",
+    "┐(´д`)┌",
+    "┐(´∀｀)┌",
+    "ʅ(́◡◝)ʃ",
+    "┐(ﾟ～ﾟ)┌",
+    "┐('д')┌",
+    "┐(‘～`;)┌",
+    "ヘ(´－｀;)ヘ",
+    "┐( -“-)┌",
+    "ʅ（´◔౪◔）ʃ",
+    "ヽ(゜～゜o)ノ",
+    "ヽ(~～~ )ノ",
+    "┐(~ー~;)┌",
+    "┐(-。ー;)┌",
+    r"¯\_(ツ)_/¯",
+    r"¯\_(⊙_ʖ⊙)_/¯",
+    r"¯\_༼ ಥ ‿ ಥ ༽_/¯",
+    "乁( ⁰͡  Ĺ̯ ⁰͡ ) ㄏ",
 ]
 
 FACEREACTS = [
@@ -629,15 +654,6 @@ async def univsaye(cowmsg):
     await cowmsg.edit(f"`{cheese.milk(text).replace('`', '´')}`")
 
 
-@register(outgoing=True, pattern="^:/$", ignore_unsafe=True)
-async def kek(keks):
-    """ Check yourself ;)"""
-    uio = ["/", "\\"]
-    for i in range(1, 15):
-        time.sleep(0.3)
-        await keks.edit(":" + uio[i % 2])
-
-
 @register(outgoing=True, pattern=r"^\.coinflip (.*)")
 async def coin(event):
     r = choice(["heads", "tails"])
@@ -707,15 +723,6 @@ async def slap(replied_user, event):
     return caption
 
 
-@register(outgoing=True, pattern="^-_-$", ignore_unsafe=True)
-async def lol(lel):
-    """ Ok... """
-    okay = "-_-"
-    for i in range(10):
-        okay = okay[:-1] + "_-"
-        await lel.edit(okay)
-
-
 @register(outgoing=True, pattern=r"^\.(yes|no|maybe|decide)$")
 async def decide(event):
     decision = event.pattern_match.group(1).lower()
@@ -728,14 +735,6 @@ async def decide(event):
     await event.client.send_message(
         event.chat_id, str(r["answer"]).upper(), reply_to=message_id, file=r["image"]
     )
-
-
-@register(outgoing=True, pattern="^;_;$", ignore_unsafe=True)
-async def fun(e):
-    t = ";_;"
-    for j in range(10):
-        t = t[:-1] + "_;"
-        await e.edit(t)
 
 
 @register(outgoing=True, pattern=r"^\.fp$")
@@ -870,6 +869,26 @@ async def zal(zgfy):
 async def hoi(hello):
     """ Greet everyone! """
     await hello.edit(choice(HELLOSTR))
+
+
+@register(outgoing=True, pattern=r"^\.iwi(?: |$)(.*)")
+async def faces(siwis):
+    """IwI"""
+    textx = await siwis.get_reply_message()
+    message = siwis.pattern_match.group(1)
+    if message:
+        pass
+    elif textx:
+        message = textx.text
+    else:
+        await siwis.edit("` IwI no text given! `")
+        return
+
+    reply_text = sub(r"(a|i|u|e|o)", "i", message)
+    reply_text = sub(r"(A|I|U|E|O)", "I", reply_text)
+    reply_text = sub(r"\!+", " " + choice(IWIS), reply_text)
+    reply_text += " " + choice(IWIS)
+    await siwis.edit(reply_text)
 
 
 @register(outgoing=True, pattern=r"^\.owo(?: |$)(.*)")
