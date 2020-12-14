@@ -5,8 +5,8 @@ import asyncio
 import glob
 import os
 import shutil
+import subprocess
 import time
-from asyncio.exceptions import TimeoutError
 
 import deezloader
 from hachoir.metadata import extractMetadata
@@ -28,6 +28,19 @@ from userbot.events import register
 from userbot.utils import chrome, progress
 
 
+async def getmusic(cat):
+    video_link = ""
+    search = cat
+    driver = await chrome()
+    driver.get("https://www.youtube.com/results?search_query=" + search)
+    user_data = driver.find_elements_by_xpath('//*[@id="video-title"]')
+    for i in user_data:
+        video_link = i.get_attribute("href")
+        break
+    command = f'youtube-dl --write-thumbnail --extract-audio --audio-format mp3 --audio-quality "320k" {video_link}'
+    os.system(command)
+
+
 async def getmusicvideo(cat):
     video_link = ""
     search = cat
@@ -39,6 +52,60 @@ async def getmusicvideo(cat):
         break
     command = 'youtube-dl -f "[filesize<50M]" --merge-output-format mp4 ' + video_link
     os.system(command)
+
+
+@register(outgoing=True, pattern=r"^\.song (.*)")
+async def _(event):
+    reply_to_id = event.message.id
+    if event.reply_to_msg_id:
+        reply_to_id = event.reply_to_msg_id
+    reply = await event.get_reply_message()
+    if event.pattern_match.group(1):
+        query = event.pattern_match.group(1)
+        await event.edit("`Wait..! I am finding your song..`")
+    elif reply.message:
+        query = reply.message
+        await event.edit("`Wait..! I am finding your song..`")
+    else:
+        await event.edit("`What I am Supposed to find?`")
+        return
+
+    await getmusic(str(query))
+    l = glob.glob("*.mp3")
+    loa = l[0]
+    metadata = extractMetadata(createParser(loa))
+    duration = 0
+    if metadata.has("duration"):
+        duration = metadata.get("duration").seconds
+    performer = loa.split("-")[0][0:-1]
+    title = loa.split("-")[1][1:]
+    img_extensions = ["webp", "jpg", "jpeg", "webp"]
+    img_filenames = [
+        fn_img
+        for fn_img in os.listdir()
+        if any(fn_img.endswith(ext_img) for ext_img in img_extensions)
+    ]
+    thumb_image = img_filenames[0]
+    await event.edit("`Yeah.. Uploading your song..`")
+    c_time = time.time()
+    await event.client.send_file(
+        event.chat_id,
+        loa,
+        attributes=[
+            DocumentAttributeAudio(duration=duration, title=title, performer=performer)
+        ],
+        thumb=thumb_image,
+        allow_cache=False,
+        caption=query,
+        reply_to=reply_to_id,
+        progress_callback=lambda d, t: asyncio.get_event_loop().create_task(
+            progress(d, t, event, c_time, "[UPLOAD]", loa)
+        ),
+    )
+    await event.delete()
+    os.system("rm -rf *.mp3")
+    os.remove(thumb_image)
+    subprocess.check_output("rm -rf *.mp3", shell=True)
 
 
 @register(outgoing=True, pattern=r"^\.vsong(?: |$)(.*)")
