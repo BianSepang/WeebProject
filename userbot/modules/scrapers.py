@@ -662,7 +662,9 @@ CMD_HELP.update(
         "trt": ">`.trt <text> [or reply]`"
         "\nUsage: Translates text to the language which is set."
         "\nUse >`.lang trt <language code>` to set language for trt. (Default is English)",
-        "yt": ">`.yt <text>`" "\nUsage: Does a YouTube search.",
+        "yt": ">`.yt` `<count> <query>`"
+        "\nUsage: Does a YouTube search."
+        "\nCan specify the number of results needed (default is 3).",
         "imdb": ">`.imdb <movie-name>`" "\nUsage: Shows movie info and other stuff.",
         "rip": ">`.ripaudio <url> or ripvideo <url>`"
         "\nUsage: Download videos and songs from YouTube "
