@@ -489,7 +489,7 @@ async def telegraphs(grop):
         try:
             result = await grop.client(
                 functions.messages.CreateChatRequest(  # pylint:disable=E0602
-                    users=["@RemmuChan_bot"],
+                    users=["@MissRose_bot"],
                     # Not enough users (to create a chat, for example)
                     # Telegram, no longer allows creating a chat with ourselves
                     title=group_name,
