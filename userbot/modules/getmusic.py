@@ -37,7 +37,7 @@ async def getmusic(cat):
     for i in user_data:
         video_link = i.get_attribute("href")
         break
-    command = f'youtube-dl --write-thumbnail --extract-audio --audio-format mp3 --audio-quality "320k" {video_link}'
+    command = f"youtube-dl -x --add-metadata --embed-thumbnail --audio-format mp3 {video_link}"
     os.system(command)
 
 
@@ -71,30 +71,12 @@ async def _(event):
         return
 
     await getmusic(str(query))
-    l = glob.glob("*.mp3")
-    loa = l[0]
-    metadata = extractMetadata(createParser(loa))
-    duration = 0
-    if metadata.has("duration"):
-        duration = metadata.get("duration").seconds
-    performer = loa.split("-")[0][0:-1]
-    title = loa.split("-")[1][1:]
-    img_extensions = ["webp", "jpg", "jpeg", "webp"]
-    img_filenames = [
-        fn_img
-        for fn_img in os.listdir()
-        if any(fn_img.endswith(ext_img) for ext_img in img_extensions)
-    ]
-    thumb_image = img_filenames[0]
+    loa = glob.glob("*.mp3")[0]
     await event.edit("`Yeah.. Uploading your song..`")
     c_time = time.time()
     await event.client.send_file(
         event.chat_id,
         loa,
-        attributes=[
-            DocumentAttributeAudio(duration=duration, title=title, performer=performer)
-        ],
-        thumb=thumb_image,
         allow_cache=False,
         caption=query,
         reply_to=reply_to_id,
@@ -104,7 +86,6 @@ async def _(event):
     )
     await event.delete()
     os.system("rm -rf *.mp3")
-    os.remove(thumb_image)
     subprocess.check_output("rm -rf *.mp3", shell=True)
 
 
