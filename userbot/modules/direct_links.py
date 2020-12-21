@@ -26,8 +26,8 @@ from userbot.utils import time_formatter
 
 _REGEX_LINK = r"https://www(\d{1,3}).zippyshare.com/v/(\w{8})/file.html"
 _REGEX_RESULT = (
-    r"var a = (\d+);[\s\S]+document.getElementById\(\'dlbutton\'\).href"
-    r' = "/d/\w{8}/.+/(.*)";'
+    r'document.getElementById\(\'dlbutton\'\).href = "/d/[a-zA-Z\d]{8}/" '
+    r'\+ \((\d+) % (\d+) \+ (\d+) % (\d+)\) \+ "\/(.+)";'
 )
 _HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -97,24 +97,32 @@ async def direct_link_generator(request):
 
 async def zippy_share(url: str) -> str:
     reply = ""
-    session = requests.Session()
-    session.headers.update(_HEADERS)
-    with session as ses:
-        match = re.match(_REGEX_LINK, url)
-        if not match:
-            raise ValueError("Invalid URL: " + str(url))
-        server, id_ = match.group(1), match.group(2)
-        res = ses.get(url)
-        res.raise_for_status()
-        match = re.search(_REGEX_RESULT, res.text)
-        if not match:
-            raise ValueError("Invalid Response!")
-        val, name = int(match.group(1)), match.group(2)
-        d_l = "https://www{}.zippyshare.com/d/{}/{}/{}".format(
-            server, id_, val ** 3 + 3, name
-        )
-    name = urllib.parse.unquote(d_l.split("/")[-1])
-    reply += f"[{name}]({d_l})\n"
+    try:
+        session = requests.Session()
+        session.headers.update(_HEADERS)
+        with session as ses:
+            match = re.match(_REGEX_LINK, url)
+            if not match:
+                raise ValueError("Invalid URL: " + str(url))
+            server, id_ = match.group(1), match.group(2)
+            res = ses.get(url)
+            res.raise_for_status()
+            match = re.search(_REGEX_RESULT, res.text)
+            if not match:
+                raise ValueError("Invalid Response!")
+            val_1 = int(match.group(1))
+            val_2 = int(match.group(2))
+            val_3 = int(match.group(3))
+            val_4 = int(match.group(4))
+            val = val_1 % val_2 + val_3 % val_4
+            name = match.group(5)
+            d_l = "https://www{}.zippyshare.com/d/{}/{}/{}".format(
+                server, id_, val, name
+            )
+        name = urllib.parse.unquote(d_l.split("/")[-1])
+        reply += f"[{name}]({d_l})\n"
+    except Exception as err:
+        reply += f"{err}"
     return reply
 
 
