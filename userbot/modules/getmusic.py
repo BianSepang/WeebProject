@@ -39,6 +39,7 @@ async def getmusic(cat):
         break
     command = f"youtube-dl -x --add-metadata --embed-thumbnail --audio-format mp3 {video_link}"
     os.system(command)
+    return video_link
 
 
 async def getmusicvideo(cat):
@@ -70,7 +71,7 @@ async def _(event):
         await event.edit("`What I am Supposed to find?`")
         return
 
-    await getmusic(str(query))
+    video_link = await getmusic(str(query))
     loa = glob.glob("*.mp3")[0]
     await event.edit("`Yeah.. Uploading your song..`")
     c_time = time.time()
@@ -78,7 +79,7 @@ async def _(event):
         event.chat_id,
         loa,
         allow_cache=False,
-        caption=query,
+        caption=f"[{query}]({video_link})",
         reply_to=reply_to_id,
         progress_callback=lambda d, t: asyncio.get_event_loop().create_task(
             progress(d, t, event, c_time, "[UPLOAD]", loa)
