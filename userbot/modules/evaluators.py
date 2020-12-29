@@ -6,7 +6,10 @@
 """ Userbot module for executing code and terminal commands from Telegram. """
 
 import asyncio
+import io
 import re
+import sys
+import traceback
 from os import remove
 from sys import executable
 
@@ -15,61 +18,63 @@ from userbot.events import register
 
 
 @register(outgoing=True, pattern=r"^\.eval(?: |$|\n)(.*)")
-async def evaluate(query):
-    """ For .eval command, evaluates the given Python expression. """
-    if query.is_channel and not query.is_group:
-        return await query.edit("`Eval isn't permitted on channels`")
+async def _(event):
+    if event.fwd_from:
+        return
+    s_m_ = await event.edit("Processing ...")
+    cmd = event.text.split(" ", maxsplit=1)[1]
+    event.message.id
+    if event.reply_to_msg_id:
+        event.reply_to_msg_id
 
-    if query.pattern_match.group(1):
-        expression = query.pattern_match.group(1)
-    else:
-        return await query.edit("``` Give an expression to evaluate. ```")
-
-    for i in ("userbot.session", "env"):
-        if expression.find(i) != -1:
-            return await query.edit("`That's a dangerous operation! Not Permitted!`")
-
-    if not re.search(r"echo[ \-\w]*\$\w+", expression) is None:
-        return await expression.edit("`That's a dangerous operation! Not Permitted!`")
+    old_stderr = sys.stderr
+    old_stdout = sys.stdout
+    redirected_output = sys.stdout = io.StringIO()
+    redirected_error = sys.stderr = io.StringIO()
+    stdout, stderr, exc = None, None, None
 
     try:
-        evaluation = str(eval(expression))
-        if evaluation:
-            if isinstance(evaluation, str):
-                if len(evaluation) >= 4096:
-                    file = open("output.txt", "w+")
-                    file.write(evaluation)
-                    file.close()
-                    await query.client.send_file(
-                        query.chat_id,
-                        "output.txt",
-                        reply_to=query.id,
-                        caption="`Output too large, sending as file`",
-                    )
-                    remove("output.txt")
-                    return
-                await query.edit(
-                    "**Query: **\n`"
-                    f"{expression}"
-                    "`\n**Result: **\n`"
-                    f"{evaluation}"
-                    "`"
-                )
-        else:
-            await query.edit(
-                "**Query: **\n`"
-                f"{expression}"
-                "`\n**Result: **\n`No Result Returned/False`"
-            )
-    except Exception as err:
-        await query.edit(
-            "**Query: **\n`" f"{expression}" "`\n**Exception: **\n" f"`{err}`"
-        )
+        await aexec(cmd, s_m_)
+    except Exception:
+        exc = traceback.format_exc()
 
-    if BOTLOG:
-        await query.client.send_message(
-            BOTLOG_CHATID, f"Eval query {expression} was executed successfully."
-        )
+    stdout = redirected_output.getvalue()
+    stderr = redirected_error.getvalue()
+    sys.stdout = old_stdout
+    sys.stderr = old_stderr
+
+    evaluation = "😐"
+    if exc:
+        evaluation = exc
+    elif stderr:
+        evaluation = stderr
+    elif stdout:
+        evaluation = stdout
+
+    final_output = "**EVAL**: `{}` \n\n **OUTPUT**: \n`{}` \n".format(cmd, evaluation)
+
+    if len(final_output) >= 4096:
+        with io.BytesIO(str.encode(final_output)) as out_file:
+            out_file.name = "eval.text"
+            await s_m_.reply(cmd, file=out_file)
+            await event.delete()
+    else:
+        await s_m_.edit(final_output)
+
+
+async def aexec(code, smessatatus):
+    message = event = smessatatus
+
+    def p(_x):
+        return print(slitu.yaml_format(_x))
+
+    reply = await event.get_reply_message()
+    exec(
+        f"async def __aexec(message, reply, client, p): "
+        + "\n event = smessatatus = message"
+        + "".join(f"\n {l}" for l in code.split("\n"))
+    )
+    return await locals()["__aexec"](message, reply, message.client, p)
 
 
 @register(outgoing=True, pattern=r"^\.exec(?: |$|\n)([\s\S]*)")
