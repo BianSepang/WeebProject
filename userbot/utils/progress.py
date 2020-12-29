@@ -23,7 +23,7 @@ from .exceptions import CancelProcess
 
 
 async def progress(
-    current, total, gdrive, start, prog_type,
+    current, total, event, start, prog_type,
     file_name=None, is_cancelled=False
 ):
     now = time.time()
@@ -56,5 +56,5 @@ async def progress(
             f"`ETA` -> {time_formatter(eta)}\n"
             f"`Duration` -> {time_formatter(elapsed_time)}"
         )
-        await gdrive.edit(f"`{prog_type}`\n\n"
-                          f"`Status`\n{tmp}")
+        await event.edit(f"`{prog_type}`\n\n"
+                         f"`Status`\n{tmp}")

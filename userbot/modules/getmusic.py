@@ -26,6 +26,7 @@ from userbot import (
 )
 from userbot.events import register
 from userbot.utils import chrome, progress
+from userbot.utils.FastTelethon import upload_file
 
 
 async def getmusic(cat):
@@ -75,15 +76,21 @@ async def _(event):
     loa = glob.glob("*.mp3")[0]
     await event.edit("`Yeah.. Uploading your song..`")
     c_time = time.time()
+    with open(loa, "rb") as f:
+        result = await upload_file(
+            client=event.client,
+            file=f,
+            name=loa,
+            progress_callback=lambda d, t: asyncio.get_event_loop().create_task(
+                progress(d, t, event, c_time, "[UPLOAD]", loa)
+            ),
+        )
     await event.client.send_file(
         event.chat_id,
-        loa,
+        result,
         allow_cache=False,
         caption=f"[{query}]({video_link})",
         reply_to=reply_to_id,
-        progress_callback=lambda d, t: asyncio.get_event_loop().create_task(
-            progress(d, t, event, c_time, "[UPLOAD]", loa)
-        ),
     )
     await event.delete()
     os.system("rm -rf *.mp3")
@@ -128,9 +135,18 @@ async def _(event):
         os.system("ffmpeg -i thumb.mp4 -vframes 1 -an -s 480x360 -ss 5 thumb.jpg")
         thumb_image = "thumb.jpg"
         c_time = time.time()
+        with open(loa, "rb") as f:
+            result = await upload_file(
+                client=event.client,
+                file=f,
+                name=loa,
+                progress_callback=lambda d, t: asyncio.get_event_loop().create_task(
+                    progress(d, t, event, c_time, "[UPLOAD]", loa)
+                ),
+            )
         await event.client.send_file(
             event.chat_id,
-            loa,
+            result,
             force_document=False,
             thumb=thumb_image,
             allow_cache=False,
@@ -146,9 +162,6 @@ async def _(event):
                     supports_streaming=True,
                 )
             ],
-            progress_callback=lambda d, t: asyncio.get_event_loop().create_task(
-                progress(d, t, event, c_time, "[UPLOAD]", loa)
-            ),
         )
         await event.edit(f"**{query}** `Uploaded Successfully..!`")
         os.remove(thumb_image)
@@ -404,17 +417,23 @@ async def upload_track(track_location, message):
     force_document = False
     caption_rts = os.path.basename(track_location)
     c_time = time.time()
+    with open(track_location, "rb") as f:
+        result = await upload_file(
+            client=message.client,
+            file=f,
+            name=track_location,
+            progress_callback=lambda d, t: asyncio.get_event_loop().create_task(
+                progress(d, t, message, c_time, "[UPLOAD]", track_location)
+            ),
+        )
     await message.client.send_file(
         message.chat_id,
-        track_location,
+        result,
         caption=caption_rts,
         force_document=force_document,
         supports_streaming=supports_streaming,
         allow_cache=False,
         attributes=document_attributes,
-        progress_callback=lambda d, t: asyncio.get_event_loop().create_task(
-            progress(d, t, message, c_time, "[UPLOAD]"),
-        ),
     )
     os.remove(track_location)
 
