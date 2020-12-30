@@ -40,7 +40,7 @@ async def lst(event):
                 size = os.stat(catpath).st_size
                 if contents.endswith((".mp3", ".flac", ".wav", ".m4a")):
                     files += "🎵 "
-                if contents.endswith((".opus")):
+                elif contents.endswith((".opus")):
                     files += "🎙 "
                 elif contents.endswith(
                     (".mkv", ".mp4", ".webm", ".avi", ".mov", ".flv")
@@ -73,7 +73,7 @@ async def lst(event):
         msg = "The details of given file :\n\n"
         if path.endswith((".mp3", ".flac", ".wav", ".m4a")):
             mode = "🎵 "
-        if path.endswith((".opus")):
+        elif path.endswith((".opus")):
             mode = "🎙 "
         elif path.endswith((".mkv", ".mp4", ".webm", ".avi", ".mov", ".flv")):
             mode = "🎞 "
