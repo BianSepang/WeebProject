@@ -1,4 +1,5 @@
 aiohttp
+appdirs
 aria2p
 async_generator
 bs4
