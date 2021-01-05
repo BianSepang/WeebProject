@@ -26,7 +26,7 @@ from userbot.utils import humanbytes, progress
 from userbot.utils.FastTelethon import download_file, upload_file
 
 
-@register(pattern=r"^\.download(?: |$)(.*)", outgoing=True)
+@register(pattern=r"^\.dl(?: |$)(.*)", outgoing=True)
 async def download(target_file):
     """ For .download command, download files to the userbot's server. """
     await target_file.edit("Processing ...")
@@ -121,7 +121,7 @@ async def get_video_thumb(file, output=None, width=90):
     return output
 
 
-@register(pattern=r"^\.upload (.*)", outgoing=True)
+@register(pattern=r"^\.up (.*)", outgoing=True)
 async def upload(u_event):
     """ For .upload command, allows you to upload a file from the userbot's server """
     await u_event.edit("Processing ...")
@@ -188,9 +188,9 @@ async def upload(u_event):
 
 CMD_HELP.update(
     {
-        "download": ">`.download <link|filename> or reply to media`"
+        "download": ">`.dl <link|filename> or reply to media`"
         "\nUsage: Downloads file to the server."
-        "\n\n>`.upload <path in server>`"
+        "\n\n>`.up <path in server>`"
         "\nUsage: Uploads a locally stored file to the chat."
     }
 )
