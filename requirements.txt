@@ -27,6 +27,7 @@ humanize
 jikanpy
 lxml
 lyricsgenius
+nekos.py
 oauth2client
 pendulum
 Pillow
