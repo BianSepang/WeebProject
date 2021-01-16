@@ -346,7 +346,9 @@ CMD_HELP.update(
     {
         "download": ">`.dl <link|filename> or reply to media`"
         "\nUsage: Downloads file to the server."
-        "\n\n>`.up <path in server>`"
+        "\n\n>`.up` <file path in server>"
         "\nUsage: Uploads a locally stored file to the chat."
+        "\n\n>`.updir` <folder path in server>"
+        "\nUsage: Uploads Folder/Directory from the server"
     }
 )
