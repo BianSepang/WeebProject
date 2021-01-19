@@ -3,6 +3,7 @@ appdirs
 aria2p
 async_generator
 bs4
+CairoSVG
 cowpy
 cryptg
 cffi
@@ -25,6 +26,7 @@ html_telegraph_poster
 httplib2
 humanize
 jikanpy
+lottie
 lxml
 lyricsgenius
 nekos.py
