@@ -170,7 +170,7 @@ async def download_api(dl):
     download = driver.find_elements_by_class_name("download__btn")[i]
     download.click()
     await dl.edit("`Starting download...`")
-    file_size = human_to_bytes(download.text.split(None, 3)[-1].strip("()"))
+    file_size = human_to_bytes(download.text.split(None, 2)[-1].strip("()"))
     display_message = None
     complete = False
     start = time.time()
