@@ -47,8 +47,6 @@ from userbot.utils import chrome, googleimagesdownload, progress
 from userbot.utils.FastTelethon import upload_file
 
 CARBONLANG = "auto"
-TTS_LANG = "id"
-TRT_LANG = "id"
 
 
 @register(outgoing=True, pattern=r"^\.crblang (.*)")
@@ -298,7 +296,17 @@ async def text_to_speech(query):
         )
 
     try:
-        gTTS(message, lang=TTS_LANG)
+        from userbot.modules.sql_helper.globals import gvarstatus
+    except AttributeError:
+        return await query.edit("**Running on Non-SQL mode!**")
+
+    if gvarstatus("tts_lang") is not None:
+        target_lang = str(gvarstatus("tts_lang"))
+    else:
+        target_lang = "en"
+
+    try:
+        gTTS(message, lang=target_lang)
     except AssertionError:
         return await query.edit(
             "The text is empty.\n"
@@ -308,13 +316,13 @@ async def text_to_speech(query):
         return await query.edit("Language is not supported.")
     except RuntimeError:
         return await query.edit("Error loading the languages dictionary.")
-    tts = gTTS(message, lang=TTS_LANG)
+    tts = gTTS(message, lang=target_lang)
     tts.save("k.mp3")
     with open("k.mp3", "rb") as audio:
         linelist = list(audio)
         linecount = len(linelist)
     if linecount == 1:
-        tts = gTTS(message, lang=TTS_LANG)
+        tts = gTTS(message, lang=target_lang)
         tts.save("k.mp3")
     with open("k.mp3", "r"):
         await query.client.send_file(query.chat_id, "k.mp3", voice_note=True)
@@ -435,7 +443,17 @@ async def translateme(trans):
         return await trans.edit("`Give a text or reply to a message to translate!`")
 
     try:
-        reply_text = translator.translate(deEmojify(message), dest=TRT_LANG)
+        from userbot.modules.sql_helper.globals import gvarstatus
+    except AttributeError:
+        return await trans.edit("`Running on Non-SQL mode!`")
+
+    if gvarstatus("trt_lang") is not None:
+        target_lang = str(gvarstatus("trt_lang"))
+    else:
+        target_lang = "en"
+
+    try:
+        reply_text = translator.translate(deEmojify(message), dest=target_lang)
     except ValueError:
         return await trans.edit("Invalid destination language.")
 
@@ -455,29 +473,41 @@ async def translateme(trans):
 async def lang(value):
     """ For .lang command, change the default langauge of userbot scrapers. """
     util = value.pattern_match.group(1).lower()
+
+    try:
+        from userbot.modules.sql_helper.globals import addgvar, delgvar, gvarstatus
+    except AttributeError:
+        return await lang.edit("**Running on Non-SQL mode!**")
+
     if util == "trt":
         scraper = "Translator"
-        global TRT_LANG
         arg = value.pattern_match.group(2).lower()
-        if arg in LANGUAGES:
-            TRT_LANG = arg
-            LANG = LANGUAGES[arg]
-        else:
+
+        if arg not in LANGUAGES:
             return await value.edit(
                 f"`Invalid Language code !!`\n`Available language codes for TRT`:\n\n`{LANGUAGES}`"
             )
+
+        if gvarstatus("trt_lang"):
+            delgvar("trt_lang")
+        addgvar("trt_lang", arg)
+        LANG = LANGUAGES[arg]
+
     elif util == "tts":
         scraper = "Text to Speech"
-        global TTS_LANG
         arg = value.pattern_match.group(2).lower()
-        if arg in tts_langs():
-            TTS_LANG = arg
-            LANG = tts_langs()[arg]
-        else:
+
+        if arg not in tts_langs():
             return await value.edit(
                 f"`Invalid Language code !!`\n`Available language codes for TTS`:\n\n`{tts_langs()}`"
             )
-    await value.edit(f"`Language for {scraper} changed to {LANG.title()}.`")
+
+        if gvarstatus("tts_lang"):
+            delgvar("tts_lang")
+        addgvar("tts_lang", arg)
+        LANG = tts_langs()[arg]
+
+    await value.edit(f"**Language for {scraper} changed to {LANG.title()}.**")
     if BOTLOG:
         await value.client.send_message(
             BOTLOG_CHATID, f"`Language for {scraper} changed to {LANG.title()}.`"
