@@ -209,6 +209,8 @@ async def approvepm(apprvpm):
         uid = replied_user.id
     elif apprvpm.pattern_match.group(1):
         inputArgs = apprvpm.pattern_match.group(1)
+        if inputArgs.isdigit():
+            inputArgs = int(inputArgs)
         try:
             user = await apprvpm.client.get_entity(inputArgs)
         except BaseException:
@@ -266,6 +268,8 @@ async def disapprovepm(disapprvpm):
         uid = replied_user.id
     elif disapprvpm.pattern_match.group(1):
         inputArgs = disapprvpm.pattern_match.group(1)
+        if inputArgs.isdigit():
+            inputArgs = int(inputArgs)
         try:
             user = await disapprvpm.client.get_entity(inputArgs)
         except BaseException:
