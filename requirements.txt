@@ -45,6 +45,7 @@ youtube-search
 pytz
 qrcode
 requests
+rarfile
 search-engine-parser
 speedtest-cli
 sqlalchemy
