@@ -17,15 +17,14 @@ from userbot import BOTLOG, BOTLOG_CHATID, CMD_HELP, TERM_ALIAS
 from userbot.events import register
 
 
-@register(outgoing=True, pattern=r"^\.eval(?: |$|\n)(.*)")
+@register(outgoing=True, pattern=r"^\.eval(?: |$|\n)([\s\S]*)")
 async def _(event):
     if event.fwd_from:
         return
     s_m_ = await event.edit("Processing ...")
-    cmd = event.text.split(" ", maxsplit=1)[1]
-    event.message.id
-    if event.reply_to_msg_id:
-        event.reply_to_msg_id
+    cmd = event.pattern_match.group(1)
+    if not cmd:
+        return await s_m_.edit("`What should i eval...`")
 
     old_stderr = sys.stderr
     old_stdout = sys.stdout
@@ -43,7 +42,7 @@ async def _(event):
     sys.stdout = old_stdout
     sys.stderr = old_stderr
 
-    evaluation = "😐"
+    evaluation = "No Output"
     if exc:
         evaluation = exc
     elif stderr:
@@ -51,7 +50,7 @@ async def _(event):
     elif stdout:
         evaluation = stdout
 
-    final_output = "**EVAL**: `{}` \n\n **OUTPUT**: \n`{}` \n".format(cmd, evaluation)
+    final_output = "**EVAL**: \n`{}` \n\n**OUTPUT**: \n`{}` \n".format(cmd, evaluation)
 
     if len(final_output) >= 4096:
         with io.BytesIO(str.encode(final_output)) as out_file:
@@ -65,16 +64,13 @@ async def _(event):
 async def aexec(code, smessatatus):
     message = event = smessatatus
 
-    def p(_x):
-        return print(slitu.yaml_format(_x))
-
     reply = await event.get_reply_message()
     exec(
-        f"async def __aexec(message, reply, client, p): "
+        f"async def __aexec(message, reply, client): "
         + "\n event = smessatatus = message"
         + "".join(f"\n {l}" for l in code.split("\n"))
     )
-    return await locals()["__aexec"](message, reply, message.client, p)
+    return await locals()["__aexec"](message, reply, message.client)
 
 
 @register(outgoing=True, pattern=r"^\.exec(?: |$|\n)([\s\S]*)")
@@ -200,7 +196,7 @@ async def terminal_runner(term):
 
 CMD_HELP.update(
     {
-        "eval": ">`.eval 2 + 3`" "\nUsage: Evalute mini-expressions.",
+        "eval": ">`.eval print('world')`" "\nUsage: Just like exec.",
         "exec": ">`.exec print('hello')`" "\nUsage: Execute small python scripts.",
         "term": ">`.term <cmd>`"
         "\nUsage: Run bash commands and scripts on your server.",
