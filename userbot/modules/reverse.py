@@ -9,7 +9,7 @@
 
 import io
 import os
-import re
+import shutil
 import urllib
 
 import requests
@@ -18,6 +18,7 @@ from PIL import Image
 
 from userbot import CMD_HELP, bot
 from userbot.events import register
+from userbot.utils import googleimagesdownload
 
 opener = urllib.request.build_opener()
 useragent = (
@@ -37,19 +38,19 @@ async def okgoogle(img):
     message = await img.get_reply_message()
 
     if not message or not message.media:
-        return await img.edit("**Reply to a photo or sticker.**")
+        return await img.edit("`Reply to a photo or sticker.`")
 
     photo = io.BytesIO()
     await bot.download_media(message, photo)
     if not photo:
-        return await img.edit("**Couldn't download the image.**")
+        return await img.edit("`Couldn't download the image.`")
 
     await img.edit("`Processing...`")
 
     try:
         image = Image.open(photo)
     except OSError:
-        return await img.edit("**Unsupported sexuality, most likely.**")
+        return await img.edit("`Unsupported sexuality, most likely.`")
 
     name = "okgoogle.png"
     image.save(name, "PNG")
@@ -62,7 +63,7 @@ async def okgoogle(img):
     fetchUrl = response.headers["Location"]
 
     if response == 400:
-        return await img.edit("**Google told me to fuck off.**")
+        return await img.edit("`Google told me to fuck off.`")
 
     await img.edit(
         "`Image successfully uploaded to Google. Maybe.`"
@@ -70,20 +71,20 @@ async def okgoogle(img):
     )
     os.remove(name)
     match = await ParseSauce(fetchUrl + "&preferences?hl=en&fg=1#languages")
-    guess = match["best_guess"]
+    guess = str(match["best_guess"])
     imgspage = match["similar_images"]
 
     if not guess and not imgspage:
-        return await img.edit("**Couldn't find anything for your uglyass.**")
+        return await img.edit("`Couldn't find anything for your uglyass.`")
 
     try:
-        lim = int(img.pattern_match.group(1))
+        counter = int(img.pattern_match.group(1))
     except BaseException:
-        lim = int(3)
-    lim = int(10) if lim > 10 else lim
-    lim = int(3) if lim < 0 else lim
+        counter = int(3)
+    counter = int(10) if counter > 10 else counter
+    counter = int(3) if counter < 0 else counter
 
-    if lim == 0:
+    if counter == 0:
         return await img.edit(
             f"**Best match:** `{guess}`\
                               \n\n[Visually similar images]({fetchUrl})\
@@ -97,32 +98,38 @@ async def okgoogle(img):
         \n\n`Fetching images...`"
     )
 
-    images = await scam(match, lim)
-    yeet = []
+    response = googleimagesdownload()
 
-    for i in images:
-        k = requests.get(i)
-        yeet.append(k.content)
+    # creating list of arguments
+    arguments = {
+        "keywords": guess,
+        "limit": counter,
+        "format": "png",
+        "no_directory": "no_directory",
+    }
 
     try:
-        await img.client.send_file(
-            entity=img.chat_id,
-            file=yeet,
-            reply_to=img,
-        )
-    except BaseException:
+        paths = response.download(arguments)
+    except Exception as e:
         return await img.edit(
             f"**Best match:** `{guess}`\
-            \n\n[Visually similar images]({fetchUrl})\
-            \n\n[Results for {guess}]({imgspage})\
-            \n\n**An error occurred while uploading images.**"
+                              \n\n[Visually similar images]({fetchUrl})\
+                              \n\n[Results for {guess}]({imgspage})\
+                              \n\n**Error:** `{e}`**.**"
         )
 
+    lst = paths[0][guess]
+    await img.client.send_file(
+        entity=img.chat_id,
+        file=lst,
+        reply_to=img,
+    )
     await img.edit(
         f"**Best match:** `{guess}`\
-        \n\n[Visually similar images]({fetchUrl})\
-        \n\n[Results for {guess}]({imgspage})"
+                   \n\n[Visually similar images]({fetchUrl})\
+                   \n\n[Results for {guess}]({imgspage})"
     )
+    shutil.rmtree(os.path.dirname(os.path.abspath(lst[0])))
 
 
 async def ParseSauce(googleurl):
@@ -146,26 +153,6 @@ async def ParseSauce(googleurl):
 
     results["best_guess"] = results["best_guess"][12:]
     return results
-
-
-async def scam(results, lim):
-    single = opener.open(results["similar_images"]).read()
-    decoded = single.decode("utf-8")
-
-    pattern = r"^,\[\"(.*[.png|.jpg|.jpeg])\",[0-9]+,[0-9]+\]$"
-    oboi = re.findall(pattern, decoded, re.I | re.M)
-
-    imglinks = []
-    counter = int(0)
-
-    for imglink in oboi:
-        if counter < lim:
-            imglinks.append(imglink)
-            counter += 1
-        else:
-            break
-
-    return imglinks
 
 
 CMD_HELP.update(
