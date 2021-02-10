@@ -9,9 +9,9 @@ import time
 from datetime import datetime
 from os.path import basename, dirname, exists, isdir, isfile, join, relpath
 from shutil import rmtree
-from zipfile import ZIP_DEFLATED, ZipFile, is_zipfile
+from zipfile import ZIP_DEFLATED, BadZipFile, ZipFile, is_zipfile
 
-from rarfile import RarFile, is_rarfile
+from rarfile import BadRarFile, RarFile, is_rarfile
 
 from userbot import CMD_HELP, TEMP_DOWNLOAD_DIRECTORY
 from userbot.events import register
@@ -220,8 +220,12 @@ async def unzip_file(event):
         try:
             with zip_type(input_str, "r") as zip_obj:
                 zip_obj.extractall(output_path)
-        except BaseException:
-            return await event.edit(f"**Error:** `Corrupted Archive`")
+        except BadRarFile:
+            return await event.edit("**Error:** `Corrupted RAR File`")
+        except BadZipFile:
+            return await event.edit("**Error:** `Corrupted ZIP File`")
+        except BaseException as err:
+            return await event.edit(f"**Error:** `{err}`")
         end_time = (datetime.now() - start_time).seconds
         await event.edit(
             f"Unzipped `{input_str}` into `{output_path}` in `{end_time}` seconds."
