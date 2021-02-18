@@ -33,7 +33,7 @@ async def _(event):
     stdout, stderr, exc = None, None, None
 
     try:
-        await aexec(cmd, s_m_)
+        returned = await aexec(cmd, s_m_)
     except Exception:
         exc = traceback.format_exc()
 
@@ -49,6 +49,8 @@ async def _(event):
         evaluation = stderr
     elif stdout:
         evaluation = stdout
+    elif returned:
+        evaluation = returned
 
     final_output = "**EVAL**: \n`{}` \n\n**OUTPUT**: \n`{}` \n".format(cmd, evaluation)
 
