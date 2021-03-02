@@ -1466,7 +1466,7 @@ CMD_HELP.update(
         "\nThis only need to run once in life time."
         "\n\n>`.gdreset`"
         "\nUsage: reset your token if something bad happened or change drive acc."
-        "\n\n>`.gd`"
+        "\n\n>`.ezupl`"
         "\nUsage: Upload file from local or uri/url/drivelink into google drive."
         "\nfor drivelink it's upload only if you want to."
         "\n\n>`.gdabort`"
