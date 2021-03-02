@@ -358,7 +358,7 @@ async def sticker_to_png(sticker):
 
 CMD_HELP.update(
     {
-        "stickers": ">`.curry [emoji('s)]?`"
+        "stickers": ">`.colong [emoji('s)]?`"
         "\nUsage: Reply .kang to a sticker or an image to kang it to your userbot pack "
         "\nor specify the emoji you want to."
         "\n\n>`.curry (emoji['s]]?` [number]?"
