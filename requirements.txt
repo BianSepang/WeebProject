@@ -13,7 +13,7 @@ dnspython
 emoji
 gitpython
 glitch_this
-google-api-python-client==1.12.8
+google-api-python-client
 google-auth-httplib2
 google-auth-oauthlib
 google_images_download
