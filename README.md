@@ -11,27 +11,39 @@
 
 ```
 #include <std/disclaimer.h>
-/**
-    Your Telegram account may get banned.
-    I am not responsible for any improper use of this bot
-    This bot is intended for the purpose of having fun with memes,
-    as well as efficiently managing groups.
-    You ended up spamming groups, getting reported left and right,
-    and you ended up in a Finale Battle with Telegram and at the end
-    Telegram Team deleted your account?
-    And after that, then you pointed your fingers at us
-    for getting your acoount deleted?
-    I will be rolling on the floor laughing at you.
-/**
+/*
+*    Your Telegram account may get banned.
+*    I am not responsible for any improper use of this bot
+*    This bot is intended for the purpose of having fun with memes,
+*    as well as efficiently managing groups.
+*    You ended up spamming groups, getting reported left and right,
+*    and you ended up in a Finale Battle with Telegram and at the end
+*    Telegram Team deleted your account?
+*    And after that, then you pointed your fingers at us
+*    for getting your acoount deleted?
+*    I will be rolling on the floor laughing at you.
+*/
 ```
 
 A modular Telegram Userbot running on Python3 with sqlalchemy database. 
 
 based on [ProjectBish](https://github.com/adekmaulana/ProjectBish) Userbot
  
- ## Host
+## Deploy
+### Heroku
 Click this button below to Deploy to Heroku
 <p align="center"><a href="https://heroku.com/deploy?template=https://github.com/BianSepang/WeebProject/tree/master"> <img src="https://www.herokucdn.com/deploy/button.png" alt="Deploy to Heroku"/></a></p>
+
+### Locally (Linux [or also macOS?])
+1. Clone this repository on your local machine and `cd` (or `chdir`, anti bloat guy) to it
+2. Set up Python virtual environment named "venv" inside it (Requires `virtualenv` installed on the system)
+  - `virtualenv venv`
+3. Set up database for the userbot, search Google on how to set up a local database (PostgreSQL is recommended)
+4. Install the requirements: `pip3 install -r ./requirements.txt`
+5. Edit `sample_config.env` and save it as `config.env`
+  - Do not forget to fill in the `REQUIRED %%` values, or else the bot will not run
+6. Run the bot: `bash ./exec.sh`
+  - Protip: See what `bash ./exec.sh --help` tells you
 
 ## Credits
 * [Adek Maulana](https://github.com/adekmaulana) - ProjectBish
