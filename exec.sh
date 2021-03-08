@@ -2,7 +2,7 @@
 
 RUNDIR=${PWD}
 BOTDIR=$(dirname $(realpath ${0}))
-UNIXTIME=$(date +%u)
+UNIXTIME=$(date +%s)
 
 if [ -z ${1} ] || [ ${1} == "-x" ] ; then
 	cd ${BOTDIR}
