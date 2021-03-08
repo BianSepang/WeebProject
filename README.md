@@ -41,7 +41,7 @@ Click this button below to Deploy to Heroku
 3. Set up database for the userbot, search Google on how to set up a local database (PostgreSQL is recommended)
 4. Install the requirements: `pip3 install -r ./requirements.txt`
 5. Edit `sample_config.env` and save it as `config.env`
-  - Do not forget to fill in the required values, or else the bot will not run
+  - Do not forget to fill in the `REQUIRED %%` values, or else the bot will not run
 6. Run the bot: `bash ./exec.sh`
   - Protip: See what `bash ./exec.sh --help` tells you
 
