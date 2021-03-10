@@ -11,6 +11,7 @@ from os.path import basename, dirname, exists, isdir, isfile, join, relpath
 from shutil import rmtree
 from zipfile import ZIP_DEFLATED, BadZipFile, ZipFile, is_zipfile
 
+from natsort import os_sorted
 from rarfile import BadRarFile, RarFile, is_rarfile
 
 from userbot import CMD_HELP, TEMP_DOWNLOAD_DIRECTORY
@@ -20,7 +21,7 @@ from userbot.utils import humanbytes
 MAX_MESSAGE_SIZE_LIMIT = 4095
 
 
-@register(outgoing=True, pattern=r"^\.ls ?(.*)")
+@register(outgoing=True, pattern=r"^\.ls(?: |$)(.*)")
 async def lst(event):
     if event.fwd_from:
         return
@@ -39,7 +40,7 @@ async def lst(event):
         lists = os.listdir(path)
         files = ""
         folders = ""
-        for contents in sorted(lists):
+        for contents in os_sorted(lists):
             catpath = path + "/" + contents
             if not isdir(catpath):
                 size = os.stat(catpath).st_size
@@ -120,7 +121,7 @@ async def lst(event):
         await event.edit(msg)
 
 
-@register(outgoing=True, pattern=r"^\.rm ?(.*)")
+@register(outgoing=True, pattern=r"^\.rm(?: |$)(.*)")
 async def rmove(event):
     """Removing Directory/File"""
     cat = event.pattern_match.group(1)

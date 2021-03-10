@@ -17,6 +17,7 @@ from datetime import datetime
 
 from hachoir.metadata import extractMetadata
 from hachoir.parser import createParser
+from natsort import os_sorted
 from pySmartDL import SmartDL
 from telethon.tl.types import (
     DocumentAttributeAudio,
@@ -231,7 +232,7 @@ async def upload(event):
             if len(lst_files) == 0:
                 return await event.edit(f"`{input_str}` is empty.")
             await event.edit(f"Found `{len(lst_files)}` files. Now uploading...")
-            for files in sorted(lst_files):
+            for files in os_sorted(lst_files):
                 file_name = os.path.basename(files)
                 thumb = None
                 attributes = []
