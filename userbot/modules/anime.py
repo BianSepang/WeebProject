@@ -171,13 +171,16 @@ def get_poster(query):
         return image
 
 
-def post_to_telegraph(anime_title, html_format_content):
+def post_to_telegraph(title, html_format_content):
     post_client = TelegraphPoster(use_api=True)
-    auth_name = "@GengKapak"
-    bish = "https://t.me/GengKapak"
+    auth_name = "WeebProject"
+    auth_url = "https://github.com/BianSepang/WeebProject"
     post_client.create_api_token(auth_name)
     post_page = post_client.post(
-        title=anime_title, author=auth_name, author_url=bish, text=html_format_content
+        title=title,
+        author=auth_name,
+        author_url=auth_url,
+        text=html_format_content,
     )
     return post_page["url"]
 

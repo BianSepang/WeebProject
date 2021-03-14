@@ -20,6 +20,7 @@ googletrans==3.1.0a0
 gTTS
 gTTS-token
 hachoir
+hentai
 heroku3
 html_telegraph_poster
 httplib2
