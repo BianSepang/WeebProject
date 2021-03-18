@@ -9,6 +9,7 @@
 
 import asyncio
 import json
+import math
 import re
 import urllib.parse
 from asyncio import create_subprocess_shell as asyncSubprocess
@@ -23,17 +24,6 @@ from humanize import naturalsize
 from userbot import CMD_HELP, USR_TOKEN
 from userbot.events import register
 from userbot.utils import time_formatter
-
-_REGEX_LINK = r"https://www(\d{1,3}).zippyshare.com/v/(\w{8})/file.html"
-_REGEX_RESULT = (
-    r'document.getElementById\(\'dlbutton\'\).href = "/d/[a-zA-Z\d]{8}/" '
-    r'\+ \((\d+) % (\d+) \+ (\d+) % (\d+)\) \+ "\/(.+)";'
-)
-_HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-    "AppleWebKit/537.36 (KHTML, like Gecko) Chrome"
-    "/75.0.3770.100 Safari/537.36"
-}
 
 
 async def subprocess_run(cmd):
@@ -96,26 +86,39 @@ async def direct_link_generator(request):
 
 
 async def zippy_share(url: str) -> str:
+    regex_link = r"https://www(\d{1,3}).zippyshare.com/v/(\w{8})/file.html"
+    regex_result = (
+        r"var a = (\d{6});\s+var b = (\d{6});\s+document\.getElementById"
+        r'\(\'dlbutton\'\).omg = "f";\s+if \(document.getElementById\(\''
+        r"dlbutton\'\).omg != \'f\'\) {\s+a = Math.ceil\(a/3\);\s+} else"
+        r" {\s+a = Math.floor\(a/3\);\s+}\s+document.getElementById\(\'d"
+        r'lbutton\'\).href = "/d/[a-zA-Z\d]{8}/\"\+\(a \+ \d{6}%b\)\+"/('
+        r'[\w%-.]+)";'
+    )
+    _headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) Chrome"
+        "/75.0.3770.100 Safari/537.36"
+    }
     reply = ""
     try:
         session = requests.Session()
-        session.headers.update(_HEADERS)
+        session.headers.update(_headers)
         with session as ses:
-            match = re.match(_REGEX_LINK, url)
+            match = re.match(regex_link, url)
             if not match:
                 raise ValueError("Invalid URL: " + str(url))
             server, id_ = match.group(1), match.group(2)
             res = ses.get(url)
             res.raise_for_status()
-            match = re.search(_REGEX_RESULT, res.text)
+            match = re.search(regex_result, res.text)
             if not match:
                 raise ValueError("Invalid Response!")
             val_1 = int(match.group(1))
-            val_2 = int(match.group(2))
-            val_3 = int(match.group(3))
-            val_4 = int(match.group(4))
-            val = val_1 % val_2 + val_3 % val_4
-            name = match.group(5)
+            val_2 = math.floor(val_1 / 3)
+            val_3 = int(match.group(2))
+            val = val_1 + val_2 % val_3
+            name = match.group(3)
             d_l = "https://www{}.zippyshare.com/d/{}/{}/{}".format(
                 server, id_, val, name
             )
