@@ -53,7 +53,7 @@ async def telegraphs(graph):
                         link_preview=True,
                     )
             elif input_str == "t":
-                user_object = await bot.get_entity(r_message.from_id)
+                user_object = await bot.get_entity(r_message.sender_id)
                 title_of_page = user_object.first_name  # + " " + user_object.last_name
                 # apparently, all Users do not have last_name field
                 page_content = r_message.message

@@ -115,7 +115,7 @@ logger.setLevel(logging.ERROR)
 @register(pattern=r"^\.gdauth(?: |$)", outgoing=True)
 async def generate_credentials(gdrive):
     """ - Only generate once for long run - """
-    if helper.get_credentials(str(gdrive.from_id)) is not None:
+    if helper.get_credentials(str(gdrive.sender_id)) is not None:
         await gdrive.edit("`You already authorized token...`")
         await asyncio.sleep(1.5)
         await gdrive.delete()
@@ -170,14 +170,14 @@ async def generate_credentials(gdrive):
         """ - Unpack credential objects into strings - """
         creds = base64.b64encode(pickle.dumps(creds)).decode()
         await gdrive.edit("`Credentials created...`")
-    helper.save_credentials(str(gdrive.from_id), creds)
+    helper.save_credentials(str(gdrive.sender_id), creds)
     await gdrive.delete()
     return
 
 
 async def create_app(gdrive):
     """ - Create google drive service app - """
-    creds = helper.get_credentials(str(gdrive.from_id))
+    creds = helper.get_credentials(str(gdrive.sender_id))
     if creds is not None:
         """ - Repack credential objects from strings - """
         creds = pickle.loads(base64.b64decode(creds.encode()))
@@ -187,7 +187,7 @@ async def create_app(gdrive):
             """ - Refresh credentials - """
             creds.refresh(Request())
             helper.save_credentials(
-                str(gdrive.from_id), base64.b64encode(pickle.dumps(creds)).decode()
+                str(gdrive.sender_id), base64.b64encode(pickle.dumps(creds)).decode()
             )
         else:
             await gdrive.edit("`Credentials is empty, please generate it...`")
@@ -200,7 +200,7 @@ async def create_app(gdrive):
 async def reset_credentials(gdrive):
     """ - Reset credentials or change account - """
     await gdrive.edit("`Resetting information...`")
-    helper.clear_credentials(str(gdrive.from_id))
+    helper.clear_credentials(str(gdrive.sender_id))
     await gdrive.edit("`Done...`")
     await asyncio.sleep(1)
     await gdrive.delete()
