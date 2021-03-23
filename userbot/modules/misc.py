@@ -8,7 +8,7 @@
 
 import io
 import sys
-from os import execl
+from os import environ, execle
 from random import randint
 from time import sleep
 
@@ -49,7 +49,7 @@ async def sleepybot(time):
 @register(outgoing=True, pattern=r"^\.shutdown$")
 async def killthebot(event):
     """ For .shutdown command, shut the bot down."""
-    await event.edit("`Goodbye...`")
+    await event.edit("`Shutting down...`")
     if BOTLOG:
         await event.client.send_message(BOTLOG_CHATID, "#SHUTDOWN \n" "Bot shut down")
     await bot.disconnect()
@@ -59,12 +59,12 @@ async def killthebot(event):
 async def killdabot(event):
     await event.edit("`*i would be back in a moment*`")
     if BOTLOG:
-        await event.client.send_message(BOTLOG_CHATID, "#RESTART \n" "Bot Restarted")
-    await bot.disconnect()
+        await event.client.send_message(
+            BOTLOG_CHATID, "#RESTART \n" "Restarting bot..."
+        )
     # Spin a new instance of bot
-    execl(sys.executable, sys.executable, *sys.argv)
-    # Shut the existing one down
-    exit()
+    args = [sys.executable, "-m", "userbot"]
+    execle(sys.executable, *args, environ)
 
 
 @register(outgoing=True, pattern=r"^\.readme$")
