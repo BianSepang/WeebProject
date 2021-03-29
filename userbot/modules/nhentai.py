@@ -39,6 +39,7 @@ async def _(event):
     title = doujin.title()
     graph_link = post_to_telegraph(title, imgs)
     msg += f"[{title}]({graph_link})"
+    msg += f"\n**Source :**\n[{code}]({doujin.url})"
     if doujin.parody:
         msg += "\n**Parodies :**"
         parodies = []
