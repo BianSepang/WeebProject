@@ -28,7 +28,6 @@ from urbandict import define
 from wikipedia import summary
 from wikipedia.exceptions import DisambiguationError, PageError
 from youtube_search import YoutubeSearch
-from yt_dlp import YoutubeDL
 from yt_dlp.utils import (
     ContentTooShortError,
     DownloadError,
