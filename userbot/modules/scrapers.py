@@ -187,7 +187,7 @@ async def gsearch(q_event):
             except IndexError:
                 break
     except BaseException as g_e:
-        return await event.edit(f"**Error : ** `{g_e}`")
+        return await q_event.edit(f"**Error : ** `{g_e}`")
     await q_event.edit(
         "**Search Query:**\n`" + match + "`\n\n**Results:**\n" + msg, link_preview=False
     )
