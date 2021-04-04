@@ -154,9 +154,6 @@ G_DRIVE_INDEX_URL = os.environ.get("G_DRIVE_INDEX_URL", None)
 TEMP_DOWNLOAD_DIRECTORY = os.environ.get("TMP_DOWNLOAD_DIRECTORY",
                                          "./downloads/")
 
-# Terminal Alias
-TERM_ALIAS = os.environ.get("TERM_ALIAS", None)
-
 # Genius Lyrics API
 GENIUS = os.environ.get("GENIUS_ACCESS_TOKEN", None)
 

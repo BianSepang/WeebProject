@@ -13,7 +13,7 @@ import traceback
 from os import remove
 from sys import executable
 
-from userbot import BOTLOG, BOTLOG_CHATID, CMD_HELP, TERM_ALIAS
+from userbot import CMD_HELP
 from userbot.events import register
 
 
@@ -132,16 +132,11 @@ async def run(run_q):
             "**Query: **\n`" f"{codepre}" "`\n**Result: **\n`No result returned/False`"
         )
 
-    if BOTLOG:
-        await run_q.client.send_message(
-            BOTLOG_CHATID, "Exec query " + codepre + " was executed successfully."
-        )
-
 
 @register(outgoing=True, pattern=r"^\.term(?: |$|\n)(.*)")
 async def terminal_runner(term):
     """ For .term command, runs bash commands and scripts on your server. """
-    curruser = TERM_ALIAS
+    curruser = "WeebProject"
     command = term.pattern_match.group(1)
     try:
         from os import geteuid
@@ -185,15 +180,9 @@ async def terminal_runner(term):
         return
 
     if uid == 0:
-        await term.edit("`" f"{curruser}:~# {command}" f"\n{result}" "`")
+        await term.edit(f"**{curruser} :** ~ # `{command}`\n`{result}`")
     else:
-        await term.edit("`" f"{curruser}:~$ {command}" f"\n{result}" "`")
-
-    if BOTLOG:
-        await term.client.send_message(
-            BOTLOG_CHATID,
-            "Terminal command " + command + " was executed sucessfully.",
-        )
+        await term.edit(f"**{curruser} :** ~ $ `{command}`\n`{result}`")
 
 
 CMD_HELP.update(
