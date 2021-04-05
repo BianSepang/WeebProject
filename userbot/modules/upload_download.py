@@ -20,7 +20,6 @@ from hachoir.metadata import extractMetadata
 from hachoir.parser import createParser
 from natsort import os_sorted
 from pySmartDL import SmartDL
-from requests import get
 from telethon.tl.types import DocumentAttributeAudio, DocumentAttributeVideo
 
 from userbot import CMD_HELP, LOGS, TEMP_DOWNLOAD_DIRECTORY
@@ -50,10 +49,6 @@ async def download(target_file):
                 if not os.path.isdir(os.path.join(TEMP_DOWNLOAD_DIRECTORY, head)):
                     os.makedirs(os.path.join(TEMP_DOWNLOAD_DIRECTORY, head))
                     file_name = os.path.join(head, tail)
-        try:
-            url = get(url).url
-        except BaseException:
-            return await target_file.edit("`This is not a valid link.`")
         downloaded_file_name = TEMP_DOWNLOAD_DIRECTORY + "" + file_name
         downloader = SmartDL(url, downloaded_file_name, progress_bar=False)
         downloader.start(blocking=False)
