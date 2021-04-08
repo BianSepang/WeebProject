@@ -153,6 +153,11 @@
       "description": "Input your DEEZER ARL TOKEN",
       "value": "",
       "required": false
+    },
+    "TERM_ALIAS": {
+      "description": "Display user for .term command",
+      "value": "WeebProject",
+      "required": false
     }
   },
   "addons": [
