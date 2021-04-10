@@ -21,6 +21,8 @@ from emoji import get_emoji_regexp
 from googletrans import LANGUAGES, Translator
 from gtts import gTTS
 from gtts.lang import tts_langs
+from hachoir.metadata import extractMetadata
+from hachoir.parser import createParser
 from requests import get
 from search_engine_parser import GoogleSearch
 from telethon.tl.types import DocumentAttributeAudio, DocumentAttributeVideo
@@ -558,12 +560,14 @@ async def yt_search(event):
 @register(outgoing=True, pattern=r".rip(audio|video) (.*)")
 async def download_video(v_url):
     """ For .rip command, download media from YouTube and many other sites. """
+    dl_type = v_url.pattern_match.group(1).lower()
     url = v_url.pattern_match.group(2)
-    type = v_url.pattern_match.group(1).lower()
 
     await v_url.edit("`Preparing to download...`")
+    video = False
+    audio = False
 
-    if type == "audio":
+    if dl_type == "audio":
         opts = {
             "format": "bestaudio",
             "addmetadata": True,
@@ -579,15 +583,14 @@ async def download_video(v_url):
                     "preferredquality": "320",
                 }
             ],
-            "outtmpl": "%(id)s.mp3",
+            "outtmpl": "%(id)s.%(ext)s",
             "quiet": True,
             "logtostderr": False,
             "external_downloader": "aria2c",
         }
-        video = False
-        song = True
+        audio = True
 
-    elif type == "video":
+    elif dl_type == "video":
         opts = {
             "format": "best",
             "addmetadata": True,
@@ -598,12 +601,11 @@ async def download_video(v_url):
             "postprocessors": [
                 {"key": "FFmpegVideoConvertor", "preferedformat": "mp4"}
             ],
-            "outtmpl": "%(id)s.mp4",
+            "outtmpl": "%(id)s.%(ext)s",
             "logtostderr": False,
             "quiet": True,
             "external_downloader": "aria2c",
         }
-        song = False
         video = True
 
     try:
@@ -632,16 +634,17 @@ async def download_video(v_url):
     except Exception as e:
         return await v_url.edit(f"{str(type(e)): {str(e)}}")
     c_time = time.time()
-    if song:
+    if audio:
         await v_url.edit(
-            f"`Preparing to upload song:`\n**{rip_data['title']}**"
-            f"\nby **{rip_data['uploader']}**"
+            f"`Preparing to upload song:`\n**{rip_data.get('title')}**"
+            f"\nby **{rip_data.get('uploader')}**"
         )
-        with open(rip_data["id"] + ".mp3", "rb") as f:
+        f_name = rip_data.get("id") + ".mp3"
+        with open(f_name, "rb") as f:
             result = await upload_file(
                 client=v_url.client,
                 file=f,
-                name=f"{rip_data['id']}.mp3",
+                name=f_name,
                 progress_callback=lambda d, t: asyncio.get_event_loop().create_task(
                     progress(
                         d, t, v_url, c_time, "Uploading..", f"{rip_data['title']}.mp3"
@@ -655,54 +658,69 @@ async def download_video(v_url):
             if any(fn_img.endswith(ext_img) for ext_img in img_extensions)
         ]
         thumb_image = img_filenames[0]
+        metadata = extractMetadata(createParser(f_name))
+        duration = 0
+        if metadata.has("duration"):
+            duration = metadata.get("duration").seconds
         await v_url.client.send_file(
             v_url.chat_id,
             result,
             supports_streaming=True,
             attributes=[
                 DocumentAttributeAudio(
-                    duration=int(rip_data["duration"]),
-                    title=str(rip_data["title"]),
-                    performer=str(rip_data["uploader"]),
+                    duration=duration,
+                    title=rip_data.get("title"),
+                    performer=rip_data.get("uploader"),
                 )
             ],
             thumb=thumb_image,
         )
         os.remove(thumb_image)
-        os.remove(f"{rip_data['id']}.mp3")
+        os.remove(f_name)
         await v_url.delete()
     elif video:
         await v_url.edit(
-            f"`Preparing to upload video:`\n**{rip_data['title']}**"
-            f"\nby **{rip_data['uploader']}**"
+            f"`Preparing to upload video:`\n**{rip_data.get('title')}**"
+            f"\nby **{rip_data.get('uploader')}**"
         )
-        thumb_image = await get_video_thumb(rip_data["id"] + ".mp4", "thumb.png")
-        with open(rip_data["id"] + ".mp4", "rb") as f:
+        f_name = rip_data.get("id") + ".mp4"
+        with open(f_name, "rb") as f:
             result = await upload_file(
                 client=v_url.client,
                 file=f,
-                name=f"{rip_data['id']}.mp4",
+                name=f_name,
                 progress_callback=lambda d, t: asyncio.get_event_loop().create_task(
                     progress(
                         d, t, v_url, c_time, "Uploading..", f"{rip_data['title']}.mp4"
                     )
                 ),
             )
+        thumb_image = await get_video_thumb(f_name, "thumb.png")
+        metadata = extractMetadata(createParser(f_name))
+        duration = 0
+        width = 0
+        height = 0
+        if metadata.has("duration"):
+            duration = metadata.get("duration").seconds
+        if metadata.has("width"):
+            width = metadata.get("width")
+        if metadata.has("height"):
+            height = metadata.get("height")
         await v_url.client.send_file(
             v_url.chat_id,
             result,
             thumb=thumb_image,
             attributes=[
                 DocumentAttributeVideo(
-                    duration=rip_data["duration"],
-                    w=rip_data["width"],
-                    h=rip_data["height"],
+                    duration=duration,
+                    w=width,
+                    h=height,
                     supports_streaming=True,
                 )
             ],
             caption=rip_data["title"],
         )
-        os.remove(f"{rip_data['id']}.mp4")
+        os.remove(f_name)
         os.remove(thumb_image)
         await v_url.delete()
 
