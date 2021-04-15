@@ -60,5 +60,5 @@ validators
 vcsi
 wikipedia
 wordcloud
-youtube_search
-yt-dlp
+youtube-dl
+youtube-search
