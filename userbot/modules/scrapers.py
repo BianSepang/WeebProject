@@ -5,13 +5,13 @@
 #
 """ Userbot module containing various scrapers. """
 
-import asyncio
 import json
 import os
 import re
 import shutil
 import time
-from asyncio import sleep
+from asyncio import get_event_loop, sleep
+from glob import glob
 from re import findall
 from urllib.error import HTTPError
 from urllib.parse import quote_plus
@@ -557,17 +557,20 @@ async def yt_search(event):
     await event.edit(output, link_preview=False)
 
 
-@register(outgoing=True, pattern=r".rip(audio|video) (.*)")
+@register(outgoing=True, pattern=r".rip(audio|video( \d{0,4})?) (.*)")
 async def download_video(v_url):
     """ For .rip command, download media from YouTube and many other sites. """
     dl_type = v_url.pattern_match.group(1).lower()
-    url = v_url.pattern_match.group(2)
+    reso = v_url.pattern_match.group(2)
+    reso = reso.strip() if reso else None
+    url = v_url.pattern_match.group(3)
 
     await v_url.edit("`Preparing to download...`")
+    s_time = time.time()
     video = False
     audio = False
 
-    if dl_type == "audio":
+    if "audio" in dl_type:
         opts = {
             "format": "bestaudio",
             "addmetadata": True,
@@ -589,18 +592,22 @@ async def download_video(v_url):
         }
         audio = True
 
-    elif dl_type == "video":
+    elif "video" in dl_type:
+        quality = (
+            f"bestvideo[height<={reso}]+bestaudio/best[height<={reso}]"
+            if reso
+            else "bestvideo+bestaudio/best"
+        )
         opts = {
-            "format": "best",
+            "format": quality,
             "addmetadata": True,
             "key": "FFmpegMetadata",
             "prefer_ffmpeg": True,
             "geo_bypass": True,
             "nocheckcertificate": True,
-            "postprocessors": [
-                {"key": "FFmpegVideoConvertor", "preferedformat": "mp4"}
-            ],
-            "outtmpl": "%(id)s.%(ext)s",
+            "outtmpl": os.path.join(
+                TEMP_DOWNLOAD_DIRECTORY, str(s_time), "%(title)s.%(ext)s"
+            ),
             "logtostderr": False,
             "quiet": True,
         }
@@ -643,7 +650,7 @@ async def download_video(v_url):
                 client=v_url.client,
                 file=f,
                 name=f_name,
-                progress_callback=lambda d, t: asyncio.get_event_loop().create_task(
+                progress_callback=lambda d, t: get_event_loop().create_task(
                     progress(
                         d, t, v_url, c_time, "Uploading..", f"{rip_data['title']}.mp3"
                     )
@@ -681,20 +688,24 @@ async def download_video(v_url):
             f"`Preparing to upload video:`\n**{rip_data.get('title')}**"
             f"\nby **{rip_data.get('uploader')}**"
         )
-        f_name = rip_data.get("id") + ".mp4"
-        with open(f_name, "rb") as f:
+        f_path = glob(os.path.join(TEMP_DOWNLOAD_DIRECTORY, str(s_time), "*"))[0]
+        # Noob way to convert from .mkv to .mp4
+        if f_path.endswith(".mkv"):
+            base = os.path.splitext(f_path)[0]
+            os.rename(f_path, base + ".mp4")
+            f_path = glob(os.path.join(TEMP_DOWNLOAD_DIRECTORY, str(s_time), "*"))[0]
+        f_name = os.path.basename(f_path)
+        with open(f_path, "rb") as f:
             result = await upload_file(
                 client=v_url.client,
                 file=f,
                 name=f_name,
-                progress_callback=lambda d, t: asyncio.get_event_loop().create_task(
-                    progress(
-                        d, t, v_url, c_time, "Uploading..", f"{rip_data['title']}.mp4"
-                    )
+                progress_callback=lambda d, t: get_event_loop().create_task(
+                    progress(d, t, v_url, c_time, "Uploading..", f_name)
                 ),
             )
-        thumb_image = await get_video_thumb(f_name, "thumb.png")
-        metadata = extractMetadata(createParser(f_name))
+        thumb_image = await get_video_thumb(f_path, "thumb.png")
+        metadata = extractMetadata(createParser(f_path))
         duration = 0
         width = 0
         height = 0
@@ -716,9 +727,9 @@ async def download_video(v_url):
                     supports_streaming=True,
                 )
             ],
-            caption=rip_data["title"],
+            caption=f"[{rip_data.get('title')}]({url})",
         )
-        os.remove(f_name)
+        shutil.rmtree(os.path.join(TEMP_DOWNLOAD_DIRECTORY, str(s_time)))
         os.remove(thumb_image)
         await v_url.delete()
 
@@ -750,8 +761,11 @@ CMD_HELP.update(
         "\nUsage: Does a YouTube search."
         "\nCan specify the number of results needed (default is 3).",
         "imdb": ">`.imdb <movie-name>`" "\nUsage: Shows movie info and other stuff.",
-        "rip": ">`.ripaudio <url> or ripvideo <url>`"
-        "\nUsage: Download videos and songs from YouTube "
-        "(and [many other sites](https://ytdl-org.github.io/youtube-dl/supportedsites.html)).",
+        "rip": ">`.ripaudio <url>`"
+        "\nUsage: Download videos from YouTube and convert to audio "
+        "\n\n>`.ripvideo <quality> <url>` (quality is optional)"
+        "\nQuality examples : `144` `240` `360` `480` `720` `1080` `2160`"
+        "\nUsage: Download videos from YouTube"
+        "\n\n[Other supported sites](https://ytdl-org.github.io/youtube-dl/supportedsites.html)",
     }
 )
