@@ -1,3 +1,4 @@
+aiofile
 aiohttp[speedups]
 appdirs
 aria2p
