@@ -78,7 +78,7 @@ async def aexec(code, smessatatus):
 
 @register(outgoing=True, pattern=r"^\.exec(?: |$|\n)([\s\S]*)")
 async def run(run_q):
-    """ For .exec command, which executes the dynamically created program """
+    """For .exec command, which executes the dynamically created program"""
     code = run_q.pattern_match.group(1)
 
     if run_q.is_channel and not run_q.is_group:
@@ -136,7 +136,7 @@ async def run(run_q):
 
 @register(outgoing=True, pattern=r"^\.term(?: |$|\n)(.*)")
 async def terminal_runner(term):
-    """ For .term command, runs bash commands and scripts on your server. """
+    """For .term command, runs bash commands and scripts on your server."""
     curruser = TERM_ALIAS if TERM_ALIAS else getuser()
     command = term.pattern_match.group(1)
     try:

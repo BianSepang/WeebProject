@@ -60,7 +60,7 @@ async def setlang(prog):
 
 @register(outgoing=True, pattern=r"^\.carbon")
 async def carbon_api(e):
-    """ A Wrapper for carbon.now.sh """
+    """A Wrapper for carbon.now.sh"""
     await e.edit("`Processing...`")
     CARBON = "https://carbon.now.sh/?l={lang}&code={code}"
     global CARBONLANG
@@ -105,7 +105,7 @@ async def carbon_api(e):
 
 @register(outgoing=True, pattern=r"^\.img (.*)")
 async def img_sampler(event):
-    """ For .img command, search and return images matching the query. """
+    """For .img command, search and return images matching the query."""
     await event.edit("`Processing...`")
     query = event.pattern_match.group(1)
     lim = findall(r"lim=\d+", query)
@@ -164,7 +164,7 @@ async def moni(event):
 
 @register(outgoing=True, pattern=r"^\.google (.*)")
 async def gsearch(q_event):
-    """ For .google command, do a Google search. """
+    """For .google command, do a Google search."""
     match = q_event.pattern_match.group(1)
     page = findall(r"page=\d+", match)
     try:
@@ -201,7 +201,7 @@ async def gsearch(q_event):
 
 @register(outgoing=True, pattern=r"^\.wiki (.*)")
 async def wiki(wiki_q):
-    """ For .wiki command, fetch content from Wikipedia. """
+    """For .wiki command, fetch content from Wikipedia."""
     match = wiki_q.pattern_match.group(1)
     try:
         summary(match)
@@ -231,7 +231,7 @@ async def wiki(wiki_q):
 
 @register(outgoing=True, pattern=r"^\.ud (.*)")
 async def urban_dict(ud_e):
-    """ For .ud command, fetch content from Urban Dictionary. """
+    """For .ud command, fetch content from Urban Dictionary."""
     await ud_e.edit("Processing...")
     query = ud_e.pattern_match.group(1)
     try:
@@ -284,7 +284,7 @@ async def urban_dict(ud_e):
 
 @register(outgoing=True, pattern=r"^\.tts(?: |$)([\s\S]*)")
 async def text_to_speech(query):
-    """ For .tts command, a wrapper for Google Text-to-Speech. """
+    """For .tts command, a wrapper for Google Text-to-Speech."""
     textx = await query.get_reply_message()
     message = query.pattern_match.group(1)
     if message:
@@ -432,7 +432,7 @@ async def imdb(e):
 
 @register(outgoing=True, pattern=r"^\.trt(?: |$)([\s\S]*)")
 async def translateme(trans):
-    """ For .trt command, translate the given text using Google Translate. """
+    """For .trt command, translate the given text using Google Translate."""
     translator = Translator()
     textx = await trans.get_reply_message()
     message = trans.pattern_match.group(1)
@@ -472,7 +472,7 @@ async def translateme(trans):
 
 @register(pattern=".lang (trt|tts) (.*)", outgoing=True)
 async def lang(value):
-    """ For .lang command, change the default langauge of userbot scrapers. """
+    """For .lang command, change the default langauge of userbot scrapers."""
     util = value.pattern_match.group(1).lower()
 
     try:
@@ -559,7 +559,7 @@ async def yt_search(event):
 
 @register(outgoing=True, pattern=r".rip(audio|video( \d{0,4})?) (.*)")
 async def download_video(v_url):
-    """ For .rip command, download media from YouTube and many other sites. """
+    """For .rip command, download media from YouTube and many other sites."""
     dl_type = v_url.pattern_match.group(1).lower()
     reso = v_url.pattern_match.group(2)
     reso = reso.strip() if reso else None
@@ -735,7 +735,7 @@ async def download_video(v_url):
 
 
 def deEmojify(inputString):
-    """ Remove emojis and other non-safe characters from string """
+    """Remove emojis and other non-safe characters from string"""
     return get_emoji_regexp().sub("", inputString)
 
 

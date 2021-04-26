@@ -29,7 +29,7 @@ from userbot.modules.admin import get_user_from_event
 
 @register(outgoing=True, pattern=r"^\.userid$")
 async def useridgetter(target):
-    """ For .userid command, returns the ID of the target user. """
+    """For .userid command, returns the ID of the target user."""
     message = await target.get_reply_message()
     if message:
         if not message.forward:
@@ -49,7 +49,7 @@ async def useridgetter(target):
 
 @register(outgoing=True, pattern=r"^\.link(?: |$)(.*)")
 async def permalink(mention):
-    """ For .link command, generates a link to the user's PM with a custom text. """
+    """For .link command, generates a link to the user's PM with a custom text."""
     user, custom = await get_user_from_event(mention)
     if not user:
         return
@@ -64,7 +64,7 @@ async def permalink(mention):
 
 @register(outgoing=True, pattern=r"^\.chatid$")
 async def chatidgetter(chat):
-    """ For .chatid, returns the ID of the chat you are in at that moment. """
+    """For .chatid, returns the ID of the chat you are in at that moment."""
     await chat.edit("Chat ID: `" + str(chat.chat_id) + "`")
 
 
@@ -338,7 +338,7 @@ async def fetch_info(chat, event):
 
 @register(outgoing=True, pattern=r"^\.log(?: |$)([\s\S]*)")
 async def log(log_text):
-    """ For .log command, forwards a message or the command argument to the bot logs group """
+    """For .log command, forwards a message or the command argument to the bot logs group"""
     if BOTLOG:
         if log_text.reply_to_msg_id:
             reply_msg = await log_text.get_reply_message()
@@ -398,14 +398,14 @@ async def _(event):
 
 @register(outgoing=True, pattern=r"^\.kickme$")
 async def kickme(leave):
-    """ Basically it's .kickme command """
+    """Basically it's .kickme command"""
     await leave.edit("Nope, no, no, I go away")
     await leave.client.kick_participant(leave.chat_id, "me")
 
 
 @register(outgoing=True, pattern=r"^\.unmutechat$")
 async def unmute_chat(unm_e):
-    """ For .unmutechat command, unmute a muted chat. """
+    """For .unmutechat command, unmute a muted chat."""
     try:
         from userbot.modules.sql_helper.keep_read_sql import unkread
     except AttributeError:
@@ -418,7 +418,7 @@ async def unmute_chat(unm_e):
 
 @register(outgoing=True, pattern=r"^\.mutechat$")
 async def mute_chat(mute_e):
-    """ For .mutechat command, mute any chat. """
+    """For .mutechat command, mute any chat."""
     try:
         from userbot.modules.sql_helper.keep_read_sql import kread
     except AttributeError:
@@ -436,7 +436,7 @@ async def mute_chat(mute_e):
 
 @register(incoming=True, disable_errors=True)
 async def keep_read(message):
-    """ The mute logic. """
+    """The mute logic."""
     try:
         from userbot.modules.sql_helper.keep_read_sql import is_kread
     except AttributeError:
@@ -462,7 +462,7 @@ async def sedNinja(event):
 
 @register(outgoing=True, pattern=r"^\.regexninja (on|off)$")
 async def sedNinjaToggle(event):
-    """ Enables or disables the regex ninja module. """
+    """Enables or disables the regex ninja module."""
     global regexNinja
     if event.pattern_match.group(1) == "on":
         regexNinja = True
