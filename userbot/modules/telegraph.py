@@ -1,5 +1,4 @@
 import os
-from datetime import datetime
 
 from PIL import Image
 from telegraph import Telegraph, exceptions, upload_file
@@ -22,34 +21,24 @@ async def telegraphs(graph):
         if not os.path.isdir(TEMP_DOWNLOAD_DIRECTORY):
             os.makedirs(TEMP_DOWNLOAD_DIRECTORY)
         if graph.reply_to_msg_id:
-            start = datetime.now()
             r_message = await graph.get_reply_message()
             input_str = graph.pattern_match.group(1)
             if input_str == "m":
                 downloaded_file_name = await bot.download_media(
                     r_message, TEMP_DOWNLOAD_DIRECTORY
                 )
-                end = datetime.now()
-                ms = (end - start).seconds
-                await graph.edit(
-                    "Downloaded to {} in {} seconds.".format(downloaded_file_name, ms)
-                )
+                await graph.edit(f"Downloaded to `{downloaded_file_name}`.")
                 if downloaded_file_name.endswith((".webp")):
                     resize_image(downloaded_file_name)
                 try:
-                    start = datetime.now()
                     media_urls = upload_file(downloaded_file_name)
                 except exceptions.TelegraphException as exc:
                     await graph.edit("ERROR: " + str(exc))
                     os.remove(downloaded_file_name)
                 else:
-                    end = datetime.now()
-                    ms_two = (end - start).seconds
                     os.remove(downloaded_file_name)
                     await graph.edit(
-                        "Successfully Uploaded to [telegra.ph](https://telegra.ph{}).".format(
-                            media_urls[0], (ms + ms_two)
-                        ),
+                        f"Successfully Uploaded to [telegra.ph](https://telegra.ph{media_urls[0]}).",
                         link_preview=True,
                     )
             elif input_str == "t":
@@ -73,12 +62,9 @@ async def telegraphs(graph):
                 response = telegraph.create_page(
                     title_of_page, html_content=page_content
                 )
-                end = datetime.now()
-                ms = (end - start).seconds
                 await graph.edit(
-                    "Successfully uploaded to [telegra.ph](https://telegra.ph/{}).".format(
-                        response["path"], ms
-                    ),
+                    "Successfully uploaded to "
+                    f"[telegra.ph](https://telegra.ph/{response['path']}).",
                     link_preview=True,
                 )
         else:
