@@ -11,6 +11,7 @@ cowpy
 deezloader
 dnspython
 emoji
+Faker==8.1.2
 gitpython
 glitch_this
 google-api-python-client
