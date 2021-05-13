@@ -892,7 +892,7 @@ async def faces(siwis):
 
 
 @register(outgoing=True, pattern=r"^\.owo(?: |$)(.*)")
-async def faces(owo):
+async def owo_faces(owo):
     """UwU"""
     textx = await owo.get_reply_message()
     message = owo.pattern_match.group(1)
