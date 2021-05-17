@@ -23,5 +23,6 @@ from .tools import (
     time_formatter,
     human_to_bytes,
     md5,
+    post_to_telegraph,
     run_cmd
 )
