@@ -6,7 +6,6 @@
 """ Userbot module containing commands related to android"""
 
 import asyncio
-import json
 import math
 import os
 import re
@@ -35,14 +34,19 @@ async def magisk(request):
         "Beta": "https://raw.githubusercontent.com/topjohnwu/magisk-files/master/beta.json",
         "Canary": "https://raw.githubusercontent.com/topjohnwu/magisk-files/master/canary.json",
     }
-    releases = "Latest Magisk Releases:\n"
+    releases = "**Latest Magisk Releases :**\n"
     async with ClientSession() as ses:
         for name, release_url in magisk_dict.items():
             async with ses.get(release_url) as resp:
-                data = json.loads(await resp.text())
+                data = await resp.json(content_type="text/plain")
                 version = data["magisk"]["version"]
+                version_code = data["magisk"]["versionCode"]
+                note = data["magisk"]["note"]
                 url = data["magisk"]["link"]
-                releases += f"{name} : [Magisk v{version}]({url})\n"
+                releases += (
+                    f"**{name}** - __v{version} ({version_code})__ : "
+                    f"[APK]({url}) | [Note]({note})\n"
+                )
     await request.edit(releases)
 
 
