@@ -14,15 +14,27 @@ from userbot.events import register
 
 DOGBIN_URL = "https://del.dog/"
 NEKOBIN_URL = "https://nekobin.com/"
+KATBIN_URL = "https://katb.in/"
 
 
-@register(outgoing=True, pattern=r"^\.paste( d)?([\s\S]*)")
+@register(outgoing=True, pattern=r"^\.paste( d| k)?([\s\S]*)")
 async def paste(pstl):
     """For .paste command, pastes the text directly to nekobin/dogbin"""
     url_type = pstl.pattern_match.group(1)
+    url_type = url_type if url_type else "n"
     match = pstl.pattern_match.group(2).strip()
     replied = await pstl.get_reply_message()
     f_ext = ".txt"
+
+    use_dogbin = False
+    use_katbin = False
+    use_nekobin = False
+    if "d" in url_type:
+        use_dogbin = True
+    elif "k" in url_type:
+        use_katbin = True
+    elif "n" in url_type:
+        use_nekobin = True
 
     if not match and not pstl.is_reply:
         return await pstl.edit("`What should i paste...?`")
@@ -40,13 +52,14 @@ async def paste(pstl):
                 try:
                     message = await fd.read()
                 except UnicodeDecodeError:
+                    os.remove(downloaded_file_name)
                     return await pstl.edit("`Can't paste this file.`")
             os.remove(downloaded_file_name)
         else:
             message = replied.message
 
     async with aiohttp.ClientSession() as ses:
-        if not url_type:
+        if use_nekobin:
             await pstl.edit("`Pasting to Nekobin...`")
             async with ses.post(
                 NEKOBIN_URL + "api/documents", json={"content": message}
@@ -62,7 +75,7 @@ async def paste(pstl):
                     )
                 else:
                     reply_text = "`Failed to reach Nekobin.`"
-        else:
+        elif use_dogbin:
             await pstl.edit("`Pasting to Dogbin...`")
             async with ses.post(
                 DOGBIN_URL + "documents", data=message.encode("utf-8")
@@ -88,8 +101,23 @@ async def paste(pstl):
                         )
                 else:
                     reply_text = "`Failed to reach Dogbin.`"
+        elif use_katbin:
+            await pstl.edit("`Pasting to Katbin...`")
+            async with ses.post(
+                "https://api.katb.in/api/paste", json={"content": message}
+            ) as resp:
+                if resp.status == 201:
+                    response = await resp.json()
+                    katbin_final_url = KATBIN_URL + response.get("paste_id")
+                    reply_text = (
+                        "`Pasted successfully!`\n\n"
+                        f"[Katb.in URL]({katbin_final_url})\n"
+                        f"[View RAW]({katbin_final_url}/raw)"
+                    )
+                else:
+                    reply_text = "`Failed to reach Katb.in.`"
 
-    await pstl.edit(reply_text)
+    await pstl.edit(reply_text, link_preview=False)
 
 
 @register(outgoing=True, pattern=r"^\.getpaste(?: |$)(.*)")
@@ -137,8 +165,8 @@ async def get_dogbin_content(dog_url):
 
 CMD_HELP.update(
     {
-        "paste": ">`.paste` or `.paste d` <text/reply>"
-        "\nUsage: Paste your text to Nekobin or Dogbin"
+        "paste": ">`.paste` or `.paste <d/k>` <text/reply>"
+        "\nUsage: Paste your text to Nekobin or Dogbin or Katbin"
         "\n\n>`.getpaste`"
         "\nUsage: Gets the content of a paste or shortened url from dogbin (https://del.dog/)"
     }
