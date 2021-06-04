@@ -290,7 +290,9 @@ async def _(event):
         )
 
 
-@register(outgoing=True, pattern=r"^\.deez (.+?|) (FLAC|MP3\_320|MP3\_256|MP3\_128)")
+@register(
+    outgoing=True, pattern=r"^\.deez (now|.+)( FLAC| MP3\_320| MP3\_256| MP3\_128)?"
+)
 async def _(event):
     """DeezLoader by @An0nimia. Ported for UniBorg by @SpEcHlDe"""
     if event.fwd_from:
@@ -324,6 +326,7 @@ async def _(event):
 
     required_link = event.pattern_match.group(1)
     required_qty = event.pattern_match.group(2)
+    required_qty = required_qty.strip() if required_qty else "MP3_320"
 
     await event.edit(strings["processing"])
 
@@ -389,6 +392,29 @@ async def _(event):
             shutil.rmtree(temp_dl_path)
             await event.delete()
 
+    elif "now" in required_link:
+        playing = User(LASTFM_USERNAME, lastfm).get_now_playing()
+        artist = str(playing.get_artist())
+        song = str(playing.get_title())
+        try:
+            required_track = loader.download_name(
+                artist=artist,
+                song=song,
+                output=temp_dl_path,
+                quality=required_qty,
+                recursive_quality=True,
+                recursive_download=True,
+                not_interface=True,
+            )
+        except BaseException as err:
+            await event.edit(f"**ERROR :** {err}")
+            await asyncio.sleep(5)
+            return
+        await event.edit(strings["uploading"])
+        await upload_track(required_track, event)
+        shutil.rmtree(temp_dl_path)
+        await event.delete()
+
     else:
         await event.edit(strings["wrong_cmd_syntax"])
 
@@ -440,22 +466,24 @@ async def upload_track(track_location, message):
 
 CMD_HELP.update(
     {
-        "getmusic": ">`.song` **Artist - Song Title**"
+        "getmusic": ">`.song` <artist - title>"
         "\nUsage: Finding and uploading song.\n\n"
-        ">`.vsong` **Artist - Song Title**"
+        ">`.vsong` <artist - title>"
         "\nUsage: Finding and uploading videoclip.\n\n"
-        ">`.smd` **Artist - Song Title**"
+        ">`.smd` <artist - title>"
         "\nUsage: Download music from spotify use `@SpotifyMusicDownloaderBot`.\n\n"
         ">`.smd now`"
         "\nUsage: Download current LastFM scrobble use `@SpotifyMusicDownloaderBot`.\n\n"
-        ">`.net` **Artist - Song Title**"
+        ">`.net` <artist - title>"
         "\nUsage: Download music use `@WooMaiBot`.\n\n"
         ">`.net now`"
         "\nUsage: Download current LastFM scrobble use `@WooMaiBot`.\n\n"
-        ">`.mhb <Spotify/Deezer Link>`"
+        ">`.mhb <spotify/deezer Link>`"
         "\nUsage: Download music from Spotify or Deezer use `@MusicsHunterBot`.\n\n"
         ">`.deez` <spotify/deezer link> FORMAT\n"
-        "Usage: Download music from deezer or spotify.\n"
-        "**Format** `FLAC`, `MP3_320`, `MP3_256`, `MP3_128`."
+        "Usage: Download music from deezer or spotify.\n\n"
+        ">`.deez now` FORMAT\n"
+        "Usage: Download current LastFM scrobble using deezloader.\n"
+        "Format (optional): `FLAC`, `MP3_320`, `MP3_256`, `MP3_128`."
     }
 )
