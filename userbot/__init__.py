@@ -10,6 +10,7 @@ from sys import version_info
 from logging import basicConfig, getLogger, INFO, DEBUG
 from distutils.util import strtobool as sb
 from platform import python_version
+from time import sleep
 
 from pylast import LastFMNetwork, md5
 from pySmartDL import SmartDL
@@ -180,6 +181,40 @@ for binary, path in binaries.items():
     downloader = SmartDL(binary, path, progress_bar=False)
     downloader.start()
     os.chmod(path, 0o755)
+
+
+def migration_workaround():
+    try:
+        from userbot.modules.sql_helper.globals import addgvar, delgvar, gvarstatus
+    except AttributeError:
+        return None
+
+    old_ip = gvarstatus("public_ip")
+    new_ip = get("https://api.ipify.org").text
+
+    if old_ip is None:
+        delgvar("public_ip")
+        addgvar("public_ip", new_ip)
+        return None
+
+    if old_ip == new_ip:
+        return None
+
+    sleep_time = 180
+    LOGS.info(
+        f"A change in IP address is detected, waiting for {sleep_time / 60} minutes before starting the bot."
+    )
+    sleep(sleep_time)
+    LOGS.info("Starting bot...")
+
+    delgvar("public_ip")
+    addgvar("public_ip", new_ip)
+    return None
+
+
+if HEROKU_APP_NAME is not None and HEROKU_API_KEY is not None:
+    migration_workaround()
+
 
 # 'bot' variable
 if STRING_SESSION:
