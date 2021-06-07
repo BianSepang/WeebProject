@@ -17,12 +17,13 @@ NEKOBIN_URL = "https://nekobin.com/"
 KATBIN_URL = "https://katb.in/"
 
 
-@register(outgoing=True, pattern=r"^\.paste( d| k)?([\s\S]*)")
+@register(outgoing=True, pattern=r"^\.paste(?: (k|d)|$)?(?: ([\s\S]+)|$)")
 async def paste(pstl):
     """For .paste command, pastes the text directly to nekobin/dogbin"""
     url_type = pstl.pattern_match.group(1)
-    url_type = url_type if url_type else "n"
-    match = pstl.pattern_match.group(2).strip()
+    url_type = url_type.strip() if url_type else "n"
+    match = pstl.pattern_match.group(2)
+    match = match.strip() if match else ""
     replied = await pstl.get_reply_message()
     f_ext = ".txt"
 
