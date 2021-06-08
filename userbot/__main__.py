@@ -6,7 +6,6 @@
 """ Userbot start point """
 
 from importlib import import_module
-from sys import argv
 
 from telethon.errors.rpcerrorlist import PhoneNumberInvalidError
 from userbot import LOGS, bot
@@ -28,7 +27,4 @@ for module_name in ALL_MODULES:
 
 LOGS.info("You are running WeebProject Userbot")
 
-if len(argv) not in (1, 3, 4):
-    bot.disconnect()
-else:
-    bot.run_until_disconnected()
+bot.run_until_disconnected()

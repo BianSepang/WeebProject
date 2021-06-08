@@ -6,6 +6,7 @@
 """ Userbot initialization. """
 
 import os
+import signal
 from sys import version_info
 from logging import basicConfig, getLogger, INFO, DEBUG
 from distutils.util import strtobool as sb
@@ -183,6 +184,15 @@ for binary, path in binaries.items():
     os.chmod(path, 0o755)
 
 
+def shutdown_bot(signum, frame):
+    LOGS.info("Received SIGTERM.")
+    bot.disconnect()
+    sys.exit(143)
+
+
+signal.signal(signal.SIGTERM, shutdown_bot)
+
+
 def migration_workaround():
     try:
         from userbot.modules.sql_helper.globals import addgvar, delgvar, gvarstatus
@@ -210,10 +220,6 @@ def migration_workaround():
     delgvar("public_ip")
     addgvar("public_ip", new_ip)
     return None
-
-
-if HEROKU_APP_NAME is not None and HEROKU_API_KEY is not None:
-    migration_workaround()
 
 
 # 'bot' variable
