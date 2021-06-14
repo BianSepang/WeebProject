@@ -1,5 +1,5 @@
 try:
-    from userbot.modules.sql_helper import SESSION, BASE
+    from userbot.modules.sql_helper import BASE, SESSION
 except ImportError:
     raise AttributeError
 
@@ -33,7 +33,7 @@ def gmute(sender):
 
 
 def ungmute(sender):
-    rem = SESSION.query(GMute).get((str(sender)))
+    rem = SESSION.query(GMute).get(str(sender))
     if rem:
         SESSION.delete(rem)
         SESSION.commit()

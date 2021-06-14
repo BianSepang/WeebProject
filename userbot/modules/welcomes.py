@@ -34,8 +34,8 @@ async def welcome_to_chat(event):
             title = chat.title if chat.title else "this chat"
             participants = await event.client.get_participants(chat)
             count = len(participants)
-            mention = "[{}](tg://user?id={})".format(a_user.first_name, a_user.id)
-            my_mention = "[{}](tg://user?id={})".format(me.first_name, me.id)
+            mention = f"[{a_user.first_name}](tg://user?id={a_user.id})"
+            my_mention = f"[{me.first_name}](tg://user?id={me.id})"
             first = a_user.first_name
             last = a_user.last_name
             if last:

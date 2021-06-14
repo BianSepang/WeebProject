@@ -19,7 +19,7 @@ import textwrap
 import time
 from asyncio.exceptions import TimeoutError
 from random import randint, uniform
-from typing import Optional, Tuple
+from typing import Optional
 
 from glitch_this import ImageGlitcher
 from hachoir.metadata import extractMetadata
@@ -249,7 +249,7 @@ async def add_text_img(image_path, text):
     return final_image
 
 
-async def runcmd(cmd: str) -> Tuple[str, str, int, int]:
+async def runcmd(cmd: str) -> tuple[str, str, int, int]:
     """run command in terminal"""
     args = shlex.split(cmd)
     process = await asyncio.create_subprocess_exec(

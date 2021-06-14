@@ -706,7 +706,7 @@ async def slap(replied_user, event):
     username = replied_user.username
 
     if username:
-        slapped = "@{}".format(username)
+        slapped = f"@{username}"
     else:
         slapped = f"[{first_name}](tg://user?id={user_id})"
 

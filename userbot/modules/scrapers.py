@@ -149,9 +149,7 @@ async def moni(event):
             if currency_to in current_response["rates"]:
                 current_rate = float(current_response["rates"][currency_to])
                 rebmun = round(number * current_rate, 2)
-                await event.edit(
-                    "{} {} = {} {}".format(number, currency_from, rebmun, currency_to)
-                )
+                await event.edit(f"{number} {currency_from} = {rebmun} {currency_to}")
             else:
                 await event.edit(
                     "`This seems to be some alien currency, which I can't convert right now.`"
@@ -325,7 +323,7 @@ async def text_to_speech(query):
     if linecount == 1:
         tts = gTTS(message, lang=target_lang)
         tts.save("k.mp3")
-    with open("k.mp3", "r"):
+    with open("k.mp3"):
         await query.client.send_file(query.chat_id, "k.mp3", voice_note=True)
         os.remove("k.mp3")
         if BOTLOG:

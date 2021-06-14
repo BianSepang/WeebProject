@@ -25,10 +25,10 @@
 */
 ```
 
-A modular Telegram Userbot running on Python3 with sqlalchemy database. 
+A modular Telegram Userbot running on Python3 with sqlalchemy database.
 
 based on [ProjectBish](https://github.com/adekmaulana/ProjectBish) Userbot
- 
+
 ## Deploy
 ### Heroku
 Click this button below to Deploy to Heroku

@@ -94,11 +94,9 @@ async def remove_a_filter(r_handler):
         return await r_handler.edit("`Running on Non-SQL mode!`")
     filt = r_handler.pattern_match.group(1)
     if not remove_filter(r_handler.chat_id, filt):
-        await r_handler.edit("`Filter`  **{}**  `doesn't exist`.".format(filt))
+        await r_handler.edit(f"`Filter`  **{filt}**  `doesn't exist`.")
     else:
-        await r_handler.edit(
-            "`Filter`  **{}**  `was deleted successfully`.".format(filt)
-        )
+        await r_handler.edit(f"`Filter`  **{filt}**  `was deleted successfully`.")
 
 
 @register(outgoing=True, pattern=r"^\.rmbotfilters (.*)")
@@ -139,9 +137,9 @@ async def filters_active(event):
     for filt in filters:
         if transact == "`There are no filters in this chat.`":
             transact = "Active filters in this chat:\n"
-            transact += "`{}`\n".format(filt.keyword)
+            transact += f"`{filt.keyword}`\n"
         else:
-            transact += "`{}`\n".format(filt.keyword)
+            transact += f"`{filt.keyword}`\n"
 
     await event.edit(transact)
 

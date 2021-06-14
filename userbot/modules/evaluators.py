@@ -53,7 +53,7 @@ async def _(event):
     elif returned:
         evaluation = returned
 
-    final_output = "**EVAL**: \n`{}` \n\n**OUTPUT**: \n`{}` \n".format(cmd, evaluation)
+    final_output = f"**EVAL**: \n`{cmd}` \n\n**OUTPUT**: \n`{evaluation}` \n"
 
     if len(final_output) >= 4096:
         with io.BytesIO(str.encode(final_output)) as out_file:

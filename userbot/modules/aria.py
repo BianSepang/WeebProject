@@ -94,7 +94,7 @@ async def aurl_download(event):
         download = aria2.add_uris(uri, options=None, position=None)
     except Exception as e:
         LOGS.info(str(e))
-        return await event.edit("Error :\n`{}`".format(str(e)))
+        return await event.edit(f"Error :\n`{str(e)}`")
     gid = download.gid
     await check_progress_for_dl(gid=gid, event=event, previous=None)
     file = aria2.get_download(gid)
@@ -196,7 +196,7 @@ async def check_progress_for_dl(gid, event, previous):
             if not complete and not file.error_message:
                 percentage = int(file.progress)
                 downloaded = percentage * int(file.total_length) / 100
-                prog_str = "`Downloading` | [{0}{1}] `{2}`".format(
+                prog_str = "`Downloading` | [{}{}] `{}`".format(
                     "".join(["●" for i in range(math.floor(percentage / 10))]),
                     "".join(["○" for i in range(10 - math.floor(percentage / 10))]),
                     file.progress_string(),
@@ -227,7 +227,7 @@ async def check_progress_for_dl(gid, event, previous):
                 )
         except Exception as e:
             if " not found" in str(e) or "'file'" in str(e):
-                await event.edit("Download Canceled :\n`{}`".format(file.name))
+                await event.edit(f"Download Canceled :\n`{file.name}`")
                 await sleep(2.5)
                 return await event.delete()
             elif " depth exceeded" in str(e):

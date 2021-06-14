@@ -23,9 +23,9 @@ async def notes_active(svd):
     for note in notes:
         if message == "`There are no saved notes in this chat`":
             message = "Notes saved in this chat:\n"
-            message += "`#{}`\n".format(note.keyword)
+            message += f"`#{note.keyword}`\n"
         else:
-            message += "`#{}`\n".format(note.keyword)
+            message += f"`#{note.keyword}`\n"
     await svd.edit(message)
 
 
@@ -38,9 +38,9 @@ async def remove_notes(clr):
         return await clr.edit("`Running on Non-SQL mode!`")
     notename = clr.pattern_match.group(1)
     if rm_note(clr.chat_id, notename) is False:
-        return await clr.edit("`Couldn't find note:` **{}**".format(notename))
+        return await clr.edit(f"`Couldn't find note:` **{notename}**")
     else:
-        return await clr.edit("`Successfully deleted note:` **{}**".format(notename))
+        return await clr.edit(f"`Successfully deleted note:` **{notename}**")
 
 
 @register(outgoing=True, pattern=r"^\.save (\w*)")

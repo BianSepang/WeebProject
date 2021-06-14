@@ -737,7 +737,7 @@ async def get_users(show):
     """For .users command, list all of the users in a chat."""
     info = await show.client.get_entity(show.chat_id)
     title = info.title if info.title else "this chat"
-    mentions = "Users in {}: \n".format(title)
+    mentions = f"Users in {title}: \n"
     try:
         if not show.pattern_match.group(1):
             async for user in show.client.iter_participants(show.chat_id):
@@ -770,7 +770,7 @@ async def get_users(show):
         await show.client.send_file(
             show.chat_id,
             "userslist.txt",
-            caption="Users in {}".format(title),
+            caption=f"Users in {title}",
             reply_to=show.id,
         )
         remove("userslist.txt")
@@ -827,7 +827,7 @@ async def get_usersdel(show):
     """For .usersdel command, list all of the deleted users in a chat."""
     info = await show.client.get_entity(show.chat_id)
     title = info.title if info.title else "this chat"
-    mentions = "deletedUsers in {}: \n".format(title)
+    mentions = f"deletedUsers in {title}: \n"
     try:
         if not show.pattern_match.group(1):
             async for user in show.client.iter_participants(show.chat_id):
@@ -862,7 +862,7 @@ async def get_usersdel(show):
         await show.client.send_file(
             show.chat_id,
             "deleteduserslist.txt",
-            caption="Users in {}".format(title),
+            caption=f"Users in {title}",
             reply_to=show.id,
         )
         remove("deleteduserslist.txt")
@@ -945,7 +945,7 @@ async def get_bots(show):
         await show.client.send_file(
             show.chat_id,
             "botlist.txt",
-            caption="Bots in {}".format(title),
+            caption=f"Bots in {title}",
             reply_to=show.id,
         )
         remove("botlist.txt")

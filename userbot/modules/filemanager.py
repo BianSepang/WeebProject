@@ -35,7 +35,7 @@ async def lst(event):
         return
     if isdir(path):
         if cat:
-            msg = "**Folders and Files in `{}`** :\n\n".format(path)
+            msg = f"**Folders and Files in `{path}`** :\n\n"
         else:
             msg = "**Folders and Files in Current Directory** :\n\n"
         lists = os.listdir(path)
@@ -47,7 +47,7 @@ async def lst(event):
                 size = os.stat(catpath).st_size
                 if contents.endswith((".mp3", ".flac", ".wav", ".m4a")):
                     files += "🎵 "
-                elif contents.endswith((".opus")):
+                elif contents.endswith(".opus"):
                     files += "🎙 "
                 elif contents.endswith(
                     (".mkv", ".mp4", ".webm", ".avi", ".mov", ".flv")
@@ -67,7 +67,7 @@ async def lst(event):
                     files += "💿 "
                 elif contents.endswith((".apk", ".xapk")):
                     files += "📱 "
-                elif contents.endswith((".py")):
+                elif contents.endswith(".py"):
                     files += "🐍 "
                 else:
                     files += "📄 "
@@ -80,7 +80,7 @@ async def lst(event):
         msg = "The details of given file :\n\n"
         if path.endswith((".mp3", ".flac", ".wav", ".m4a")):
             mode = "🎵 "
-        elif path.endswith((".opus")):
+        elif path.endswith(".opus"):
             mode = "🎙 "
         elif path.endswith((".mkv", ".mp4", ".webm", ".avi", ".mov", ".flv")):
             mode = "🎞 "
@@ -94,7 +94,7 @@ async def lst(event):
             mode = "💿 "
         elif path.endswith((".apk", ".xapk")):
             mode = "📱 "
-        elif path.endswith((".py")):
+        elif path.endswith(".py"):
             mode = "🐍 "
         else:
             mode = "📄 "

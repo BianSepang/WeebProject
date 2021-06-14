@@ -110,11 +110,11 @@ async def get_weather(weather):
     mph = str(wind * 2.237).split(".")
 
     def fahrenheit(f):
-        temp = str(((f - 273.15) * 9 / 5 + 32)).split(".")
+        temp = str((f - 273.15) * 9 / 5 + 32).split(".")
         return temp[0]
 
     def celsius(c):
-        temp = str((c - 273.15)).split(".")
+        temp = str(c - 273.15).split(".")
         return temp[0]
 
     def sun(unix):

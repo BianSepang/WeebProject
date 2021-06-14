@@ -44,7 +44,7 @@ async def useridgetter(target):
                 name = "@" + message.forward.sender.username
             else:
                 name = "*" + message.forward.sender.first_name + "*"
-        await target.edit("**Name:** {} \n**User ID:** `{}`".format(name, user_id))
+        await target.edit(f"**Name:** {name} \n**User ID:** `{user_id}`")
 
 
 @register(outgoing=True, pattern=r"^\.link(?: |$)(.*)")
@@ -238,8 +238,8 @@ async def fetch_info(chat, event):
         if hasattr(chat_obj_info, "verified") and chat_obj_info.verified
         else "No"
     )
-    username = "@{}".format(username) if username else None
-    creator_username = "@{}".format(creator_username) if creator_username else None
+    username = f"@{username}" if username else None
+    creator_username = f"@{creator_username}" if creator_username else None
     # end of spaghetti block
 
     if admins is None:

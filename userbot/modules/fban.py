@@ -33,7 +33,7 @@ async def fban(event):
             "**Error: This action has been prevented by KensurBot self preservation protocols.**"
         )
 
-    if len((fed_list := get_flist())) == 0:
+    if len(fed_list := get_flist()) == 0:
         return await event.edit("**You haven't connected to any federations yet!**")
 
     user_link = f"[{fban_id}](tg://user?id={fban_id})"
@@ -102,7 +102,7 @@ async def unfban(event):
     if event.sender_id == unfban_id:
         return await event.edit("**Wait, that's illegal**")
 
-    if len((fed_list := get_flist())) == 0:
+    if len(fed_list := get_flist()) == 0:
         return await event.edit("**You haven't connected to any federations yet!**")
 
     user_link = f"[{unfban_id}](tg://user?id={unfban_id})"
@@ -187,7 +187,7 @@ async def listf(event):
     except IntegrityError:
         return await event.edit("**Running on Non-SQL mode!**")
 
-    if len((fed_list := get_flist())) == 0:
+    if len(fed_list := get_flist()) == 0:
         return await event.edit("**You haven't connected to any federations yet!**")
 
     msg = "**Connected federations:**\n\n"

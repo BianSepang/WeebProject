@@ -1,5 +1,5 @@
 try:
-    from userbot.modules.sql_helper import SESSION, BASE
+    from userbot.modules.sql_helper import BASE, SESSION
 except ImportError:
     raise AttributeError
 
@@ -33,7 +33,7 @@ def kread(chat):
 
 
 def unkread(chat):
-    rem = SESSION.query(KRead).get((str(chat)))
+    rem = SESSION.query(KRead).get(str(chat))
     if rem:
         SESSION.delete(rem)
         SESSION.commit()
