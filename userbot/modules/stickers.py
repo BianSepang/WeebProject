@@ -358,15 +358,14 @@ async def sticker_to_png(sticker):
 
 CMD_HELP.update(
     {
-        "stickers": ">`.curry [emoji('s)]?`"
-        "\nUsage: Reply .kang to a sticker or an image to kang it to your userbot pack "
-        "\nor specify the emoji you want to."
+        "stickers": ">`.curry`"
+        "\nUsage: Reply .curry to a sticker or an image to put it to your sticker pack."
         "\n\n>`.curry (emoji['s]]?` [number]?"
-        "\nUsage: Kang's the sticker/image to the specified pack but uses 🤔 as emoji "
-        "or choose the emoji you want to."
+        "\nUsage: Curry the sticker/image to the specified pack. You can specify the emoji too. "
+        "(Default: 🤔)"
         "\n\n>`.stkrinfo`"
         "\nUsage: Gets info about the sticker pack."
         "\n\n>`.getsticker`"
-        "\nUsage: reply to a sticker to get 'PNG' file of sticker."
+        "\nUsage: Reply to a sticker to get 'PNG' file of sticker."
     }
 )
