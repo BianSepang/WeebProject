@@ -358,24 +358,24 @@ async def imdb(e):
             mov_details = re.sub(r"\s+", " ", pg)
         else:
             mov_details = ""
-        credits = soup.findAll("div", "credit_summary_item")
-        if len(credits) == 1:
-            director = credits[0].a.text
+        mov_credits = soup.findAll("div", "credit_summary_item")
+        if len(mov_credits) == 1:
+            director = mov_credits[0].a.text
             writer = "Not available"
             stars = "Not available"
-        elif len(credits) > 2:
-            director = credits[0].a.text
-            writer = credits[1].a.text
+        elif len(mov_credits) > 2:
+            director = mov_credits[0].a.text
+            writer = mov_credits[1].a.text
             actors = []
-            for x in credits[2].findAll("a"):
+            for x in mov_credits[2].findAll("a"):
                 actors.append(x.text)
             actors.pop()
             stars = actors[0] + "," + actors[1] + "," + actors[2]
         else:
-            director = credits[0].a.text
+            director = mov_credits[0].a.text
             writer = "Not available"
             actors = []
-            for x in credits[1].findAll("a"):
+            for x in mov_credits[1].findAll("a"):
                 actors.append(x.text)
             actors.pop()
             stars = actors[0] + "," + actors[1] + "," + actors[2]

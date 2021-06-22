@@ -230,10 +230,10 @@ async def upload(event):
         elif os.path.isdir(input_str):
             start_time = datetime.now()
             lst_files = []
-            for root, dirs, files in os.walk(input_str):
+            for root, _, files in os.walk(input_str):
                 for file in files:
                     lst_files.append(os.path.join(root, file))
-            if len(lst_files) == 0:
+            if not lst_files:
                 return await event.edit(f"`{input_str}` is empty.")
             await event.edit(f"Found `{len(lst_files)}` files. Now uploading...")
             for files in os_sorted(lst_files):

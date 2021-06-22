@@ -1,7 +1,7 @@
 # Ported by Aidil Aryanto
 
 import os
-from asyncio.exceptions import TimeoutError
+from asyncio.exceptions import TimeoutError as TOError
 
 from telethon.errors.rpcerrorlist import YouBlockedUserError
 
@@ -66,7 +66,7 @@ async def _(event):
                 await event.client.delete_messages(conv.chat_id, [msg.id, response.id])
         await event.delete()
         return os.remove(downloaded_file_name)
-    except TimeoutError:
+    except TOError:
         return await event.edit("`Error: `@SpotifyNowBot` is not responding!.`")
 
 

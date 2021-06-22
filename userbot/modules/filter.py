@@ -103,7 +103,6 @@ async def remove_a_filter(r_handler):
 async def kick_marie_filter(event):
     """ For .rmfilters command, allows you to kick all \
         Marie(or her clones) filters from a chat. """
-    event.text[0]
     bot_type = event.pattern_match.group(1).lower()
     if bot_type not in ["marie", "rose"]:
         return await event.edit("`That bot is not yet supported!`")
@@ -113,10 +112,10 @@ async def kick_marie_filter(event):
     filters = resp.text.split("-")[1:]
     for i in filters:
         if bot_type.lower() == "marie":
-            await event.reply("/stop %s" % (i.strip()))
+            await event.reply(f"/stop {i.strip()}")
         if bot_type.lower() == "rose":
             i = i.replace("`", "")
-            await event.reply("/stop %s" % (i.strip()))
+            await event.reply(f"/stop {i.strip()}")
         await sleep(0.3)
     await event.respond("```Successfully purged bots filters yaay!```\n Gimme cookies!")
     if BOTLOG:

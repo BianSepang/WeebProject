@@ -943,10 +943,10 @@ async def metoo(hahayes):
     await hahayes.edit(choice(METOOSTR))
 
 
-@register(outgoing=True, pattern=r"^\.Oof$")
+@register(outgoing=True, pattern=r"^\.oof$")
 async def Oof(e):
     t = "Oof"
-    for j in range(16):
+    for _ in range(16):
         t = t[:-1] + "of"
         await e.edit(t)
 
@@ -954,15 +954,7 @@ async def Oof(e):
 @register(outgoing=True, pattern=r"^\.oem$")
 async def oem(e):
     t = "Oem"
-    for j in range(16):
-        t = t[:-1] + "em"
-        await e.edit(t)
-
-
-@register(outgoing=True, pattern=r"^\.Oem$")
-async def Oem(e):
-    t = "Oem"
-    for j in range(16):
+    for _ in range(16):
         t = t[:-1] + "em"
         await e.edit(t)
 
@@ -976,7 +968,7 @@ async def iqless(e):
 async def moon(event):
     deq = deque(list("🌗🌘🌑🌒🌓🌔🌕🌖"))
     try:
-        for x in range(32):
+        for _ in range(32):
             await sleep(0.1)
             await event.edit("".join(deq))
             deq.rotate(1)
@@ -988,7 +980,7 @@ async def moon(event):
 async def clock(event):
     deq = deque(list("🕙🕘🕗🕖🕕🕔🕓🕒🕑🕐🕛"))
     try:
-        for x in range(32):
+        for _ in range(32):
             await sleep(0.1)
             await event.edit("".join(deq))
             deq.rotate(1)
@@ -1171,9 +1163,9 @@ CMD_HELP.update(
         "\nUsage: You retard !!"
         "\n\n>`.zal`"
         "\nUsage: Invoke the feeling of chaos."
-        "\n\n>`Oem`"
+        "\n\n>`.oem`"
         "\nUsage: Oeeeem"
-        "\n\n>`Oof`"
+        "\n\n>`.oof`"
         "\nUsage: Ooooof"
         "\n\n>`.fp`"
         "\nUsage: Facepalm :P"

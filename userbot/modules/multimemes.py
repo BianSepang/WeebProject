@@ -17,7 +17,6 @@ import re
 import shlex
 import textwrap
 import time
-from asyncio.exceptions import TimeoutError
 from random import randint, uniform
 from typing import Optional
 
@@ -289,7 +288,6 @@ async def quotess(qotli):
         await qotli.edit("```Reply to text message```")
         return
     chat = "@QuotLyBot"
-    reply_message.sender
     if reply_message.sender.bot:
         await qotli.edit("```Reply to actual users message.```")
         return
@@ -321,7 +319,7 @@ async def quotess(qotli):
                 await bot.send_read_acknowledge(qotli.chat_id)
                 await qotli.client.delete_messages(conv.chat_id, [msg.id, response.id])
                 os.remove(downloaded_file_name)
-    except TimeoutError:
+    except asyncio.exceptions.TimeoutError:
         await qotli.edit("`@QuotlyBot doesnt responding`")
         await qotli.client.delete_messages(conv.chat_id, [msg.id])
 
@@ -448,7 +446,7 @@ async def fryerrr(fry):
                     )
         await fry.delete()
         return os.remove(downloaded_file_name)
-    except TimeoutError:
+    except asyncio.exceptions.TimeoutError:
         await fry.edit("`@image_deepfrybot isnt responding..`")
         await fry.client.delete_messages(conv.chat_id, [msg.id])
 
@@ -558,7 +556,7 @@ async def lastname(steal):
     message = await steal.get_reply_message()
     chat = "@SangMataInfo_bot"
     user_id = message.sender.id
-    id = f"/search_id {user_id}"
+    sent_msg = f"/search_id {user_id}"
     if message.sender.bot:
         await steal.edit("`Reply to actual users message.`")
         return
@@ -566,7 +564,7 @@ async def lastname(steal):
     try:
         async with bot.conversation(chat) as conv:
             try:
-                msg = await conv.send_message(id)
+                msg = await conv.send_message(sent_msg)
                 r = await conv.get_response()
                 response = await conv.get_response()
             except YouBlockedUserError:
@@ -593,7 +591,7 @@ async def lastname(steal):
             await steal.client.delete_messages(
                 conv.chat_id, [msg.id, r.id, response.id, respond.id]
             )
-    except TimeoutError:
+    except asyncio.exceptions.TimeoutError:
         return await steal.edit("`Error: `@SangMataInfo_bot` is not responding!.`")
 
 

@@ -46,9 +46,9 @@ async def trumptweet(text):
     return "gpx.webp"
 
 
-async def phss(uplded, input, name):
+async def phss(uplded, user_input, name):
     web = requests.get(
-        f"https://nekobot.xyz/api/imagegen?type=phcomment&image={uplded}&text={input}&username={name}"
+        f"https://nekobot.xyz/api/imagegen?type=phcomment&image={uplded}&text={user_input}&username={name}"
     ).json()
     alf = web.get("message")
     uri = url(alf)
