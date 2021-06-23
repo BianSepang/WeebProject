@@ -5,7 +5,6 @@
 #
 """Userbot module for managing events. One of the main components of the userbot."""
 
-import codecs
 import sys
 from asyncio import create_subprocess_shell as asyncsubshell
 from asyncio import subprocess as asyncsub
@@ -13,7 +12,7 @@ from os import remove
 from time import gmtime, strftime
 from traceback import format_exc
 
-import requests
+from aiohttp import ClientSession
 from telethon import events
 
 from userbot import BOTLOG_CHATID, LOGSPAMMER, bot
@@ -108,7 +107,7 @@ def register(**args):
                     date = strftime("%Y-%m-%d %H:%M:%S", gmtime())
 
                     text = "**USERBOT ERROR REPORT**\n"
-                    text += "Nothing is logged except the fact of error and date\n\n"
+                    text += "Nothing is logged except the fact of error and date."
 
                     ftext = "========== DISCLAIMER =========="
                     ftext += "\nThis file uploaded ONLY here,"
@@ -146,25 +145,19 @@ def register(**args):
 
                     if LOGSPAMMER:
                         await check.respond(
-                            "`Sorry, my userbot has crashed.\
-                        \nThe error logs are stored in the userbot's log chat.`"
+                            "`Sorry, my userbot has crashed."
+                            "\nThe error logs are stored in the userbot's log chat.`"
                         )
 
-                        log = codecs.open("error.txt", "r", encoding="utf-8")
-                        data = log.read()
-                        key = (
-                            requests.post(
-                                "https://nekobin.com/api/documents",
-                                json={"content": data},
+                        async with ClientSession() as ses, ses.post(
+                            "https://api.katb.in/api/paste", json={"content": ftext}
+                        ) as resp:
+                            url = (
+                                f"https://katb.in/{(await resp.json()).get('paste_id')}"
                             )
-                            .json()
-                            .get("result")
-                            .get("key")
-                        )
-                        url = f"https://nekobin.com/raw/{key}"
-                        anu = f"{text}Pasted to: [Nekobin]({url})"
+                        text += f"\n\nPasted to : [Katb.in]({url})"
 
-                        await check.client.send_file(send_to, "error.txt", caption=anu)
+                        await check.client.send_file(send_to, "error.txt", caption=text)
                         remove("error.txt")
             else:
                 pass
