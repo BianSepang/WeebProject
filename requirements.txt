@@ -39,6 +39,7 @@ pendulum
 Pillow
 psycopg2
 psycopg2-binary
+py7zr
 pybase64
 pylast
 pySmartDL

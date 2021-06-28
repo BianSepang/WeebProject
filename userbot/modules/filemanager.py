@@ -3,16 +3,16 @@
 import io
 import os
 import os.path
-import re
 import shutil
 import time
 from datetime import datetime
-from os.path import basename, dirname, exists, isdir, isfile, join, relpath
+from os.path import basename, dirname, exists, isdir, isfile, join, relpath, splitext
 from shutil import rmtree
 from tarfile import TarFile, is_tarfile
 from zipfile import ZIP_DEFLATED, BadZipFile, ZipFile, is_zipfile
 
 from natsort import os_sorted
+from py7zr import Bad7zFile, SevenZipFile, is_7zfile
 from rarfile import BadRarFile, RarFile, is_rarfile
 
 from userbot import CMD_HELP, TEMP_DOWNLOAD_DIRECTORY
@@ -208,8 +208,7 @@ async def unzip_file(event):
     if not exists(TEMP_DOWNLOAD_DIRECTORY):
         os.makedirs(TEMP_DOWNLOAD_DIRECTORY)
     input_str = event.pattern_match.group(1)
-    file_name = basename(input_str)
-    output_path = TEMP_DOWNLOAD_DIRECTORY + re.split("(.zip|.rar|.tar)", file_name)[0]
+    output_path = TEMP_DOWNLOAD_DIRECTORY + basename(splitext(input_str)[0])
     if exists(input_str):
         start_time = datetime.now()
         await event.edit("`Unzipping...`")
@@ -219,9 +218,11 @@ async def unzip_file(event):
             zip_type = RarFile
         elif is_tarfile(input_str):
             zip_type = TarFile
+        elif is_7zfile(input_str):
+            zip_type = SevenZipFile
         else:
             return await event.edit(
-                "`Unsupported file types!`\n`ZIP, TAR, and RAR only`"
+                "`Unsupported file types!`\n`ZIP, TAR, 7z, and RAR only`"
             )
         try:
             with zip_type(input_str, "r") as zip_obj:
@@ -230,6 +231,8 @@ async def unzip_file(event):
             return await event.edit("**Error:** `Corrupted RAR File`")
         except BadZipFile:
             return await event.edit("**Error:** `Corrupted ZIP File`")
+        except Bad7zFile:
+            return await event.edit("**Error:** `Corrupted 7z File`")
         except BaseException as err:
             return await event.edit(f"**Error:** `{err}`")
         end_time = (datetime.now() - start_time).seconds
@@ -252,6 +255,6 @@ CMD_HELP.update(
         "\nUsage: For zipping file or folder."
         "\n\n>`.unzip` <path to zip file>"
         "\nUsage: For extracting archive file"
-        "\nOnly support ZIP, TAR, and RAR file!"
+        "\nOnly support ZIP, TAR, 7z, and RAR file!"
     }
 )
