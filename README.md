@@ -46,6 +46,14 @@ Click this button below to Deploy to Heroku
 6. Run the bot: `bash ./exec.sh`
   - Protip: See what `bash ./exec.sh --help` tells you
 
+### Docker
+1. Clone this repository on your local machine and `cd` (or `chdir`, anti bloat guy) to it
+2. Edit `sample_config.env` and save it as `config.env`
+  - Set `DATABASE_URL` to `postgresql://USERNAME:PASSWORD@db:5432/weebproject`
+  - You should set `USERNAME` and `PASSWORD` too in `docker-compose.yml`
+  - Do not forget to fill in the `REQUIRED %%` values, or else the bot will not run
+3. Run docker: `docker-compose up`
+
 ##### ※ Those steps are probably possible to pull off on Windows but it's pretty much unknown (different file tree paradigm, directory conventions, PowerShell instead of BASH or ZSH) -- If you're on Windows, you'd be better off running this on WSL (or WSL2)
 ---
 ## Credits
