@@ -12,10 +12,10 @@ from os import remove
 from time import gmtime, strftime
 from traceback import format_exc
 
-from aiohttp import ClientSession
 from telethon import events
 
 from userbot import BOTLOG_CHATID, LOGSPAMMER, bot
+from userbot.utils.pastebin import PasteBin
 
 
 def register(**args):
@@ -149,13 +149,10 @@ def register(**args):
                             "\nThe error logs are stored in the userbot's log chat.`"
                         )
 
-                        async with ClientSession() as ses, ses.post(
-                            "https://api.katb.in/api/paste", json={"content": ftext}
-                        ) as resp:
-                            url = (
-                                f"https://katb.in/{(await resp.json()).get('paste_id')}"
-                            )
-                        text += f"\n\nPasted to : [Katb.in]({url})"
+                        async with PasteBin(ftext) as client:
+                            await client.post()
+                            if client:
+                                text += f"\n\nPasted to : [URL]({client.raw_link})"
 
                         await check.client.send_file(send_to, "error.txt", caption=text)
                         remove("error.txt")
