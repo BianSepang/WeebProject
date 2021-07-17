@@ -7,7 +7,7 @@ services:
       - POSTGRES_DB=weebproject
       - POSTGRES_USER=USERNAME
       - POSTGRES_PASSWORD=PASSWORD
-    ports: 
+    ports:
       - 5432:5432
     restart: always
   weebproject:
