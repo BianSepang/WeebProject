@@ -644,7 +644,7 @@ async def download_video(v_url):
             f"`Preparing to upload song:`\n**{rip_data.get('title')}**"
             f"\nby **{rip_data.get('uploader')}**"
         )
-        f_name = glob(os.path.join(TEMP_DOWNLOAD_DIRECTORY, str(s_time), "*"))[0]
+        f_name = glob(os.path.join(TEMP_DOWNLOAD_DIRECTORY, str(s_time), "*.mp3"))[0]
         with open(f_name, "rb") as f:
             result = await upload_file(
                 client=v_url.client,
@@ -664,7 +664,7 @@ async def download_video(v_url):
         ][0]
         metadata = extractMetadata(createParser(f_name))
         duration = 0
-        if metadata.has("duration"):
+        if metadata and metadata.has("duration"):
             duration = metadata.get("duration").seconds
         await v_url.client.send_file(
             v_url.chat_id,
@@ -706,12 +706,13 @@ async def download_video(v_url):
         duration = 0
         width = 0
         height = 0
-        if metadata.has("duration"):
-            duration = metadata.get("duration").seconds
-        if metadata.has("width"):
-            width = metadata.get("width")
-        if metadata.has("height"):
-            height = metadata.get("height")
+        if metadata:
+            if metadata.has("duration"):
+                duration = metadata.get("duration").seconds
+            if metadata.has("width"):
+                width = metadata.get("width")
+            if metadata.has("height"):
+                height = metadata.get("height")
         await v_url.client.send_file(
             v_url.chat_id,
             result,
