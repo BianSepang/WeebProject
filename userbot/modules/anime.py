@@ -9,7 +9,6 @@ import json
 import re
 import textwrap
 from io import BytesIO, StringIO
-from urllib.parse import quote as urlencode
 
 import aiohttp
 import bs4
@@ -421,23 +420,24 @@ async def whatanime(e):
     await e.edit("`Searching for result..`")
     file = memory_file(filename, content)
     async with aiohttp.ClientSession() as session:
-        url = "https://trace.moe/api/search"
+        url = "https://api.trace.moe/search?anilistInfo"
         async with session.post(url, data={"image": file}) as raw_resp0:
-            resp0 = await raw_resp0.text()
-        js0 = json.loads(resp0)["docs"]
+            resp0 = await raw_resp0.json()
+        js0 = resp0.get("result")
         if not js0:
             await e.edit("`No results found.`")
             return
         js0 = js0[0]
-        text = f'<b>{html.escape(js0["title_romaji"])}'
-        if js0["title_native"]:
-            text += f' ({html.escape(js0["title_native"])})'
+        text = f'<b>{html.escape(js0["anilist"]["title"]["romaji"])}'
+        if js0["anilist"]["title"]["native"]:
+            text += f' ({html.escape(js0["anilist"]["title"]["native"])})'
         text += "</b>\n"
         if js0["episode"]:
             text += f'<b>Episode:</b> {html.escape(str(js0["episode"]))}\n'
         percent = round(js0["similarity"] * 100, 2)
         text += f"<b>Similarity:</b> {percent}%\n"
-        dt = pendulum.from_timestamp(js0["at"])
+        at = re.findall(r"t=(.+)&", js0["video"])[0]
+        dt = pendulum.from_timestamp(float(at))
         text += f"<b>At:</b> {html.escape(dt.to_time_string())}"
         await e.edit(text, parse_mode="html")
         dt0 = pendulum.from_timestamp(js0["from"])
@@ -445,14 +445,7 @@ async def whatanime(e):
         ctext = (
             f"{html.escape(dt0.to_time_string())} - {html.escape(dt1.to_time_string())}"
         )
-        url = (
-            "https://media.trace.moe/video/"
-            f'{urlencode(str(js0["anilist_id"]))}' + "/"
-            f'{urlencode(js0["filename"])}'
-            f'?t={urlencode(str(js0["at"]))}'
-            f'&token={urlencode(js0["tokenthumb"])}'
-        )
-        async with session.get(url) as raw_resp1:
+        async with session.get(js0["video"]) as raw_resp1:
             file = memory_file("preview.mp4", await raw_resp1.read())
         try:
             await e.reply(ctext, file=file, parse_mode="html")
