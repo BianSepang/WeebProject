@@ -7,6 +7,7 @@
 
 import os
 import signal
+import sys
 from distutils.util import strtobool as sb
 from logging import DEBUG, INFO, basicConfig, getLogger
 from platform import python_version
@@ -19,6 +20,8 @@ from pySmartDL import SmartDL
 from requests import get
 from telethon import TelegramClient, version
 from telethon.sessions import StringSession
+from telethon.network.connection.tcpabridged import ConnectionTcpAbridge
+
 
 load_dotenv("config.env")
 
@@ -225,10 +228,23 @@ def migration_workaround():
 # 'bot' variable
 if STRING_SESSION:
     # pylint: disable=invalid-name
-    bot = TelegramClient(StringSession(STRING_SESSION), API_KEY, API_HASH)
+    session = StringSession(str(STRING_SESSION))
 else:
     # pylint: disable=invalid-name
-    bot = TelegramClient("userbot", API_KEY, API_HASH)
+    session = "userbot"
+try:
+    # pylint: disable=invalid-name
+    bot = TelegramClient(
+      session=session,
+      api_id=API_KEY,
+      api_hash=API_HASH,
+      connection=ConnectionTcpAbridged,
+      auto_reconnect=True,
+      connection_retries=None,
+    )  
+except Exception as e:
+    print(f"STRING_SESSION - {str(e)}")
+    sys.exit()
 
 
 async def check_botlog_chatid():
