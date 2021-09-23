@@ -124,8 +124,10 @@ TZ_NUMBER = int(os.environ.get("TZ_NUMBER", 1))
 # Clean Welcome
 CLEAN_WELCOME = sb(os.environ.get("CLEAN_WELCOME", "True"))
 
-# Deezload ARL Token for Deezloader
+# Deezload Credentials
 DEEZER_ARL_TOKEN = os.environ.get("DEEZER_ARL_TOKEN", None)
+DEEZER_EMAIL = os.environ.get("DEEZER_EMAIL", None)
+DEEZER_PASSWORD = os.environ.get("DEEZER_PASSWORD", None)
 
 # Last.fm Module
 BIO_PREFIX = os.environ.get("BIO_PREFIX", None)
