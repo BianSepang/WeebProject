@@ -334,7 +334,7 @@ async def _(event):
 
     required_link = event.pattern_match.group(1)
     required_qty = event.pattern_match.group(2)
-    required_qty = required_qty.strip() if required_qty else "MP3_320"
+    required_qty = required_qty.strip() if required_qty else "MP3_128"
 
     await event.edit(strings["processing"])
 
