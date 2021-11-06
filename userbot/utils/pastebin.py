@@ -151,5 +151,5 @@ class PasteBin:
         if self._hkey:
             return self.HASTEBIN_URL + "raw/" + self._hkey
         if self._kkey:
-            return self.KATBIN_URL + "raw/" + self._kkey
+            return self.KATBIN_URL + self._kkey
         return False
