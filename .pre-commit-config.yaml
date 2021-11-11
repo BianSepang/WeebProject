@@ -17,17 +17,17 @@ repos:
                  "--remove-unused-variables",
                  "--ignore-init-module-imports"]
     - repo: https://github.com/pycqa/isort
-      rev: 5.9.3
+      rev: 5.10.1
       hooks:
         - id: isort
           args: ["--profile", "black", "--filter-files"]
     - repo: https://github.com/psf/black
-      rev: 21.8b0
+      rev: 21.10b0
       hooks:
         - id: black
           language_version: python3
     - repo: https://github.com/asottile/pyupgrade
-      rev: v2.25.0
+      rev: v2.29.0
       hooks:
         - id: pyupgrade
           args: ["--py39-plus"]
