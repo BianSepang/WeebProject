@@ -25,6 +25,7 @@ from hachoir.metadata import extractMetadata
 from hachoir.parser import createParser
 from requests import get
 from search_engine_parser import GoogleSearch
+from telethon.errors.rpcerrorlist import MediaEmptyError
 from telethon.tl.types import DocumentAttributeAudio, DocumentAttributeVideo
 from urbandict import define
 from wikipedia import summary
@@ -127,10 +128,15 @@ async def img_sampler(event):
 
     # passing the arguments to the function
     paths = response.download(arguments)
-    lst = paths[0][query]
-    await event.client.send_file(
-        await event.client.get_input_entity(event.chat_id), lst
-    )
+    lst = paths[0][query.replace(",", " ")]
+    try:
+        await event.client.send_file(event.chat_id, lst)
+    except MediaEmptyError:
+        for i in lst:
+            try:
+                await event.client.send_file(event.chat_id, i)
+            except MediaEmptyError:
+                pass
     shutil.rmtree(os.path.dirname(os.path.abspath(lst[0])))
     await event.delete()
 
