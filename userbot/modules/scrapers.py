@@ -104,18 +104,15 @@ async def carbon_api(e):
     await e.delete()  # Deleting msg
 
 
-@register(outgoing=True, pattern=r"^\.img (.*)")
+@register(outgoing=True, pattern=r"^\.img(?: -l(\d+))? (.+)")
 async def img_sampler(event):
     """For .img command, search and return images matching the query."""
     await event.edit("`Processing...`")
-    query = event.pattern_match.group(1)
-    lim = findall(r"lim=\d+", query)
     try:
-        lim = lim[0]
-        lim = lim.replace("lim=", "")
-        query = query.replace("lim=" + lim[0], "")
-    except IndexError:
-        lim = 7
+        lim = int(event.pattern_match.group(1))
+    except (TypeError, ValueError):
+        lim = 5
+    query = event.pattern_match.group(2)
     response = googleimagesdownload()
 
     # creating list of arguments
@@ -741,8 +738,8 @@ def deEmojify(inputString):
 
 CMD_HELP.update(
     {
-        "img": ">`.img <search_query>`"
-        "\nUsage: Does an image search on Google and shows 5 images.",
+        "img": ">`.img -l3 <search_query>`"
+        "\nUsage: Does an image search on Google and shows 3 images. (Default limit is 5.)",
         "currency": ">`.currency <amount> <from> <to>`"
         "\nUsage: Converts various currencies for you.",
         "carbon": ">`.carbon <text> [or reply]`"
