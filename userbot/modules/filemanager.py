@@ -9,7 +9,7 @@ from datetime import datetime
 from os.path import basename, dirname, exists, isdir, isfile, join, relpath, splitext
 from shutil import rmtree
 from tarfile import TarFile, is_tarfile
-from zipfile import ZIP_DEFLATED, BadZipFile, ZipFile, is_zipfile
+from zipfile import BadZipFile, ZipFile, is_zipfile
 
 from natsort import os_sorted
 from py7zr import Bad7zFile, SevenZipFile, is_7zfile
@@ -177,7 +177,7 @@ async def zip_file(event):
                 zip_path = join(TEMP_DOWNLOAD_DIRECTORY, zip_name)
                 if not zip_name.endswith(".zip"):
                     zip_path += ".zip"
-            with ZipFile(zip_path, "w", ZIP_DEFLATED) as zip_obj:
+            with ZipFile(zip_path, "w") as zip_obj:
                 for roots, _, files in os.walk(path):
                     for file in files:
                         files_path = join(roots, file)
