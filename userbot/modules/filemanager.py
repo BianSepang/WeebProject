@@ -1,12 +1,23 @@
 # Credits to Userge for Remove and Rename
 
 import io
-import os
-import os.path
 import shutil
 import time
 from datetime import datetime
-from os.path import basename, dirname, exists, isdir, isfile, join, relpath, splitext
+from os import getcwd, listdir, makedirs, remove, stat, walk
+from os.path import (
+    basename,
+    dirname,
+    exists,
+    getatime,
+    getctime,
+    getmtime,
+    isdir,
+    isfile,
+    join,
+    relpath,
+    splitext,
+)
 from shutil import rmtree
 from tarfile import TarFile, is_tarfile
 from zipfile import BadZipFile, ZipFile, is_zipfile
@@ -27,7 +38,7 @@ async def lst(event):
     if event.fwd_from:
         return
     cat = event.pattern_match.group(1)
-    path = cat if cat else os.getcwd()
+    path = cat if cat else getcwd()
     if not exists(path):
         await event.edit(
             f"There is no such directory or file with the name `{cat}` check again!"
@@ -38,13 +49,13 @@ async def lst(event):
             msg = f"**Folders and Files in `{path}`** :\n\n"
         else:
             msg = "**Folders and Files in Current Directory** :\n\n"
-        lists = os.listdir(path)
+        lists = listdir(path)
         files = ""
         folders = ""
         for contents in os_sorted(lists):
             catpath = path + "/" + contents
             if not isdir(catpath):
-                size = os.stat(catpath).st_size
+                size = stat(catpath).st_size
                 if contents.endswith((".mp3", ".flac", ".wav", ".m4a")):
                     files += "🎵 "
                 elif contents.endswith(".opus"):
@@ -76,7 +87,7 @@ async def lst(event):
                 folders += f"📁 `{contents}`\n"
         msg = msg + folders + files if files or folders else msg + "__empty path__"
     else:
-        size = os.stat(path).st_size
+        size = stat(path).st_size
         msg = "The details of given file :\n\n"
         if path.endswith((".mp3", ".flac", ".wav", ".m4a")):
             mode = "🎵 "
@@ -98,9 +109,9 @@ async def lst(event):
             mode = "🐍 "
         else:
             mode = "📄 "
-        time.ctime(os.path.getctime(path))
-        time2 = time.ctime(os.path.getmtime(path))
-        time3 = time.ctime(os.path.getatime(path))
+        time.ctime(getctime(path))
+        time2 = time.ctime(getmtime(path))
+        time3 = time.ctime(getatime(path))
         msg += f"**Location :** `{path}`\n"
         msg += f"**Icon :** `{mode}`\n"
         msg += f"**Size :** `{humanbytes(size)}`\n"
@@ -133,7 +144,7 @@ async def rmove(event):
         await event.edit("`File path not exists!`")
         return
     if isfile(cat):
-        os.remove(cat)
+        remove(cat)
     else:
         rmtree(cat)
     await event.edit(f"Removed `{cat}`")
@@ -157,7 +168,7 @@ async def zip_file(event):
     if event.fwd_from:
         return
     if not exists(TEMP_DOWNLOAD_DIRECTORY):
-        os.makedirs(TEMP_DOWNLOAD_DIRECTORY)
+        makedirs(TEMP_DOWNLOAD_DIRECTORY)
     input_str = event.pattern_match.group(1)
     path = input_str
     zip_name = ""
@@ -178,7 +189,7 @@ async def zip_file(event):
                 if not zip_name.endswith(".zip"):
                     zip_path += ".zip"
             with ZipFile(zip_path, "w") as zip_obj:
-                for roots, _, files in os.walk(path):
+                for roots, _, files in walk(path):
                     for file in files:
                         files_path = join(roots, file)
                         arc_path = join(dir_path, relpath(files_path, path))
@@ -206,7 +217,7 @@ async def unzip_file(event):
     if event.fwd_from:
         return
     if not exists(TEMP_DOWNLOAD_DIRECTORY):
-        os.makedirs(TEMP_DOWNLOAD_DIRECTORY)
+        makedirs(TEMP_DOWNLOAD_DIRECTORY)
     input_str = event.pattern_match.group(1)
     output_path = TEMP_DOWNLOAD_DIRECTORY + basename(splitext(input_str)[0])
     if exists(input_str):
