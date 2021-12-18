@@ -20,17 +20,70 @@ from os.path import (
 )
 from shutil import rmtree
 from tarfile import TarFile, is_tarfile
-from zipfile import BadZipFile, ZipFile, is_zipfile
+from zipfile import ZipFile, is_zipfile
 
 from natsort import os_sorted
-from py7zr import Bad7zFile, SevenZipFile, is_7zfile
-from rarfile import BadRarFile, RarFile, is_rarfile
+from py7zr import SevenZipFile, is_7zfile
+from rarfile import RarFile, is_rarfile
 
 from userbot import CMD_HELP, TEMP_DOWNLOAD_DIRECTORY
 from userbot.events import register
-from userbot.utils import humanbytes
+from userbot.utils import async_wrap, humanbytes
 
 MAX_MESSAGE_SIZE_LIMIT = 4095
+
+
+@async_wrap
+def async_zip(file_path, zip_name="", zip_out=TEMP_DOWNLOAD_DIRECTORY):
+    if not exists(file_path):
+        raise Exception("File/Folder not found.")
+    if isdir(file_path):
+        dir_path = file_path.split("/")[-1]
+        if file_path.endswith("/"):
+            dir_path = file_path.split("/")[-2]
+        zip_path = join(zip_out, dir_path) + ".zip"
+        if zip_name:
+            zip_path = join(zip_out, zip_name)
+            if not zip_name.endswith(".zip"):
+                zip_path += ".zip"
+        with ZipFile(zip_path, "w") as zip_obj:
+            for roots, _, files in walk(file_path):
+                for file in files:
+                    files_path = join(roots, file)
+                    arc_path = join(dir_path, relpath(files_path, file_path))
+                    zip_obj.write(files_path, arc_path)
+        return zip_path
+    elif isfile(file_path):
+        file_name = basename(file_path)
+        zip_path = join(zip_out, file_name) + ".zip"
+        if zip_name:
+            zip_path = join(zip_out, zip_name)
+            if not zip_name.endswith(".zip"):
+                zip_path += ".zip"
+        with ZipFile(zip_path, "w") as zip_obj:
+            zip_obj.write(file_path, file_name)
+        return zip_path
+
+
+@async_wrap
+def async_unzip(file_path, zip_out=TEMP_DOWNLOAD_DIRECTORY):
+    if not exists(zip_out):
+        makedirs(zip_out)
+    output_path = join(zip_out, basename(splitext(file_path)[0]))
+    if is_zipfile(file_path):
+        zip_type = ZipFile
+    elif is_rarfile(file_path):
+        zip_type = RarFile
+    elif is_tarfile(file_path):
+        zip_type = TarFile
+    elif is_7zfile(file_path):
+        zip_type = SevenZipFile
+    else:
+        raise TypeError("Unsupported archive.")
+    with zip_type(file_path, "r") as zip_obj:
+        zip_obj.extractall(output_path)
+
+    return output_path
 
 
 @register(outgoing=True, pattern=r"^\.ls(?: |$)(.*)")
@@ -173,41 +226,19 @@ async def zip_file(event):
     path = input_str
     zip_name = ""
     if "|" in input_str:
-        path, zip_name = path.split("|")
+        path, zip_name = input_str.split("|")
         path = path.strip()
         zip_name = zip_name.strip()
     if exists(path):
         await event.edit("`Zipping...`")
         start_time = datetime.now()
-        if isdir(path):
-            dir_path = path.split("/")[-1]
-            if path.endswith("/"):
-                dir_path = path.split("/")[-2]
-            zip_path = join(TEMP_DOWNLOAD_DIRECTORY, dir_path) + ".zip"
-            if zip_name:
-                zip_path = join(TEMP_DOWNLOAD_DIRECTORY, zip_name)
-                if not zip_name.endswith(".zip"):
-                    zip_path += ".zip"
-            with ZipFile(zip_path, "w") as zip_obj:
-                for roots, _, files in walk(path):
-                    for file in files:
-                        files_path = join(roots, file)
-                        arc_path = join(dir_path, relpath(files_path, path))
-                        zip_obj.write(files_path, arc_path)
-            end_time = (datetime.now() - start_time).seconds
-            await event.edit(
-                f"Zipped `{path}` into `{zip_path}` in `{end_time}` seconds."
-            )
-        elif isfile(path):
-            file_name = basename(path)
-            zip_path = join(TEMP_DOWNLOAD_DIRECTORY, file_name) + ".zip"
-            if zip_name:
-                zip_path = join(TEMP_DOWNLOAD_DIRECTORY, zip_name)
-                if not zip_name.endswith(".zip"):
-                    zip_path += ".zip"
-            with ZipFile(zip_path, "w", ZIP_DEFLATED) as zip_obj:
-                zip_obj.write(path, file_name)
-            await event.edit(f"Zipped `{path}` into `{zip_path}`")
+        try:
+            zip_path = await async_zip(path, zip_name=zip_name)
+        except BaseException as err:
+            await event.edit(f"**ERROR :** `{str(err)}`")
+            return
+        end_time = (datetime.now() - start_time).seconds
+        await event.edit(f"Zipped `{path}` into `{zip_path}` in `{end_time}` seconds.")
     else:
         await event.edit("`404: Not Found`")
 
@@ -216,40 +247,24 @@ async def zip_file(event):
 async def unzip_file(event):
     if event.fwd_from:
         return
-    if not exists(TEMP_DOWNLOAD_DIRECTORY):
-        makedirs(TEMP_DOWNLOAD_DIRECTORY)
     input_str = event.pattern_match.group(1)
-    output_path = TEMP_DOWNLOAD_DIRECTORY + basename(splitext(input_str)[0])
     if exists(input_str):
         start_time = datetime.now()
         await event.edit("`Unzipping...`")
-        if is_zipfile(input_str):
-            zip_type = ZipFile
-        elif is_rarfile(input_str):
-            zip_type = RarFile
-        elif is_tarfile(input_str):
-            zip_type = TarFile
-        elif is_7zfile(input_str):
-            zip_type = SevenZipFile
-        else:
-            return await event.edit(
-                "`Unsupported file types!`\n`ZIP, TAR, 7z, and RAR only`"
-            )
         try:
-            with zip_type(input_str, "r") as zip_obj:
-                zip_obj.extractall(output_path)
-        except BadRarFile:
-            return await event.edit("**Error:** `Corrupted RAR File`")
-        except BadZipFile:
-            return await event.edit("**Error:** `Corrupted ZIP File`")
-        except Bad7zFile:
-            return await event.edit("**Error:** `Corrupted 7z File`")
+            output_path = await async_unzip(input_str)
         except BaseException as err:
-            return await event.edit(f"**Error:** `{err}`")
+            if "password" in str(err):
+                await event.edit("**ERROR :** `Password required.`")
+                return
+            else:
+                await event.edit(f"**ERROR :** `{str(err)}`")
+                return
         end_time = (datetime.now() - start_time).seconds
         await event.edit(
             f"Unzipped `{input_str}` into `{output_path}` in `{end_time}` seconds."
         )
+        return
     else:
         await event.edit("`404: Not Found`")
 

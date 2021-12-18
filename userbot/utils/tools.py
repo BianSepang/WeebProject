@@ -18,6 +18,7 @@
 import asyncio
 import hashlib
 import re
+from functools import partial, wraps
 
 from html_telegraph_poster import TelegraphPoster
 
@@ -97,3 +98,14 @@ def post_to_telegraph(title, html_format_content):
         text=html_format_content,
     )
     return post_page["url"]
+
+
+def async_wrap(func):
+    @wraps(func)
+    async def run(*args, loop=None, executor=None, **kwargs):
+        if loop is None:
+            loop = asyncio.get_event_loop()
+        pfunc = partial(func, *args, **kwargs)
+        return await loop.run_in_executor(executor, pfunc)
+
+    return run
