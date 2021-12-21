@@ -23,7 +23,7 @@ from zippyshare_downloader import extract_info_coro
 
 from userbot import CMD_HELP, USR_TOKEN
 from userbot.events import register
-from userbot.utils import time_formatter
+from userbot.utils import humanbytes, time_formatter
 
 
 async def subprocess_run(cmd):
@@ -88,7 +88,7 @@ async def direct_link_generator(request):
 async def zippy_share(url: str) -> str:
     zippy = await extract_info_coro(url, download=False)
 
-    return f"[{zippy.name}]({zippy.download_url}) __({zippy.size})__"
+    return f"[{zippy.name}]({zippy.download_url}) __({humanbytes(zippy.size)})__"
 
 
 async def yandex_disk(url: str) -> str:
