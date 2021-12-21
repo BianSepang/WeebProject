@@ -13,14 +13,13 @@ import re
 import urllib.parse
 from asyncio import create_subprocess_shell as asyncSubprocess
 from asyncio.subprocess import PIPE as asyncPIPE
-from os.path import basename
 from random import choice
 
 import aiohttp
 import requests
 from bs4 import BeautifulSoup
 from humanize import naturalsize
-from js2py import EvalJs
+from zippyshare_downloader import extract_info_coro
 
 from userbot import CMD_HELP, USR_TOKEN
 from userbot.events import register
@@ -87,31 +86,9 @@ async def direct_link_generator(request):
 
 
 async def zippy_share(url: str) -> str:
-    link = re.findall("https:/.(.*?).zippyshare", url)[0]
-    response_content = (requests.get(url)).content
-    bs_obj = BeautifulSoup(response_content, "lxml")
+    zippy = await extract_info_coro(url, download=False)
 
-    try:
-        js_script = bs_obj.find("div", {"class": "center",}).find_all(
-            "script"
-        )[1]
-    except BaseException:
-        js_script = bs_obj.find("div", {"class": "right",}).find_all(
-            "script"
-        )[0]
-
-    js_content = re.findall(r'\.href.=."/(.*?)";', str(js_script))
-    js_content = 'var x = "/' + js_content[0] + '"'
-
-    evaljs = EvalJs()
-    setattr(evaljs, "x", None)
-    evaljs.execute(js_content)
-    js_content = getattr(evaljs, "x")
-
-    dl_url = f"https://{link}.zippyshare.com{js_content}"
-    file_name = basename(dl_url)
-
-    return f"[{urllib.parse.unquote_plus(file_name)}]({dl_url})"
+    return f"[{zippy.name}]({zippy.download_url}) __({zippy.size})__"
 
 
 async def yandex_disk(url: str) -> str:
