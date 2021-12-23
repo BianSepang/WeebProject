@@ -5,6 +5,8 @@
 #
 """ Userbot module for keeping control who PM you. """
 
+from io import BytesIO
+
 from sqlalchemy.exc import IntegrityError
 from telethon.tl.functions.contacts import BlockRequest, UnblockRequest
 from telethon.tl.functions.messages import ReportSpamRequest
@@ -434,6 +436,13 @@ async def get_approve(event):
                 else f"[{user.first_name}](tg://user?id={user.id})"
             )
             msg += f"• {user_msg} | `{user.id}`\n"
+
+    if len(msg) >= 4096:
+        with BytesIO(str.encode(msg)) as file:
+            file.name = "approved_users.txt"
+            await event.edit("`List too long, sending as file:`")
+            await event.reply(file=file)
+        return
 
     await event.edit(msg)
 
