@@ -36,3 +36,12 @@ def dissprove(chat_id):
     if rem:
         SESSION.delete(rem)
         SESSION.commit()
+
+
+def get_approved():
+    try:
+        return SESSION.query(PMPermit).all()
+    except BaseException:
+        return None
+    finally:
+        SESSION.close()

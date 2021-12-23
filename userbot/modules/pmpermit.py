@@ -20,6 +20,7 @@ from userbot import (
     PM_AUTO_BAN,
 )
 from userbot.events import register
+from userbot.modules.sql_helper.pm_permit_sql import get_approved
 
 # ========================= CONSTANTS ============================
 DEF_UNAPPROVED_MSG = (
@@ -412,12 +413,39 @@ async def add_pmsg(cust_msg):
             )
 
 
+@register(outgoing=True, pattern=r"^\.getapprove$")
+async def get_approve(event):
+    await event.edit("`Fetching user ids...`")
+    user_ids = get_approved()
+    if not user_ids:
+        await event.edit("`You haven't approved any users.`")
+        return
+
+    msg = "**Approved Users List**\n\n"
+    for i in user_ids:
+        try:
+            user = await event.client.get_entity(int(i.chat_id))
+        except ValueError:
+            msg += f"• __Unknown__ | `{i.chat_id}`\n"
+        else:
+            user_msg = (
+                f"@{user.username}"
+                if user.username
+                else f"[{user.first_name}](tg://user?id={user.id})"
+            )
+            msg += f"• {user_msg} | `{user.id}`\n"
+
+    await event.edit(msg)
+
+
 CMD_HELP.update(
     {
         "pmpermit": ">`.approve`"
         "\nUsage: Approves the mentioned/replied person to PM."
         "\n\n>`.disapprove`"
         "\nUsage: Disapproves the mentioned/replied person to PM."
+        "\n\n>`.getapprove`"
+        "\nUsage: Get all approved users."
         "\n\n>`.block`"
         "\nUsage: Blocks the person."
         "\n\n>`.unblock`"
