@@ -18,6 +18,7 @@ from pylast import LastFMNetwork, md5
 from pySmartDL import SmartDL
 from requests import get
 from telethon import TelegramClient, version
+from telethon.network.connection.tcpabridged import ConnectionTcpAbridged
 from telethon.sessions import StringSession
 
 load_dotenv("config.env")
@@ -224,13 +225,13 @@ def migration_workaround():
     return None
 
 
-# 'bot' variable
-if STRING_SESSION:
-    # pylint: disable=invalid-name
-    bot = TelegramClient(StringSession(STRING_SESSION), API_KEY, API_HASH)
-else:
-    # pylint: disable=invalid-name
-    bot = TelegramClient("userbot", API_KEY, API_HASH)
+bot = TelegramClient(
+    session=StringSession(STRING_SESSION),
+    api_id=API_KEY,
+    api_hash=API_HASH,
+    connection=ConnectionTcpAbridged,
+    auto_reconnect=True,
+)
 
 
 async def check_botlog_chatid():
