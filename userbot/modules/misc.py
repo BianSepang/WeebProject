@@ -12,7 +12,7 @@ from os import environ, execle
 from random import randint
 from time import sleep
 
-from userbot import BOTLOG, BOTLOG_CHATID, CMD_HELP, bot
+from userbot import BOTLOG, BOTLOG_CHATID, CMD_HELP
 from userbot.events import register
 from userbot.utils import time_formatter
 
@@ -46,13 +46,13 @@ async def sleepybot(time):
     await time.edit("`OK, I'm awake now.`")
 
 
-@register(outgoing=True, pattern=r"^\.shutdown$")
+@register(outgoing=True, pattern=r"^\.shutdown$", disable_errors=True)
 async def killthebot(event):
     """For .shutdown command, shut the bot down."""
     await event.edit("`Shutting down...`")
     if BOTLOG:
         await event.client.send_message(BOTLOG_CHATID, "#SHUTDOWN \n" "Bot shut down")
-    await bot.disconnect()
+    await event.client.disconnect()
 
 
 @register(outgoing=True, pattern=r"^\.restart$")
