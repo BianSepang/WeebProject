@@ -1,4 +1,5 @@
 config.env
+error.txt
 */__pycache__/*
 userbot.db
 userbot.session
