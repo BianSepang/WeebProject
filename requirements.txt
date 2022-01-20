@@ -8,7 +8,7 @@ CairoSVG
 cffi
 covid
 cowpy
-deezloader
+deezloader==2021.9.22
 dnspython
 emoji
 Faker==8.1.2
