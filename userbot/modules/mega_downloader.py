@@ -29,10 +29,11 @@ import time
 from asyncio import create_subprocess_shell as asyncSubprocess
 from asyncio.subprocess import PIPE as asyncPIPE
 from urllib.error import HTTPError
+from urllib.parse import quote
 
 from pySmartDL import SmartDL
 
-from userbot import CMD_HELP, LOGS, TEMP_DOWNLOAD_DIRECTORY
+from userbot import CMD_HELP, G_DRIVE_INDEX_URL, LOGS, TEMP_DOWNLOAD_DIRECTORY
 from userbot.events import register
 from userbot.modules.google_drive import create_app, get_mimeType, upload
 from userbot.utils import humanbytes, time_formatter
@@ -65,7 +66,6 @@ async def mega_downloader(megadl):
         pass
     elif msg_link:
         link = msg_link.text
-        link_msg_id = msg_link.id
     else:
         return await megadl.edit("Usage: `.mega` **<MEGA.nz link>**")
     try:
@@ -95,10 +95,7 @@ async def mega_downloader(megadl):
     temp_file_name = file_name + ".temp"
     temp_file_path = TEMP_DOWNLOAD_DIRECTORY + temp_file_name
     file_path = TEMP_DOWNLOAD_DIRECTORY + file_name
-    mimeType = await get_mimeType(file_path)
-    service = await create_app(megadl)
-    if service is False:
-        return None
+
     if os.path.isfile(file_path):
         try:
             raise FileExistsError(errno.EEXIST, os.strerror(errno.EEXIST), file_path)
@@ -166,43 +163,36 @@ async def mega_downloader(megadl):
         else:
             await megadl.edit(
                 f"`{file_name}`\n\n"
-                f"Successfully downloaded in: '`{file_path}`'.\n"
+                f"Successfully downloaded in: `{file_path}`.\n"
                 f"Download took: {time_formatter(download_time)}.",
             )
 
+        msg = await megadl.respond("`Uploading to GDrive...`")
+        service = await create_app(msg)
+        if service is False:
+            await asyncio.sleep(2.5)
+            await msg.delete()
+            return
+        mime_type = await get_mimeType(file_path)
+
         try:
-            resultgd = await upload(megadl, service, file_path, file_name, mimeType)
+            resultgd = await upload(msg, service, file_path, file_name, mime_type)
         except CancelProcess:
-            megadl.respond(
+            msg.edit(
                 "`[FILE - CANCELLED]`\n\n"
                 "`Status` : **OK** - received signal cancelled."
             )
-        if resultgd and msg_link:
-            await megadl.respond(
-                "`[FILE - UPLOAD]`\n\n"
-                f"`Name   :` `{file_name}`\n"
-                f"`Size   :` `{humanbytes(resultgd[0])}`\n"
-                f"`Link   :` [{file_name}]({resultgd[1]})\n"
-                "`Status :` **OK** - Successfully uploaded.\n",
-                link_preview=False,
-                reply_to=link_msg_id,
-            )
-            await megadl.delete()
-        elif resultgd and link:
-            await megadl.respond(
-                "`[FILE - UPLOAD]`\n\n"
-                f"`Name   :` `{file_name}`\n"
-                f"`Size   :` `{humanbytes(resultgd[0])}`\n"
-                f"`Link   :` [{file_name}]({resultgd[1]})\n"
-                "`Status :` **OK** - Successfully uploaded.\n",
+        if resultgd:
+            result_output = f"**GDrive Upload**\n\n📄 [{file_name}]({resultgd[1]})"
+            if G_DRIVE_INDEX_URL:
+                index_url = G_DRIVE_INDEX_URL.rstrip("/") + "/" + quote(file_name)
+                result_output += f"\n👥 [Index URL]({index_url})"
+            result_output += f"\n__Size : {humanbytes(resultgd[0])}__"
+            await msg.edit(
+                result_output,
                 link_preview=False,
             )
-            await megadl.delete()
 
-        if os.path.exists(file_path):
-            os.remove(file_path)
-        else:
-            pass
     else:
         await megadl.edit(
             "`Failed to download, " "check heroku Logs for more details.`"
