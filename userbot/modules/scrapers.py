@@ -16,6 +16,7 @@ from re import findall
 from urllib.error import HTTPError
 from urllib.parse import quote_plus
 
+from aiohttp import ClientSession
 from bs4 import BeautifulSoup
 from emoji import get_emoji_regexp
 from googletrans import LANGUAGES, Translator
@@ -568,6 +569,13 @@ async def download_video(v_url):
     video = False
     audio = False
 
+    # handle tiktok link
+    if "tiktok.com" in url:
+        async with ClientSession() as ses, ses.head(
+            url, allow_redirects=True, timeout=5
+        ) as head:
+            url = str(head.url)
+
     if "audio" in dl_type:
         opts = {
             "format": "bestaudio",
@@ -637,7 +645,7 @@ async def download_video(v_url):
     except ExtractorError:
         return await v_url.edit("`There was an error during info extraction.`")
     except Exception as e:
-        return await v_url.edit(f"{str(type(e)): {str(e)}}")
+        return await v_url.edit(f"{str(type(e))}: {str(e)}")
     c_time = time.time()
     if audio:
         await v_url.edit(
