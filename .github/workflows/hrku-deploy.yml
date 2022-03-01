@@ -4,8 +4,8 @@ on: workflow_dispatch
 
 env:
   IMAGE_NAME: worker
-  HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-  HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }
+  HEROKU_API_KEY: ${{ secrets.HEROKU_API }}
+  HEROKU_APP_NAME: ${{ secrets.HEROKU_APP }}
 
 jobs:
   build_and_push:
@@ -21,11 +21,11 @@ jobs:
         run: heroku container:login
 
       - name: Push the image to Heroku
-        run: heroku container:push "${IMAGE_NAME}" -a "${HEROKU_APP_NAME}"
+        run: heroku container:push "${IMAGE_NAME}" -a "${HEROKU_APP}"
         
       - name: Release image to Heroku
-        run: heroku container:release "${IMAGE_NAME}" -a "${HEROKU_APP_NAME}"
+        run: heroku container:release "${IMAGE_NAME}" -a "${HEROKU_APP}"
         
       - name: set database url
         run: |
-            heroku addons:create heroku-postgresql -a "${HEROKU_APP_NAME}"
+            heroku addons:create heroku-postgresql -a "${HEROKU_APP}"
