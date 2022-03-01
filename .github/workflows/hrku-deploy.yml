@@ -1,0 +1,31 @@
+name: Heroku Container build and push
+
+on: workflow_dispatch
+
+env:
+  IMAGE_NAME: worker
+  HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+  HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }
+
+jobs:
+  build_and_push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Build the image
+        run: docker build . --file Dockerfile --tag "${IMAGE_NAME}"
+
+      - name: Login into Heroku Container registry
+        run: heroku container:login
+
+      - name: Push the image to Heroku
+        run: heroku container:push "${IMAGE_NAME}" -a "${HEROKU_APP_NAME}"
+        
+      - name: Release image to Heroku
+        run: heroku container:release "${IMAGE_NAME}" -a "${HEROKU_APP_NAME}"
+        
+      - name: set database url
+        run: |
+            heroku addons:create heroku-postgresql -a "${HEROKU_APP_NAME}"
