@@ -38,6 +38,7 @@ based on [ProjectBish](https://github.com/adekmaulana/ProjectBish) Userbot
 - `STRING_SESSION` __# Get this value by running [python3 string_session.py] in Termux or local system__.
 - `HEROKU_API_KEY` __# Get your heroku api from [Heroku Account Settings](https://dashboard.heroku.com/account)__.
 - `HEROKU_APP_NAME` __# Your heroku app name which are deployed as userbot__.
+
 **2. Non Mandatory Variable Name. [Suggest to set this]**
 - `ALIVE_NAME` __# Name to show in .alive message__.
 - `ALIVE_LOGO` __# Show Image/Logo in .alive message. Use telegra.ph or any direct link image__.
@@ -80,6 +81,8 @@ based on [ProjectBish](https://github.com/adekmaulana/ProjectBish) Userbot
 5. Fill All credentials required in Github secrets
 - `HEROKU_API`. Fill your [Heroku api key](https://dashboard.heroku.com/account)
 - `HEROKY_APP`. Fill your Heroku app name
+- `HEROKU_REGION`. Fill `us` or `en`
+- `HEROKU_EMAIL`. Your heroku email
 6. Now Go To Action tab in your repository [[example pict]](https://telegra.ph/file/28cecfc199fc34558ac91.jpg), Click Select Workflow [[example pict]](https://telegra.ph/file/5efd02314c3689bf149f3.jpg) Choose `Heroku Container build and push` Then Click Run Workflow from master branch [[example pict]](https://telegra.ph/file/b0afed12ff49f0ddf7c58.jpg). Wait process finish, if you got some errors while run workflow You can ask in [SUPPORT GROUP](https://t.me/+BYn1fSHCjHY5M2E1)
 
 **Using "Bare hands", using Git and Python3 -- on (Linux, macOS, and Android [via Termux])**
