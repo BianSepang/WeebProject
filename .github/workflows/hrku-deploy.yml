@@ -1,0 +1,21 @@
+name: Heroku Container build and push
+
+on: workflow_dispatch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: akhileshns/heroku-deploy@v3.12.12
+        with:
+          heroku_api_key: ${{secrets.HEROKU_API}}
+          heroku_app_name: ${{secrets.HEROKU_APP}}
+          heroku_email: ${{secrets.HEROKU_EMAIL}}
+          usedocker: true
+          docker_heroku_process_type: worker
+          stack: "container"
+          region: ${{secrets.HEROKU_REGION}}
+        env:
+          HD_HEROKU_APP_NAME: ${{secrets.HEROKU_APP}}
+          HD_HEROKU_API_KEY: ${{secrets.HEROKU_API}}
