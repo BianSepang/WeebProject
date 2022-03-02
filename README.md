@@ -35,45 +35,45 @@ based on [ProjectBish](https://github.com/adekmaulana/ProjectBish) Userbot
 **1. Required Variable name and value**
 - `API_KEY` __# Get this value from [Telegram.org](https://my.telegram.org)__.
 - `API_HASH` __# Get this value from [Telegram.org](https://my.telegram.org)__.
+- `BOTLOG` __# Set to `False` to disable group logging. (Default `True`)__
+- `BOTLOG_CHATID` __# Log chat id. Set it to `0` if BOTLOG = `False` and/or LOGSPAMMER = `False`__.
+- `HEROKU_API_KEY` __# Get your Heroku API from [Heroku Account Settings](https://dashboard.heroku.com/account)__.
+- `HEROKU_APP_NAME` __# Your Heroku app name which are deployed as userbot__.
+- `LOGSPAMMER` __# Set this to `True` in case you want the error logs to be stored in the userbot log group. (requires a valid `BOTLOG_CHATID` to be set)__.
 - `STRING_SESSION` __# Get this value by running [python3 string_session.py] in Termux or local system__.
-- `HEROKU_API_KEY` __# Get your heroku api from [Heroku Account Settings](https://dashboard.heroku.com/account)__.
-- `HEROKU_APP_NAME` __# Your heroku app name which are deployed as userbot__.
+- `TMP_DOWNLOAD_DIRECTORY` __# This variable for Download directory for many modules (GDrive, .download etc..)__.
 
-**2. Non Mandatory Variable Name. [Reccommend to set this]**
+**2. Non Mandatory Variable Name. [Recommended to fill this]**
 - `ALIVE_NAME` __# Name to show in .alive message__.
 - `ALIVE_LOGO` __# Show Image/Logo in .alive message. Use telegra.ph or any direct link image__.
-- `ANTI_SPAMBOT` __# Kicks spambots from groups after they join. [Requires admin powers in groups to kick.] Fill__ `true` __or__ `false`.
+- `ANTI_SPAMBOT` __# Kick spambots from groups after they join. (Requires admin permissions in group) fill this with `True` or `False`__
 - `ANTI_SPAMBOT_SHOUT` __# Fill this value as false. if you're want Report spambots to @admins in groups after they join, just in case when you don't have admin powers to kick that shit by yourself__.
-- `BOTLOG` __# LOG your userbot, Fill__ `true` __or__ `false`.
-- `BOTLOG_CHATID` __# chat_id of the Log group. Set it to__ `0` __if__ `BOTLOG` __=__`false` __and/or if__ `LOGSPAMMER` __=__ `false`.
 - `BIO_PREFIX` __# Prefix for Last.FM Module Bio__.
 - `COUNTRY` __# Your Country to be used in the .time and .date commands__.
-- `CLEAN_WELCOME` __# When a new person joins, the old welcome message is deleted, Fill__ `true` __or__ `false`.
-- `CONSOLE_LOGGER_VERBOSE` __# If you need verbosity on the console logging__ __Fill__ `true` __or__ `false`.
+- `CLEAN_WELCOME` __# When a new person joins, the old welcome message is deleted, Set this to `True` or `False`__.
+- `CONSOLE_LOGGER_VERBOSE` __# If you need verbosity on the console logging, set this `True` or `False`__.
 - `DEEZER_ARL_TOKEN` __# Your DEEZER ARL TOKEN. If you don't know this, leave it blank__.
 - `DEFAULT_BIO` __# Default you profile bio__.
 - `G_DRIVE_DATA` __# Your client_secret.json__.
 - `G_DRIVE_INDEX_URL` __# Your Cloudflare Google Drive Index URL__.
 - `GENIUS_ACCESS_TOKEN` __# Client Access Token from [Genius](https://genius.com/api-clients) site__.
-- `LOGSPAMMER` __# Set this to__ `true` __in case you want the error logs to be stored in the userbot log group, instead of spitting out the file in the current chat, requires a valid BOTLOG_CHATID to be set__.
-- `LASTFM_API` __# API Key for Last.FM module. Get one from [last.fm](https://www.last.fm/api/account/create) site, Leave this blank if you won't use last.fm module__.
-- `LASTFM_SECRET` __# SECRET Key for Last.FM module. Get one from [last.fm](https://www.last.fm/api/account/create) site, Leave this blank if you won't use last.fm module__.
+- `LASTFM_API` __# API Key for Last.FM module. Get one from [Last.FM](https://www.last.fm/api/account/create) site, Leave this blank if you won't use last.fm module__.
+- `LASTFM_SECRET` __# SECRET Key for Last.FM module. Get one from [Last.FM](https://www.last.fm/api/account/create) site, Leave this blank if you won't use last.fm module__.
 - `LASTFM_PASSWORD` __# Your last.fm password. Leave this blank if you won't use last.fm module__.
-- `OPEN_WEATHER_MAP_APPID` __# Get your own API key from [openweatermap](https://api.openweathermap.org/data/2.5/weather) site. If you won't use this. Leave it Blank__.
-- `OCR_SPACE_API_KEY` __# OCR API Key for .ocr command. Get from [Ocr space](https://ocr.space/ocrapi) site__.
-- `PM_AUTO_BAN` __# PM shield if you won't any user spam your PM. Fill__ `true` __or__ `false`.
-- `REM_BG_API_KEY` __# API Key for .rbg command. Get from this [Site](https://www.remove.bg/api)__.
-- `TZ_NUMBER` __# Fill__ `1` __as a default value, Or in case you've country has multiple time zones. Just change a value to any time zones__.
-- `TERM_ALIAS` __# Display user for .term command. set this value as__ `WeebProject` __or any name you want__.
-- `TMP_DOWNLOAD_DIRECTORY` __# Set this to__ `./downloads/`. __This variable for Download location many modules (GDrive, .download etc..)__.
-- `UPSTREAM_REPO_URL` __# In case if you are maintain a your fork repo, Fill your URL forked repo in value. if not, just paste this [URL](https://github.com/BianSepang/WeebProject)__.
-- `USR_TOKEN_UPTOBOX` __# API for direct link uptobox link, Read [this](https://docs.uptobox.com/#how-to-find-my-api-token) NOTE: Required premium uptobox account__.
+- `OPEN_WEATHER_MAP_APPID` __# Get your own API key from [Open Weather Map](https://openweathermap.org/api) site. Leave it blank if you won't use this__.
+- `OCR_SPACE_API_KEY` __# OCR API Key for .ocr command. Get one from [OCR Space](https://ocr.space/ocrapi) site__.
+- `PM_AUTO_BAN` __# PM shield if you won't any user spam your PM. Set this__ `True` __or__ `False`.
+- `REM_BG_API_KEY` __# API Key for .rbg command. Get one from [remove.bg](https://www.remove.bg/api)__.
+- `TZ_NUMBER` __# Fill `1` as a default value, Or in your country has multiple time zones. Just change the value to any time zones__.
+- `TERM_ALIAS` __# Display user for .term command__.
+- `UPSTREAM_REPO_URL` __# In case you're maintaining a fork repo, fill this with your fork repo url. if not, just leave this blank__.
+- `USR_TOKEN_UPTOBOX` __# Uptobox API for uptobox direct link. Read [this](https://docs.uptobox.com/#how-to-find-my-api-token) (Required premium uptobox account)__.
 - `WEATHER_DEFCITY` __# Set the default city for the userbot's weather module__.
 
 </details>
 
 # Deploy
-**Build and push to heroku with github actions [workflows]**
+**Heroku (GitHub Actions)**
 1. Create github account and heroku account
 2. Fork THIS repository [RECOMMEND TO ENABLE DEKSTOP MODE IN YOUR BROWSER]
 3. Go to Your Gitub Forked repository settings. [[example pict]](https://telegra.ph/file/5f8e378f13f41ff7971de.jpg), Scroll down then Click Secret > actions
@@ -87,7 +87,7 @@ based on [ProjectBish](https://github.com/adekmaulana/ProjectBish) Userbot
 
 <details>
   <summary>Heroku posgress</summary>
-  
+
 ![Posgress](https://telegra.ph/file/d6ca4af1af08ba628ab1c.jpg)
 
 </details>
