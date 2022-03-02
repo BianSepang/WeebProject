@@ -39,17 +39,17 @@ based on [ProjectBish](https://github.com/adekmaulana/ProjectBish) Userbot
 - `HEROKU_API_KEY` __# Get your heroku api from [Heroku Account Settings](https://dashboard.heroku.com/account)__.
 - `HEROKU_APP_NAME` __# Your heroku app name which are deployed as userbot__.
 
-**2. Non Mandatory Variable Name. [Suggest to set this]**
+**2. Non Mandatory Variable Name. [Reccommend to set this]**
 - `ALIVE_NAME` __# Name to show in .alive message__.
 - `ALIVE_LOGO` __# Show Image/Logo in .alive message. Use telegra.ph or any direct link image__.
-- `ANTI_SPAMBOT` __# Kicks spambots from groups after they join. [Requires admin powers in groups to kick.] type value this is__ `true` __or__ `false`.
+- `ANTI_SPAMBOT` __# Kicks spambots from groups after they join. [Requires admin powers in groups to kick.] Fill__ `true` __or__ `false`.
 - `ANTI_SPAMBOT_SHOUT` __# Fill this value as false. if you're want Report spambots to @admins in groups after they join, just in case when you don't have admin powers to kick that shit by yourself__.
-- `BOTLOG` __# LOG your userbot, type value this variable is__ `true` __or__ `false`.
-- `BOTLOG_CHATID` __# chat_id of the Log group. Set it to__ `0` __if BOTLOG =__ `false` __and/or if LOGSPAMMER =__ `false`.
+- `BOTLOG` __# LOG your userbot, Fill__ `true` __or__ `false`.
+- `BOTLOG_CHATID` __# chat_id of the Log group. Set it to__ `0` __if__ `BOTLOG` __=__`false` __and/or if__ `LOGSPAMMER` __=__ `false`.
 - `BIO_PREFIX` __# Prefix for Last.FM Module Bio__.
 - `COUNTRY` __# Your Country to be used in the .time and .date commands__.
-- `CLEAN_WELCOME` __# When a new person joins, the old welcome message is deleted, Set this to__ `true` __or__ `false`.
-- `CONSOLE_LOGGER_VERBOSE` __# If you need verbosity on the console logging__ __set this__ `true` __or__ `false`.
+- `CLEAN_WELCOME` __# When a new person joins, the old welcome message is deleted, Fill__ `true` __or__ `false`.
+- `CONSOLE_LOGGER_VERBOSE` __# If you need verbosity on the console logging__ __Fill__ `true` __or__ `false`.
 - `DEEZER_ARL_TOKEN` __# Your DEEZER ARL TOKEN. If you don't know this, leave it blank__.
 - `DEFAULT_BIO` __# Default you profile bio__.
 - `G_DRIVE_DATA` __# Your client_secret.json__.
@@ -61,7 +61,7 @@ based on [ProjectBish](https://github.com/adekmaulana/ProjectBish) Userbot
 - `LASTFM_PASSWORD` __# Your last.fm password. Leave this blank if you won't use last.fm module__.
 - `OPEN_WEATHER_MAP_APPID` __# Get your own API key from [openweatermap](https://api.openweathermap.org/data/2.5/weather) site. If you won't use this. Leave it Blank__.
 - `OCR_SPACE_API_KEY` __# OCR API Key for .ocr command. Get from [Ocr space](https://ocr.space/ocrapi) site__.
-- `PM_AUTO_BAN` __# PM shield if you won't any user spam your PM. Set this__ `true` __or__ `false`.
+- `PM_AUTO_BAN` __# PM shield if you won't any user spam your PM. Fill__ `true` __or__ `false`.
 - `REM_BG_API_KEY` __# API Key for .rbg command. Get from this [Site](https://www.remove.bg/api)__.
 - `TZ_NUMBER` __# Fill__ `1` __as a default value, Or in case you've country has multiple time zones. Just change a value to any time zones__.
 - `TERM_ALIAS` __# Display user for .term command. set this value as__ `WeebProject` __or any name you want__.
@@ -75,16 +75,15 @@ based on [ProjectBish](https://github.com/adekmaulana/ProjectBish) Userbot
 # Deploy
 **Build and push to heroku with github actions [workflows]**
 1. Create github account and heroku account
-2. Create new app in [heroku dashboard](https://dashboard.heroku.com/new-app) Choose region by you want
-3. Fork THIS repository [RECOMMEND TO ENABLE DEKSTOP MODE IN YOUR BROWSER]
-4. Go to Your Gitub Forked repository settings. [[example pict]](https://telegra.ph/file/5f8e378f13f41ff7971de.jpg), Scroll down then Click Secret > actions
-5. Fill All credentials required in Github secrets
+2. Fork THIS repository [RECOMMEND TO ENABLE DEKSTOP MODE IN YOUR BROWSER]
+3. Go to Your Gitub Forked repository settings. [[example pict]](https://telegra.ph/file/5f8e378f13f41ff7971de.jpg), Scroll down then Click Secret > actions
+4. Fill All credentials required in Github secrets
 - `HEROKU_API`. Fill your [Heroku api key](https://dashboard.heroku.com/account)
-- `HEROKY_APP`. Fill your Heroku app name
+- `HEROKY_APP`. Fill your Heroku app name. **This name should only contain lowercase letters, numbers, and dashes.**
 - `HEROKU_REGION`. Fill `us` or `en`
 - `HEROKU_EMAIL`. Your heroku email
-6. Now Go To Action tab in your repository [[example pict]](https://telegra.ph/file/28cecfc199fc34558ac91.jpg), Click Select Workflow [[example pict]](https://telegra.ph/file/5efd02314c3689bf149f3.jpg) Choose `Heroku Container build and push` Then Click Run Workflow from master branch [[example pict]](https://telegra.ph/file/b0afed12ff49f0ddf7c58.jpg). Wait process finish, if you got some errors while run workflow You can ask in [SUPPORT GROUP](https://t.me/+BYn1fSHCjHY5M2E1)
-7. After deploy is finished, go to your heroku resource app add heroku posgress, check pict below
+5. Now Go To Action tab in your repository [[example pict]](https://telegra.ph/file/28cecfc199fc34558ac91.jpg), Click Select Workflow [[example pict]](https://telegra.ph/file/5efd02314c3689bf149f3.jpg) Choose `Heroku Container build and push` Then Click Run Workflow from master branch [[example pict]](https://telegra.ph/file/b0afed12ff49f0ddf7c58.jpg). Wait process finish, if you got some errors while run workflow You can ask in [SUPPORT GROUP](https://t.me/+BYn1fSHCjHY5M2E1)
+6. After deploy is finished, go to your heroku resource app add heroku posgress, check pict below
 
 <details>
   <summary>Heroku posgress</summary>
