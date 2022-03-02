@@ -84,6 +84,14 @@ based on [ProjectBish](https://github.com/adekmaulana/ProjectBish) Userbot
 - `HEROKU_REGION`. Fill `us` or `en`
 - `HEROKU_EMAIL`. Your heroku email
 6. Now Go To Action tab in your repository [[example pict]](https://telegra.ph/file/28cecfc199fc34558ac91.jpg), Click Select Workflow [[example pict]](https://telegra.ph/file/5efd02314c3689bf149f3.jpg) Choose `Heroku Container build and push` Then Click Run Workflow from master branch [[example pict]](https://telegra.ph/file/b0afed12ff49f0ddf7c58.jpg). Wait process finish, if you got some errors while run workflow You can ask in [SUPPORT GROUP](https://t.me/+BYn1fSHCjHY5M2E1)
+7. After deploy is finished, go to your heroku resource app add heroku posgress, check pict below
+
+<details>
+  <summary>Heroku posgress</summary>
+  
+![Posgress](https://telegra.ph/file/d6ca4af1af08ba628ab1c.jpg)
+
+</details>
 
 **Using "Bare hands", using Git and Python3 -- on (Linux, macOS, and Android [via Termux])**
 1. Clone this repository on your local machine and `cd` (or `chdir`, anti bloat guy) to it
