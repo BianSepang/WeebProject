@@ -57,6 +57,7 @@ async def ssvideo(framecap):
             framecap.chat_id,
             "ss.png",
             reply_to=framecap.reply_to_msg_id,
+            force_document=True,
         )
         await framecap.delete()
     except BaseException as e:
