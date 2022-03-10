@@ -31,7 +31,7 @@ based on [ProjectBish](https://github.com/adekmaulana/ProjectBish) Userbot
 ## Variable For Heroku Vars Settings
 <details>
    <summary>Click for more details</summary>
-   
+
 **1. Required Variable name and value**
 - `API_KEY` __# Get this value from [Telegram.org](https://my.telegram.org)__.
 - `API_HASH` __# Get this value from [Telegram.org](https://my.telegram.org)__.
@@ -75,8 +75,8 @@ based on [ProjectBish](https://github.com/adekmaulana/ProjectBish) Userbot
 # Deploy
 **Heroku (GitHub Actions)**
 1. Create github account and heroku account
-2. Fork THIS repository [RECOMMEND TO ENABLE DEKSTOP MODE IN YOUR BROWSER]
-3. Go to Your Gitub Forked repository settings. [[example pict]](https://telegra.ph/file/5f8e378f13f41ff7971de.jpg), Scroll down then Click Secret > actions
+2. Fork this repository [RECOMMEND TO ENABLE DEKSTOP MODE IN YOUR BROWSER]
+3. Go to Your GitHub Forked repository settings. [[example pict]](https://telegra.ph/file/5f8e378f13f41ff7971de.jpg), Scroll down then Click Secret > actions
 4. Fill All credentials required in Github secrets
 - `HEROKU_API`. Fill your [Heroku api key](https://dashboard.heroku.com/account)
 - `HEROKY_APP`. Fill your Heroku app name. **This name should only contain lowercase letters, numbers, and dashes.**
