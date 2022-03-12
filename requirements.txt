@@ -11,6 +11,7 @@ cowpy
 deezloader==2021.9.22
 dnspython
 emoji
+fake-headers
 Faker==8.1.2
 git+https://github.com/Ncode2014/search-engine-parser
 gitpython
