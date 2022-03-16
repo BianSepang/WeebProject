@@ -85,9 +85,21 @@ async def kang(args):
             is_anim = True
             photo = 1
         elif "video" in message.media.document.mime_type:
-            await args.edit("`Converting...`")
-            vid_sticker = await convert_webm(message)
-            await args.edit(f"`{random.choice(KANGING_STR)}`")
+            sticker_attr = [
+                attr
+                for attr in message.media.document.attributes
+                if isinstance(attr, DocumentAttributeSticker)
+            ]
+
+            if not sticker_attr:
+                await args.edit("`Converting...`")
+                vid_sticker = await convert_webm(message)
+                await args.edit(f"`{random.choice(KANGING_STR)}`")
+            else:
+                await args.edit(f"`{random.choice(KANGING_STR)}`")
+                vid_sticker = await bot.download_media(message)
+                emoji = sticker_attr[0].alt
+                emojibypass = True
 
             is_video = True
             photo = 1
@@ -172,8 +184,8 @@ async def kang(args):
                             await conv.send_file("AnimatedSticker.tgs")
                             remove("AnimatedSticker.tgs")
                         elif is_video:
-                            await conv.send_file(vid_input)
-                            remove(vid_input)
+                            await conv.send_file(vid_sticker, force_document=True)
+                            remove(vid_sticker)
                         else:
                             file.seek(0)
                             await conv.send_file(file, force_document=True)
@@ -209,7 +221,7 @@ async def kang(args):
                     await conv.send_file("AnimatedSticker.tgs")
                     remove("AnimatedSticker.tgs")
                 elif is_video:
-                    await conv.send_file(vid_sticker)
+                    await conv.send_file(vid_sticker, force_document=True)
                     remove(vid_sticker)
                 else:
                     file.seek(0)
@@ -242,7 +254,7 @@ async def kang(args):
                     await conv.send_file("AnimatedSticker.tgs")
                     remove("AnimatedSticker.tgs")
                 elif is_video:
-                    await conv.send_file(vid_sticker)
+                    await conv.send_file(vid_sticker, force_document=True)
                     remove(vid_sticker)
                 else:
                     file.seek(0)
@@ -407,10 +419,12 @@ async def convert_webm(message, output="sticker.webm"):
             "ffmpeg",
             "-i",
             vid_input,
+            "-ss",
+            "00:00:00",
+            "-to",
+            "00:00:02.900",
             "-c:v",
             "libvpx-vp9",
-            "-t",
-            "3",
             "-vf",
             f"scale={w}:{h}",
             "-an",
