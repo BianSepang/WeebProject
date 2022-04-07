@@ -104,7 +104,7 @@ async def fetch_info(replied_user, event):
     """Get details from the User object."""
     replied_user_profile_photos = await event.client(
         GetUserPhotosRequest(
-            user_id=replied_user.user.id, offset=42, max_id=0, limit=80
+            user_id=replied_user.full_user.id, offset=42, max_id=0, limit=80
         )
     )
     replied_user_profile_photos_count = (
@@ -114,20 +114,20 @@ async def fetch_info(replied_user, event):
         replied_user_profile_photos_count = replied_user_profile_photos.count
     except AttributeError:
         pass
-    user_id = replied_user.user.id
-    first_name = replied_user.user.first_name
-    last_name = replied_user.user.last_name
+    user_id = replied_user.full_user.id
+    first_name = replied_user.users[0].first_name
+    last_name = replied_user.users[0].last_name
     try:
-        dc_id, _ = get_input_location(replied_user.profile_photo)
+        dc_id, _ = get_input_location(replied_user.full_user.profile_photo)
     except Exception as e:
         dc_id = "Couldn't fetch DC ID!"
         str(e)
-    common_chat = replied_user.common_chats_count
-    username = replied_user.user.username
-    user_bio = replied_user.about
-    is_bot = replied_user.user.bot
-    restricted = replied_user.user.restricted
-    verified = replied_user.user.verified
+    common_chat = replied_user.full_user.common_chats_count
+    username = replied_user.users[0].username
+    user_bio = replied_user.full_user.about
+    is_bot = replied_user.users[0].bot
+    restricted = replied_user.users[0].restricted
+    verified = replied_user.users[0].verified
     photo = await event.client.download_profile_photo(
         user_id, TEMP_DOWNLOAD_DIRECTORY + str(user_id) + ".jpg", download_big=True
     )
@@ -155,7 +155,7 @@ async def fetch_info(replied_user, event):
     caption += f"Bio: \n<code>{user_bio}</code>\n\n"
     caption += f"Common Chats with this user: {common_chat}\n"
     caption += f"Permanent Link To Profile: "
-    caption += f'<a href="tg://user?id={user_id}">{first_name}</a>'
+    caption += f'<a href="tg://user?id={user_id}">Here</a>'
 
     return photo, caption
 
