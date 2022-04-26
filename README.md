@@ -79,7 +79,7 @@ based on [ProjectBish](https://github.com/adekmaulana/ProjectBish) Userbot
 3. Go to Your GitHub Forked repository settings. [[example pict]](https://telegra.ph/file/5f8e378f13f41ff7971de.jpg), Scroll down then Click Secret > actions
 4. Fill All credentials required in Github secrets
 - `HEROKU_API`. Fill your [Heroku api key](https://dashboard.heroku.com/account)
-- `HEROKY_APP`. Fill your Heroku app name. **This name should only contain lowercase letters, numbers, and dashes.**
+- `HEROKU_APP`. Fill your Heroku app name. **This name should only contain lowercase letters, numbers, and dashes.**
 - `HEROKU_REGION`. Fill `us` or `en`
 - `HEROKU_EMAIL`. Your heroku email
 5. Now Go To Action tab in your repository [[example pict]](https://telegra.ph/file/28cecfc199fc34558ac91.jpg), Click Select Workflow [[example pict]](https://telegra.ph/file/5efd02314c3689bf149f3.jpg) Choose `Heroku Container build and push` Then Click Run Workflow from master branch [[example pict]](https://telegra.ph/file/b0afed12ff49f0ddf7c58.jpg). Wait process finish, if you got some errors while run workflow You can ask in [SUPPORT GROUP](https://t.me/+BYn1fSHCjHY5M2E1)
