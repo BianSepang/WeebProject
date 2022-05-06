@@ -153,7 +153,7 @@ async def kang(args):
             "  A <strong>Telegram</strong> user has created the <strong>Sticker&nbsp;Set</strong>."
             not in htmlstr
         ):
-            async with bot.conversation("Stickers") as conv:
+            async with bot.conversation("@Stickers") as conv:
                 await conv.send_message("/addsticker")
                 await conv.get_response()
                 # Ensure user doesn't get spamming notifications
@@ -241,7 +241,7 @@ async def kang(args):
                 await bot.send_read_acknowledge(conv.chat_id)
         else:
             await args.edit("`Brewing a new Pack...`")
-            async with bot.conversation("Stickers") as conv:
+            async with bot.conversation("@Stickers") as conv:
                 await conv.send_message(cmd)
                 await conv.get_response()
                 # Ensure user doesn't get spamming notifications
