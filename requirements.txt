@@ -28,13 +28,13 @@ hentai
 heroku3
 html_telegraph_poster
 httplib2
-https://github.com/LonamiWebs/Telethon/archive/v1.24.zip
 humanize
 jikanpy
 lottie
 lxml
 lyricsgenius
 natsort
+newthon==1.26.4
 oauth2client
 pendulum
 Pillow
