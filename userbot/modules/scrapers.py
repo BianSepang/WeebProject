@@ -25,6 +25,7 @@ from hachoir.metadata import extractMetadata
 from hachoir.parser import createParser
 from requests import get
 from search_engine_parser import GoogleSearch
+from selenium.webdriver.common.by import By
 from telethon.errors.rpcerrorlist import MediaEmptyError
 from telethon.tl.types import DocumentAttributeAudio, DocumentAttributeVideo
 from urbandict import define
@@ -59,28 +60,25 @@ async def setlang(prog):
     await prog.edit(f"Language for carbon.now.sh set to {CARBONLANG}")
 
 
-@register(outgoing=True, pattern=r"^\.carbon")
+@register(outgoing=True, pattern=r"^\.carbon(?: (.+)|$)")
 async def carbon_api(e):
     """A Wrapper for carbon.now.sh"""
-    await e.edit("`Processing...`")
-    CARBON = "https://carbon.now.sh/?l={lang}&code={code}"
     global CARBONLANG
-    textx = await e.get_reply_message()
-    pcode = e.text
-    if pcode[8:]:
-        pcode = str(pcode[8:])
-    elif textx:
-        pcode = str(textx.message)  # Importing message to module
-    code = quote_plus(pcode)  # Converting to urlencoded
+
+    await e.edit("`Processing...`")
+    input_str = e.pattern_match.group(1)
+    reply = await e.get_reply_message()
+    code = reply.message if reply else input_str
+    url = f"https://carbon.now.sh/?l={CARBONLANG}&code={quote_plus(code)}"
+
     await e.edit("`Processing...\n25%`")
-    file_path = TEMP_DOWNLOAD_DIRECTORY + "carbon.png"
+    file_path = os.path.join(TEMP_DOWNLOAD_DIRECTORY, "carbon.png")
     if os.path.isfile(file_path):
         os.remove(file_path)
-    url = CARBON.format(code=code, lang=CARBONLANG)
     driver = await chrome()
     driver.get(url)
     await e.edit("`Processing...\n50%`")
-    driver.find_element_by_css_selector('[data-cy="quick-export-button"]').click()
+    driver.find_element(By.CSS_SELECTOR, '[data-cy="quick-export-button"]').click()
     await e.edit("`Processing...\n75%`")
     # Waiting for downloading
     while not os.path.isfile(file_path):
