@@ -17,7 +17,7 @@ from urllib.error import HTTPError
 from urllib.parse import quote_plus
 
 from bs4 import BeautifulSoup
-from emoji import get_emoji_regexp
+from emoji import replace_emoji
 from googletrans import LANGUAGES, Translator
 from gtts import gTTS
 from gtts.lang import tts_langs
@@ -450,7 +450,7 @@ async def translateme(trans):
         target_lang = "en"
 
     try:
-        reply_text = translator.translate(deEmojify(message), dest=target_lang)
+        reply_text = translator.translate(replace_emoji(message), dest=target_lang)
     except ValueError:
         return await trans.edit("Invalid destination language.")
 
@@ -727,11 +727,6 @@ async def download_video(v_url):
         )
         os.remove(thumb_image)
         await v_url.delete()
-
-
-def deEmojify(inputString):
-    """Remove emojis and other non-safe characters from string"""
-    return get_emoji_regexp().sub("", inputString)
 
 
 CMD_HELP.update(
