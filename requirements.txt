@@ -27,6 +27,7 @@ hentai
 heroku3
 html_telegraph_poster
 httplib2
+https://github.com/Ncode2014/search-engine-parser/archive/refs/heads/master.zip
 humanize
 jikanpy
 lottie
@@ -50,7 +51,6 @@ qrcode
 rarfile
 requests
 scipy
-search-engine-parser
 selenium>=4.0.0
 speedtest-cli
 sqlalchemy<=1.3.23
