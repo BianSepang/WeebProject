@@ -7,8 +7,8 @@ import logging
 import math
 import os
 from collections import defaultdict
-from typing import BinaryIO, DefaultDict, Optional, Union
 from collections.abc import AsyncGenerator, Awaitable
+from typing import BinaryIO, DefaultDict, Optional, Union
 
 from telethon import TelegramClient, helpers, utils
 from telethon.crypto import AuthKey
