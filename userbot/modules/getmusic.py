@@ -320,11 +320,7 @@ async def upload_track(track_location, message):
 
 CMD_HELP.update(
     {
-        "getmusic": ">`.song` <artist - title>"
-        "\nUsage: Finding and uploading song.\n\n"
-        ">`.vsong` <artist - title>"
-        "\nUsage: Finding and uploading videoclip.\n\n"
-        ">`.smd` <artist - title>"
+        "getmusic": ">`.smd` <artist - title>"
         "\nUsage: Download music from spotify use `@SpotifyMusicDownloaderBot`.\n\n"
         ">`.smd now`"
         "\nUsage: Download current LastFM scrobble use `@SpotifyMusicDownloaderBot`.\n\n"
