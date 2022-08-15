@@ -34,7 +34,7 @@ lottie
 lxml
 lyricsgenius
 natsort
-newthon==1.27.0
+newthon==1.27.5
 oauth2client
 pendulum
 Pillow
