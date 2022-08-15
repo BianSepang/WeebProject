@@ -1,11 +1,11 @@
-# WeebProject Userbot
+<h1 align="center">WeebProject Userbot</h1>
 
 <p align="center">
     <a href="https://app.codacy.com/gh/BianSepang/WeebProject/dashboard"> <img src="https://img.shields.io/codacy/grade/a723cb464d5a4d25be3152b5d71de82d?color=blue&logo=codacy&style=flat-square" alt="Codacy" /></a><br>
     <a href="https://github.com/BianSepang/WeebProject/stargazers"> <img src="https://img.shields.io/github/stars/BianSepang/WeebProject?logo=github&style=flat-square" alt="Stars" /></a>
     <a href="https://github.com/BianSepang/WeebProject/network/members"> <img src="https://img.shields.io/github/forks/BianSepang/WeebProject?logo=github&style=flat-square" alt="Forks" /></a>
-    <a href="https://github.com/BianSepang/WeebProject/watchers"> <img src="https://img.shields.io/github/watchers/BianSepang/WeebProject?logo=github&style=flat-square" alt="Watch" /></a><br>
-    <a href="https://github.com/BianSepang/WeebProject/graphs/contributors"> <img src="https://img.shields.io/github/contributors/BianSepang/WeebProject?color=blue&style=flat-square" alt="Contributors" /></a>
+    <a href="https://github.com/BianSepang/WeebProject/graphs/contributors"> <img src="https://img.shields.io/github/contributors/BianSepang/WeebProject?logo=github&color=blue&style=flat-square" alt="Contributors" /></a><br>
+    <a href="https://python.org/downloads"> <img src="https://img.shields.io/static/v1?label=python&message=3.9&style=flat-square&color=blue&logo=python" /></a>
     <a href="https://pypi.org/project/Telethon/"> <img src="https://img.shields.io/pypi/v/telethon?label=telethon&logo=pypi&logoColor=white&style=flat-square" /></a>
 </p>
 
