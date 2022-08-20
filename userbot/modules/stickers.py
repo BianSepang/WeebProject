@@ -337,10 +337,11 @@ async def get_pack_info(event):
 
     get_stickerset = await bot(
         GetStickerSetRequest(
-            InputStickerSetID(
+            stickerset=InputStickerSetID(
                 id=stickerset_attr.stickerset.id,
                 access_hash=stickerset_attr.stickerset.access_hash,
-            )
+            ),
+            hash=0,
         )
     )
     pack_emojis = []
