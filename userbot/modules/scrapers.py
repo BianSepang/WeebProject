@@ -756,6 +756,6 @@ CMD_HELP.update(
         "\n\n>`.ripvideo <quality> <url>` (quality is optional)"
         "\nQuality examples : `144` `240` `360` `480` `720` `1080` `2160`"
         "\nUsage: Download videos from YouTube"
-        "\n\n[Other supported sites](https://ytdl-org.github.io/youtube-dl/supportedsites.html)",
+        "\n\n[Other supported sites](https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md)",
     }
 )
