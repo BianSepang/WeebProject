@@ -21,6 +21,7 @@ from urllib.parse import quote
 from urllib.request import HTTPError, Request, URLError, urlopen
 
 from selenium import webdriver
+from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 
 http.client._MAXHEADERS = 1000
@@ -494,8 +495,16 @@ class googleimagesdownload:
 
     @staticmethod
     def _image_objects_from_pack(data):
-        image_objects = json.loads(data)[31][-1][12][2]
-        image_objects = [x for x in image_objects if x[0] == 1]
+        image_data = json.loads(data)
+        # NOTE: google sometimes changes their format, breaking this. set a breakpoint here to find the correct index
+        grid = image_data[56][-1][0][-1][-1][0]
+        image_objects = []
+        for item in grid:
+            obj = list(item[0][0].values())[0]
+            # ads and carousels will be empty
+            if not obj or not obj[1]:
+                continue
+            image_objects.append(obj)
         return image_objects
 
     # Downloading entire Web Document (Raw Page Content)
@@ -574,14 +583,14 @@ class googleimagesdownload:
         time.sleep(1)
         print("Getting you a lot of images. This may take a few moments...")
 
-        element = browser.find_element_by_tag_name("body")
+        element = browser.find_element(By.TAG_NAME, "body")
         # Scroll down
         for _ in range(50):
             element.send_keys(Keys.PAGE_DOWN)
             time.sleep(0.3)
 
         try:
-            browser.find_element_by_xpath('//input[@value="Show more results"]').click()
+            browser.find_element(By.XPATH, '//input[@value="Show more results"]').click()
             for _ in range(50):
                 element.send_keys(Keys.PAGE_DOWN)
                 time.sleep(0.3)  # bot id protection
