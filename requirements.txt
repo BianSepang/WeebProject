@@ -34,7 +34,6 @@ lottie
 lxml
 lyricsgenius
 natsort
-newthon==1.27.9
 oauth2client
 pendulum
 Pillow
@@ -55,6 +54,7 @@ selenium>=4.0.0
 speedtest-cli
 sqlalchemy<=1.3.23
 telegraph
+telethon==1.25.4
 telethon-session-sqlalchemy
 telethon-tgcrypto
 urbandict
