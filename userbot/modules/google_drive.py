@@ -28,7 +28,7 @@ import re
 import time
 from mimetypes import guess_type
 from os.path import getctime, isdir, isfile, join
-from urllib.parse import quote
+from urllib.parse import parse_qs, quote, urlparse
 
 import requests
 from bs4 import BeautifulSoup
@@ -66,7 +66,7 @@ SCOPES = [
     "https://www.googleapis.com/auth/drive",
     "https://www.googleapis.com/auth/drive.metadata",
 ]
-REDIRECT_URI = "urn:ietf:wg:oauth:2.0:oob"
+REDIRECT_URI = "http://localhost:5000"
 # =========================================================== #
 #      STATIC CASE FOR G_DRIVE_FOLDER_ID IF VALUE IS URL      #
 # =========================================================== #
@@ -159,11 +159,14 @@ async def generate_credentials(gdrive):
     msg = await gdrive.respond("`Go to your BOTLOG group to authenticate token...`")
     async with gdrive.client.conversation(BOTLOG_CHATID) as conv:
         url_msg = await conv.send_message(
-            "Please go to this URL:\n" f"{auth_url}\nauthorize then reply the code"
+            f"Please go to this URL:\n{auth_url}\nauthorize, copy the link and then reply the code."
         )
-        r = conv.wait_event(events.NewMessage(outgoing=True, chats=BOTLOG_CHATID))
-        r = await r
+        r = await conv.wait_event(events.NewMessage(outgoing=True, chats=BOTLOG_CHATID))
         code = r.message.message.strip()
+        if code.startswith(REDIRECT_URI):
+            code = parse_qs(urlparse(code).query).get("code")
+            if isinstance(code, list):
+                code = code[0]
         flow.fetch_token(code=code)
         creds = flow.credentials
         await asyncio.sleep(3.5)
