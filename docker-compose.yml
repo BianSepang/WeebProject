@@ -1,19 +1,20 @@
-version: '3.4'
+version: '3.8'
 
 services:
   db:
     image: postgres
-    environment:
-      - POSTGRES_DB=weebproject
-      - POSTGRES_USER=USERNAME
-      - POSTGRES_PASSWORD=PASSWORD
     ports:
       - 5432:5432
-    restart: always
+    restart: unless-stopped
+    env_file:
+      - config.env
+
   weebproject:
     build:
       context: .
       dockerfile: ./Dockerfile
     depends_on:
       - db
-    restart: always
+    restart: unless-stopped
+    env_file:
+      - config.env
