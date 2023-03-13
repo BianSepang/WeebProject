@@ -12,7 +12,7 @@ from userbot.events import register
 from userbot.utils.pastebin import PasteBin
 
 
-@register(outgoing=True, pattern=r"^\.paste(?: (-d|-n|-h|-k|-s)|$)?(?: ([\s\S]+)|$)")
+@register(outgoing=True, pattern=r"^\.paste(?: (-n|-k|-s)|$)?(?: ([\s\S]+)|$)")
 async def paste(pstl):
     """For .paste command, pastes the text directly to a pastebin."""
     service = pstl.pattern_match.group(1)
@@ -45,7 +45,7 @@ async def paste(pstl):
     async with PasteBin(message) as client:
         if service:
             service = service.strip()
-            if service not in ["-d", "-n", "-h", "-k", "-s"]:
+            if service not in ["-n", "-k", "-s"]:
                 return await pstl.edit("Invalid flag")
             await client(client.service_match[service])
         else:
@@ -54,8 +54,7 @@ async def paste(pstl):
         if client:
             reply_text = (
                 "`Pasted successfully!`\n\n"
-                f"[URL]({client.link})\n"
-                f"[View RAW]({client.raw_link})"
+                f"[URL]({client.link})"
             )
         else:
             reply_text = "`Failed to reach Pastebin Service`"
@@ -66,7 +65,7 @@ async def paste(pstl):
 CMD_HELP.update(
     {
         "paste": "`.paste` [flags] <text/reply>"
-        "\nUsage: Create a paste to a pastebin service flags ['-d', '-n', '-h', '-k', '-s']"
-        "\n\n-d -> Dogbin\n-n -> Nekobin\n-h -> Hastebin\n-k -> Katbin\n-s -> Spacebin"
+        "\nUsage: Create a paste to a pastebin service flags ['-n', '-k', '-s']"
+        "\n\n\n-n -> Nekobin\n-k -> Katbin\n-s -> Spacebin"
     }
 )

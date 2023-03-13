@@ -152,7 +152,7 @@ def register(**args):
                         async with PasteBin(ftext) as client:
                             await client.post()
                             if client:
-                                text += f"\n\nPasted to : [URL]({client.raw_link})"
+                                text += f"\n\nPasted to : [URL]({client.link})"
 
                         await check.client.send_file(send_to, "error.txt", caption=text)
                         remove("error.txt")
