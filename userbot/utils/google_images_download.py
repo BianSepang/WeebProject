@@ -673,9 +673,7 @@ class googleimagesdownload:
     def format_object(obj):
         data = obj[1]
         main = data[3]
-        info = data[9]
-        if info is None:
-            info = data[23]
+        info = data[-1]
         formatted_object = {}
         try:
             formatted_object["image_height"] = main[2]
